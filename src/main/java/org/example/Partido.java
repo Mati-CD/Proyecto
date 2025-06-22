@@ -36,7 +36,7 @@ public class Partido extends TorneoComponent {
     }
 
     @Override
-    public List<TorneoComponent> getChildren() {
+    public List<TorneoComponent> getComponentes() {
         return Collections.emptyList();
     }
 
