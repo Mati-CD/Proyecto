@@ -1,8 +1,8 @@
 package org.example.GUI;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 import java.util.Stack;
 
 public class Main {
@@ -10,6 +10,8 @@ public class Main {
         SwingUtilities.invokeLater(() -> new VentanaPrincipal().setVisible(true));
     }
 }
+
+// Distincion de roles Usuario/Organizador
 
 abstract class Rango {
     protected String name;
@@ -43,165 +45,458 @@ class Organizador extends Rango {
     }
 }
 
-interface PanelPrincipal {
-    JPanel getPanel();
-    void inicializar(Rango rango, ActionListener irAtras, ActionListener irAdelante);
+// Paneles con los Actions que se ejecutaran al pulsar "x" boton
+
+interface CrearActions {
+    ActionListener getAction(String actionID);
 }
 
-class PanelUsuario implements PanelPrincipal {
-    private JPanel panel;
-    private JButton volverInicioBoton;
+class InicioActions implements CrearActions {
+    private Navegador navegador;
+    private PanelInicio panelInicio;
+
+    public InicioActions(Navegador navegador, PanelInicio panelInicio) {
+        this.navegador = navegador;
+        this.panelInicio = panelInicio;
+    }
+
+    @Override
+    public ActionListener getAction(String actionID) {
+        switch (actionID) {
+            case "LOGIN":
+                return e -> {
+                    String rol = panelInicio.getTipoDeRango().getText().trim();
+                    if ("Organizador".equalsIgnoreCase(rol)) {
+                        navegador.mostrarPanelOrganizador(new Organizador("El admin"));
+                    }
+                    else if ("Usuario".equalsIgnoreCase(rol)) {
+                        navegador.mostrarPanelUsuario(new Usuario("El no admin"));
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(null, "Rol no válido.");
+                    }
+                };
+            default:
+                return null;
+        }
+    }
+}
+
+class UsuarioActions implements CrearActions {
+    private Navegador navegador;
+
+    public UsuarioActions(Navegador navegador) {
+        this.navegador = navegador;
+    }
+
+    @Override
+    public ActionListener getAction(String actionID) {
+        switch (actionID) {
+            case "IR_A_INICIO":
+                return e -> navegador.mostrarPanelInicio();
+            default:
+                return null;
+        }
+    }
+}
+
+class OrganizadorActions implements CrearActions {
+    private Navegador navegador;
+    private Rango rango;
+
+    public OrganizadorActions(Navegador navegador, Rango rango) {
+        this.rango = rango;
+        this.navegador = navegador;
+    }
+
+    @Override
+    public ActionListener getAction(String actionID) {
+        switch (actionID) {
+            case "IR_A_INICIO":
+                return e -> navegador.mostrarPanelInicio();
+            case "CREAR_TORNEO":
+                return e -> navegador.mostrarPanelCrearTorneo(rango);
+            default:
+                return null;
+        }
+    }
+}
+
+class CrearTorneoActions implements CrearActions {
+    private Navegador navegador;
+    private Rango rango;
+
+    public CrearTorneoActions(Navegador navegador, Rango rango) {
+        this.navegador = navegador;
+        this.rango = rango;
+    }
+
+    @Override
+    public ActionListener getAction(String actionID) {
+        switch (actionID) {
+            case "IR_ATRAS":
+                return e -> navegador.mostrarPanelOrganizador(rango);
+            default:
+                return null;
+        }
+    }
+}
+
+// Panel generico para crear un boton
+
+class PanelButton extends JButton {
+    public PanelButton(String label, Font font) {
+        super(label);
+        this.setFont(font);
+    }
+}
+
+// Paneles con el grupo de botones que seran asignados a un panel en especifico
+
+interface PanelButtonsGroup {
+    void setNavegadorActions(CrearActions actions);
+}
+
+class PanelInicioButtons extends JPanel implements PanelButtonsGroup {
+    private PanelButton loginBtn;
+
+    public PanelInicioButtons() {
+        setLayout(new BorderLayout());
+        Font font = new Font("SansSerif", Font.BOLD, 18);
+        loginBtn = new PanelButton("Login", font);
+        add(loginBtn);
+    }
+
+    @Override
+    public void setNavegadorActions(CrearActions actions) {
+        loginBtn.addActionListener(actions.getAction("LOGIN"));
+    }
+}
+
+class PanelOrganizadorButtons extends JPanel implements PanelButtonsGroup {
+    private PanelButton irAInicioBtn;
+    private PanelButton crearTorneoBtn;
+    private PanelButton inscribirParticipantesBtn;
+    private PanelButton iniciarTorneoBtn;
+    private PanelButton actualizarRegistroDeResultadosBtn;
+
+    public PanelOrganizadorButtons() {
+        setLayout(new BorderLayout());
+        setBackground(new Color(200, 255, 200));
+
+        Font font = new Font("SansSerif", Font.BOLD, 18);
+        Font font1 = new Font("Arial", Font.BOLD, 12);
+
+        // Crear botones
+        irAInicioBtn = new PanelButton("Volver al Inicio", font1);
+        crearTorneoBtn = new PanelButton("Crear Torneo", font);
+        inscribirParticipantesBtn = new PanelButton("Inscribir Participantes", font);
+        iniciarTorneoBtn = new PanelButton("Iniciar Torneo", font);
+        actualizarRegistroDeResultadosBtn = new PanelButton("Actualizar Registro de Resultados", font);
+
+        // Posicionar botones
+        JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topLeftPanel.setOpaque(false);
+        topLeftPanel.add(irAInicioBtn);
+        add(topLeftPanel, BorderLayout.NORTH);
+
+        JPanel columnaButtonsPanel = new JPanel(new GridLayout(4, 1, 0, 100));
+        columnaButtonsPanel.setOpaque(false);
+        columnaButtonsPanel.setBorder(BorderFactory.createEmptyBorder(40, 150, 60, 0));
+
+        columnaButtonsPanel.add(crearTorneoBtn);
+        columnaButtonsPanel.add(inscribirParticipantesBtn);
+        columnaButtonsPanel.add(iniciarTorneoBtn);
+        columnaButtonsPanel.add(actualizarRegistroDeResultadosBtn);
+
+        JPanel centerLeftButtonsPanel = new JPanel(new BorderLayout());
+        centerLeftButtonsPanel.setOpaque(false);
+        centerLeftButtonsPanel.add(columnaButtonsPanel, BorderLayout.WEST);
+        add(centerLeftButtonsPanel, BorderLayout.CENTER);
+    }
+
+    @Override
+    public void setNavegadorActions(CrearActions actions) {
+        irAInicioBtn.addActionListener(actions.getAction("IR_A_INICIO"));
+        crearTorneoBtn.addActionListener(actions.getAction("CREAR_TORNEO"));
+    }
+}
+
+// Clase temporal para el prototipo
+class PanelCrearTorneoButtons extends JPanel implements PanelButtonsGroup {
+    private PanelButton irAtrasBtn;
+
+    public PanelCrearTorneoButtons() {
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBackground(new Color(255, 255, 200));
+
+        Font font = new Font("SansSerif", Font.BOLD, 18);
+
+        // Crear Botones
+        irAtrasBtn = new PanelButton("Volver atrás", font);
+
+        irAtrasBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        add(Box.createVerticalGlue());
+        add(irAtrasBtn);
+    }
+
+    @Override
+    public void setNavegadorActions(CrearActions actions) {
+        irAtrasBtn.addActionListener(actions.getAction("IR_ATRAS"));
+    }
+}
+
+class PanelUsuarioButtons extends JPanel implements PanelButtonsGroup{
+    private PanelButton irAInicioBtn;
+    private PanelButton verEstadoActualTorneoBtn;
+    private PanelButton verProxEncuentrosBtn;
+    private PanelButton verEstadisticasBtn;
+
+    public PanelUsuarioButtons() {
+        setLayout(new BorderLayout());
+        setBackground(new Color(200, 200, 255));
+
+        Font font = new Font("SansSerif", Font.BOLD, 18);
+        Font font1 = new Font("Arial", Font.BOLD, 12);
+
+        // Crear Botones
+        irAInicioBtn = new PanelButton("Volver atrás", font1);
+        verEstadoActualTorneoBtn = new PanelButton("Ver estado actual del Torneo", font);
+        verProxEncuentrosBtn = new PanelButton("Ver próximos encuentros", font);
+        verEstadisticasBtn = new PanelButton("Ver estadisticas del Torneo", font);
+
+        // Posicionar botones
+        JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topLeftPanel.setOpaque(false);
+        topLeftPanel.add(irAInicioBtn);
+        add(topLeftPanel, BorderLayout.NORTH);
+
+        JPanel columnaButtonsPanel = new JPanel(new GridLayout(4, 1, 0, 100));
+        columnaButtonsPanel.setOpaque(false);
+        columnaButtonsPanel.setBorder(BorderFactory.createEmptyBorder(40, 150, 60, 0));
+
+        columnaButtonsPanel.add(verEstadoActualTorneoBtn);
+        columnaButtonsPanel.add(verProxEncuentrosBtn);
+        columnaButtonsPanel.add(verEstadisticasBtn);
+
+        JPanel centerLeftButtonsPanel = new JPanel(new BorderLayout());
+        centerLeftButtonsPanel.setOpaque(false);
+        centerLeftButtonsPanel.add(columnaButtonsPanel, BorderLayout.WEST);
+        add(centerLeftButtonsPanel, BorderLayout.CENTER);
+    }
+
+    @Override
+    public void setNavegadorActions(CrearActions actions) {
+        irAInicioBtn.addActionListener(actions.getAction("IR_A_INICIO"));
+    }
+}
+
+// Configurar paneles a visualizar
+
+interface PanelConfigurable {
+    void inicializar(Rango rango, CrearActions actions);
+}
+
+class PanelInicio extends JPanel implements PanelConfigurable {
+    private PanelInicioButtons panelBtns;
+    private JTextField tipoDeRango;
+
+    public PanelInicio() {
+        super(new FlowLayout(FlowLayout.CENTER, 10, 100));
+        setBackground(Color.LIGHT_GRAY);
+        this.add(new JLabel("Ingresa tu rol (Organizador/Usuario):"));
+
+        tipoDeRango = new JTextField(15);
+        this.add(tipoDeRango);
+
+        panelBtns = new PanelInicioButtons();
+        this.add(panelBtns);
+    }
+
+    public JTextField getTipoDeRango() {
+        return tipoDeRango;
+    }
+
+    @Override
+    public void inicializar(Rango rango, CrearActions actions) {
+        panelBtns.setNavegadorActions(actions);
+        this.revalidate();
+        this.repaint();
+    }
+}
+
+class PanelUsuario extends JPanel implements PanelConfigurable {
+    private PanelUsuarioButtons panelBtns;
 
     public PanelUsuario() {
-        panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(200, 200, 255));
+        super(new BorderLayout());
+        setBackground(new Color(200, 200, 255));
 
-        // Colocacion de botones
-        volverInicioBoton = new JButton("Volver al Inicio");
-
-        JPanel southPanel = new JPanel();
-        southPanel.setBackground(panel.getBackground());
-        southPanel.add(volverInicioBoton);
-        southPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        panel.add(southPanel, BorderLayout.SOUTH);
-
+        panelBtns = new PanelUsuarioButtons();
+        this.add(panelBtns, BorderLayout.CENTER);
     }
 
     @Override
-    public JPanel getPanel() {
-        return panel;
-    }
-
-    @Override
-    public void inicializar(Rango usuario, ActionListener irAInicio, ActionListener irAdelante) {
-
-        JLabel rolLabel = new JLabel("Estás en el panel de: " + usuario.getRolDisplay(), SwingConstants.CENTER);
-        rolLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        panel.add(rolLabel, BorderLayout.CENTER);
-
-        for (ActionListener al : volverInicioBoton.getActionListeners()) {
-            volverInicioBoton.removeActionListener(al);
-        }
-        if (irAInicio != null) {
-            volverInicioBoton.addActionListener(irAInicio);
-        }
-
-        panel.revalidate();
-        panel.repaint();
+    public void inicializar(Rango rango, CrearActions actions) {
+        panelBtns.setNavegadorActions(actions);
+        this.revalidate();
+        this.repaint();
     }
 }
 
-class PanelOrganizador implements PanelPrincipal {
-    private JPanel panel;
-    private JButton crearTorneoBoton;
-    private JButton volverInicioBoton;
+class PanelOrganizador extends JPanel implements PanelConfigurable {
+    private PanelOrganizadorButtons panelBtns;
 
     public PanelOrganizador() {
-        panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(200, 255, 200));
+        super(new BorderLayout());
+        setBackground(new Color(200, 255, 200));
 
-        crearTorneoBoton = new JButton("Crear Torneo");
-        crearTorneoBoton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        volverInicioBoton = new JButton("Volver al Inicio");
-
-        // Colocacion
-        JPanel centerPanel = new JPanel();
-        centerPanel.setBackground(panel.getBackground());
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.setBorder(BorderFactory.createEmptyBorder(50, 0, 50, 0));
-
-        centerPanel.add(crearTorneoBoton);
-        panel.add(centerPanel, BorderLayout.CENTER);
-
-        JPanel southPanel = new JPanel();
-        southPanel.setBackground(panel.getBackground());
-        southPanel.add(volverInicioBoton);
-
-        panel.add(southPanel, BorderLayout.SOUTH);
+        panelBtns = new PanelOrganizadorButtons();
+        this.add(panelBtns, BorderLayout.CENTER);
     }
 
     @Override
-    public JPanel getPanel() {
-        return panel;
-    }
-
-    @Override
-    public void inicializar(Rango organizador, ActionListener irAInicio, ActionListener crearTorneoAL) {
-
-        for (ActionListener al : volverInicioBoton.getActionListeners()) {
-            volverInicioBoton.removeActionListener(al);
-        }
-        if (irAInicio != null) {
-            volverInicioBoton.addActionListener(irAInicio);
-        }
-
-        for (ActionListener al : crearTorneoBoton.getActionListeners()) {
-            crearTorneoBoton.removeActionListener(al);
-        }
-        if (crearTorneoAL != null) {
-            crearTorneoBoton.addActionListener(crearTorneoAL);
-        }
-
-        panel.revalidate();
-        panel.repaint();
+    public void inicializar(Rango rango, CrearActions actions) {
+        panelBtns.setNavegadorActions(actions);
+        this.revalidate();
+        this.repaint();
     }
 }
 
-class PanelCrearTorneo implements PanelPrincipal {
-    private JPanel panel;
-    private JButton volverBoton;
-    private JButton pulsarParaCrearBoton;
+class PanelCrearTorneo extends JPanel implements PanelConfigurable {
+    private PanelCrearTorneoButtons panelBtns;
 
     public PanelCrearTorneo() {
-        panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(255, 255, 200));
+        super(new BorderLayout());
+        setBackground(new Color(255, 255, 200));
 
-        JLabel titleLabel = new JLabel("Panel: Crear Torneo", SwingConstants.CENTER);
+        panelBtns = new PanelCrearTorneoButtons();
+        this.add(panelBtns, BorderLayout.CENTER);
+
+        JLabel titleLabel = new JLabel("Panel Crear Torneo", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(50, 0, 50, 0));
-        panel.add(titleLabel, BorderLayout.CENTER);
-
-        volverBoton = new JButton("Volver atrás");
-        pulsarParaCrearBoton = new JButton("Pulsar para crear");
-
-        JPanel southPanel = new JPanel();
-        southPanel.setBackground(panel.getBackground());
-        southPanel.add(volverBoton);
-        panel.add(southPanel, BorderLayout.SOUTH);
-
-        JPanel centerPanel = new JPanel();
-        centerPanel.setBackground(panel.getBackground());
-        centerPanel.add(pulsarParaCrearBoton);
-        panel.add(centerPanel, BorderLayout.CENTER);
+        this.add(titleLabel, BorderLayout.NORTH);
     }
 
     @Override
-    public JPanel getPanel() {
-        return panel;
-    }
-
-    @Override
-    public void inicializar(Rango rango, ActionListener irAtras, ActionListener irAdelante) {
-        for (ActionListener al : volverBoton.getActionListeners()) {
-            volverBoton.removeActionListener(al);
-        }
-        if (irAtras != null) {
-            volverBoton.addActionListener(irAtras);
-        }
-        panel.revalidate();
-        panel.repaint();
+    public void inicializar(Rango rango, CrearActions actions) {
+        panelBtns.setNavegadorActions(actions);
+        this.revalidate();
+        this.repaint();
     }
 }
 
-class VentanaPrincipal extends JFrame {
+// Panel Principal
+
+class PanelPrincipal extends JPanel {
     private JPanel panelActual;
-    private JTextField tipoDeRango;
-    private JPanel panelInicio;
+    private HashMap<String, JPanel> contenedorPaneles;
 
-    private PanelOrganizador panelOrganizador;
-    private PanelUsuario panelUsuario;
-    private PanelCrearTorneo panelCrearTorneo;
+    public PanelPrincipal() {
+        super(new BorderLayout());
+        contenedorPaneles = new HashMap<>();
 
+        contenedorPaneles.put("INICIO", new PanelInicio());
+        contenedorPaneles.put("ORGANIZADOR", new PanelOrganizador());
+        contenedorPaneles.put("USUARIO", new PanelUsuario());
+        contenedorPaneles.put("CREAR_TORNEO", new PanelCrearTorneo());
+    }
+
+    public JPanel getPanel(String panelName) {
+        return contenedorPaneles.get(panelName);
+    }
+
+    public <T extends JPanel & PanelConfigurable> T getPanel(String panelName, Class<T> type) {
+        JPanel panel = contenedorPaneles.get(panelName);
+        if (type.isInstance(panel)) {
+            return type.cast(panel);
+        }
+        else {
+            return null;
+        }
+    }
+
+    public void cambiarPanel(JPanel nuevoPanel) {
+        if (panelActual != null) {
+            remove(panelActual);
+        }
+        panelActual = nuevoPanel;
+        add(panelActual, BorderLayout.CENTER);
+        revalidate();
+        repaint();
+    }
+}
+
+// Navegador para manejar el historial de acciones del Usuario/Organizador
+
+class Navegador {
+    private PanelPrincipal panelPrincipal;
+
+    // Historial de navegacion del Usuario/Organizador
+    private Stack<ActionListener> historial;
+
+    public Navegador(PanelPrincipal panelPrincipal) {
+        this.panelPrincipal = panelPrincipal;
+        this.historial = new Stack<>();
+    }
+
+    public void mostrarPanelInicio() {
+        // El historial se limpia por completo si se vuelve al inicio
+        historial.clear();
+
+        PanelInicio panelInicio = panelPrincipal.getPanel("INICIO", PanelInicio.class);
+
+        // Paquete de acciones para PanelInicio
+        InicioActions inicioActions = new InicioActions(this, panelInicio);
+
+        panelInicio.inicializar(null, inicioActions);
+        panelPrincipal.cambiarPanel(panelInicio);
+
+        panelInicio.getTipoDeRango().setText("");
+    }
+
+    public void mostrarPanelUsuario(Rango rango) {
+        historial.push(e -> mostrarPanelInicio());
+        PanelUsuario panelUsuario = panelPrincipal.getPanel("USUARIO", PanelUsuario.class);
+
+        // Paquete de acciones para Usuario
+        UsuarioActions usuarioActions = new UsuarioActions(this);
+
+        // Inicializar
+        panelUsuario.inicializar(rango, usuarioActions);
+        panelPrincipal.cambiarPanel(panelUsuario);
+    }
+
+    public void mostrarPanelOrganizador(Rango rango) {
+        historial.push(e -> mostrarPanelInicio());
+        PanelOrganizador panelOrganizador = panelPrincipal.getPanel("ORGANIZADOR", PanelOrganizador.class);
+
+        // Paquete de acciones para Organizador
+        OrganizadorActions organizadorActions = new OrganizadorActions(this, rango);
+
+        // Inicializar
+        panelOrganizador.inicializar(rango, organizadorActions);
+        panelPrincipal.cambiarPanel(panelOrganizador);
+    }
+
+    public void mostrarPanelCrearTorneo(Rango rango) {
+        historial.push(e -> mostrarPanelOrganizador(rango));
+        PanelCrearTorneo panelCrearTorneo = panelPrincipal.getPanel("CREAR_TORNEO", PanelCrearTorneo.class);
+
+        // Paquete de acciones para Organizador en CrearTorneo
+        CrearTorneoActions crearTorneoActions = new CrearTorneoActions(this, rango);
+
+        // Inicializar
+        panelCrearTorneo.inicializar(rango, crearTorneoActions);
+        panelPrincipal.cambiarPanel(panelCrearTorneo);
+    }
+}
+
+// Ventana principal
+
+class VentanaPrincipal extends JFrame {
+    private PanelPrincipal panelPrincipal;
     private Navegador navegador;
 
     public VentanaPrincipal() {
@@ -211,124 +506,15 @@ class VentanaPrincipal extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        panelOrganizador = new PanelOrganizador();
-        panelUsuario = new PanelUsuario();
-        panelCrearTorneo = new PanelCrearTorneo();
-
-        // Panel de inicio
-        panelInicio = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 100));
-        panelInicio.setBackground(Color.LIGHT_GRAY);
-        panelInicio.add(new JLabel("Ingresa tu rol (Organizador/Usuario):"));
-        tipoDeRango = new JTextField(15);
-        panelInicio.add(tipoDeRango);
-        JButton loginBoton = new JButton("Login");
-        panelInicio.add(loginBoton);
+        panelPrincipal = new PanelPrincipal();
 
         // Instanciar el navegador
-        navegador = new Navegador(this,
-                panelInicio,
-                panelOrganizador,
-                panelUsuario,
-                panelCrearTorneo
-        );
+        navegador = new Navegador(panelPrincipal);
 
-        // Listener para el boton de login
-        loginBoton.addActionListener(e -> {
-            String rol = tipoDeRango.getText().trim();
-
-            if ("Organizador".equalsIgnoreCase(rol)) {
-                navegador.mostrarPanelOrganizador(new Organizador("El Admin"));
-            }
-            else if ("Usuario".equalsIgnoreCase(rol)) {
-                navegador.mostrarPanelUsuario(new Usuario("El no Admin"));
-            }
-            else {
-                JOptionPane.showMessageDialog(this, "Rol no válido.");
-            }
-            tipoDeRango.setText("");
-        });
-
-        // Al iniciar, siempre mostrar el panel inicial
+        // Al iniciar, siempre mostrar el PanelInicio
         navegador.mostrarPanelInicio();
-    }
 
-    public void cambiarPanel(JPanel nuevoPanel) {
-        if (panelActual != null) {
-            remove(panelActual);
-        }
-
-        panelActual = nuevoPanel;
-        add(panelActual, BorderLayout.CENTER);
-        revalidate();
-        repaint();
+        add(panelPrincipal);
+        setVisible(true);
     }
 }
-
-class Navegador {
-    private VentanaPrincipal ventanaPrincipal;
-
-    // Paneles
-    private JPanel panelInicio;
-    private PanelOrganizador panelOrganizador;
-    private PanelUsuario panelUsuario;
-    private PanelCrearTorneo panelCrearTorneo;
-
-    // Historial de navegacion del Usuario/Organizador
-    private Stack<Runnable> historial;
-
-    public Navegador(VentanaPrincipal ventanaPrincipal,
-                     JPanel panelInicio,
-                     PanelOrganizador panelOrganizador,
-                     PanelUsuario panelUsuario,
-                     PanelCrearTorneo panelCrearTorneo) {
-
-        this.ventanaPrincipal = ventanaPrincipal;
-        this.panelInicio = panelInicio;
-        this.panelOrganizador = panelOrganizador;
-        this.panelUsuario = panelUsuario;
-        this.panelCrearTorneo = panelCrearTorneo;
-
-        this.historial = new Stack<>();
-    }
-
-    public void mostrarPanelInicio() {
-        // El historial se limpia por completo si se vuelve al inicio
-        historial.clear();
-        ventanaPrincipal.cambiarPanel(panelInicio);
-    }
-
-    public void mostrarPanelUsuario(Rango rango) {
-        historial.push(() -> mostrarPanelUsuario(rango));
-
-        ActionListener irAInicioAction = e -> mostrarPanelInicio();
-        panelUsuario.inicializar(rango, irAInicioAction, null);
-        ventanaPrincipal.cambiarPanel(panelUsuario.getPanel());
-    }
-
-    public void mostrarPanelOrganizador(Rango rango) {
-        historial.push(() -> mostrarPanelOrganizador(rango));
-
-        ActionListener irAInicioAction = e -> mostrarPanelInicio();
-        ActionListener crearTorneoAction = e -> mostrarPanelCrearTorneo(rango);
-        panelOrganizador.inicializar(rango, irAInicioAction, crearTorneoAction);
-        ventanaPrincipal.cambiarPanel(panelOrganizador.getPanel());
-    }
-
-    public void mostrarPanelCrearTorneo(Rango rango) {
-        historial.push(() -> mostrarPanelOrganizador(rango));
-
-        ActionListener irAtrasAction = e -> irAPanelAnterior();
-        panelCrearTorneo.inicializar(rango, irAtrasAction, null);
-        ventanaPrincipal.cambiarPanel(panelCrearTorneo.getPanel());
-    }
-
-    public void irAPanelAnterior() {
-        if (!historial.empty()) {
-            historial.pop().run();
-        }
-        else {
-            mostrarPanelInicio();
-        }
-    }
-}
-
