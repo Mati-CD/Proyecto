@@ -2,9 +2,10 @@ package org.example.GUI;
 
 public interface PanelConfigurable {
     /**
-     * Inicializa el diseño del panel.
+     * Inicializa el panel.
      *
-     * @param asignarAction El objeto de tipo AsignarAction que el panel usará para configurar sus acciones.
+     * @param actionAssigner El objeto de tipo ActionAssigner que el panel usará para obtener y configurar sus ActionListeners.
      */
-    void inicializar(AsignarAction asignarAction);
+    void inicializar(ActionAssigner actionAssigner);
 }
+
