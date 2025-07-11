@@ -2,7 +2,7 @@ package org.example.GUI;
 
 import javax.swing.*;
 
-public enum PanelID {
+public enum PanelType {
     INICIO("INICIO") {
         @Override
         public PanelInicio crearPanel() {
@@ -48,7 +48,7 @@ public enum PanelID {
 
     private final String id;
 
-    PanelID(String id) {
+    PanelType(String id) {
         this.id = id;
     }
 
@@ -58,8 +58,8 @@ public enum PanelID {
 
     public abstract JPanel crearPanel();
 
-    public static PanelID getByID(String id) {
-        for (PanelID panel : values()) {
+    public static PanelType getByID(String id) {
+        for (PanelType panel : values()) {
             if (panel.id.equals(id)) {
                 return panel;
             }
