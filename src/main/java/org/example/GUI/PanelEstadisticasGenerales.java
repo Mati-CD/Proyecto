@@ -4,18 +4,23 @@ import javax.swing.*;
 import java.awt.*;
 
 public class PanelEstadisticasGenerales extends JPanel implements PanelConfigurable {
-    private EstadisticasGeneralesButtons buttonsGroup;
+    private PanelButton irAtrasBtn;
 
     public PanelEstadisticasGenerales() {
         super(new BorderLayout());
         setBackground(new Color(104, 120, 1));
 
-        buttonsGroup = new EstadisticasGeneralesButtons();
-        this.add(buttonsGroup, BorderLayout.CENTER);
+        Font font = new Font("SansSerif", Font.BOLD, 18);
+        irAtrasBtn = new PanelButton("Volver atrás", font);
+        // Posicionar boton
+        JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topLeftPanel.setOpaque(false);
+        topLeftPanel.add(irAtrasBtn);
+        add(topLeftPanel, BorderLayout.NORTH);
 
         JLabel titleLabel = new JLabel("Panel Estadisticas Generales", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
-        this.add(titleLabel, BorderLayout.NORTH);
+        add(titleLabel, BorderLayout.SOUTH);
     }
 
     /**
@@ -23,7 +28,8 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
      */
     @Override
     public void inicializar(ActionAssigner actionAssigner) {
-        buttonsGroup.setButtonActions(actionAssigner);
+        irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_USUARIO.getID()));
+
         this.revalidate();
         this.repaint();
     }

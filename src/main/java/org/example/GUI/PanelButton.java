@@ -8,4 +8,5 @@ public class PanelButton extends JButton {
         super(label);
         this.setFont(font);
     }
+
 }

@@ -4,18 +4,26 @@ import javax.swing.*;
 import java.awt.*;
 
 public class PanelInicio extends JPanel implements PanelConfigurable {
-    private InicioButtons buttonsGroup;
+    private PanelButton organizadorBtn;
+    private PanelButton usuarioBtn;
 
     public PanelInicio() {
         super(new FlowLayout(FlowLayout.CENTER, 10, 100));
         setBackground(Color.LIGHT_GRAY);
-        buttonsGroup = new InicioButtons();
-        this.add(buttonsGroup);
+
+        Font font = new Font("SansSerif", Font.BOLD, 18);
+        organizadorBtn = new PanelButton("Organizador", font);
+        usuarioBtn = new PanelButton("Usuario", font);
+
+        add(organizadorBtn, BorderLayout.WEST);
+        add(usuarioBtn, BorderLayout.EAST);
     }
 
     @Override
     public void inicializar(ActionAssigner actionAssigner) {
-        buttonsGroup.setButtonActions(actionAssigner);
+        organizadorBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
+        usuarioBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_USUARIO.getID()));
+
         this.revalidate();
         this.repaint();
     }
