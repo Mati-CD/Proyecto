@@ -44,7 +44,13 @@ public class Navegador {
         mostrarPanel(PanelType.USUARIO, e -> mostrarPanelInicio());
     }
     public void mostrarPanelEstadoActualTorneo() {
-        mostrarPanel(PanelType.ESTADO_ACTUAL, e -> mostrarPanelOrganizador());
+        mostrarPanel(PanelType.ESTADO_ACTUAL, e -> mostrarPanelUsuario());
+    }
+    public void mostrarPanelProximosEncuentros() {
+        mostrarPanel(PanelType.PROXIMOS_ENCUENTROS, e -> mostrarPanelUsuario());
+    }
+    public void mostrarPanelEstadisticasGenerales() {
+        mostrarPanel(PanelType.ESTADISTICAS_GENERALES, e -> mostrarPanelUsuario());
     }
     public void mostrarPanelOrganizador() {
         mostrarPanel(PanelType.ORGANIZADOR, e -> mostrarPanelInicio());
@@ -57,5 +63,8 @@ public class Navegador {
     }
     public void mostrarPanelIniciarTorneo() {
         mostrarPanel(PanelType.INICIAR_TORNEO, e -> mostrarPanelOrganizador());
+    }
+    public void mostrarPanelRegistrarResultados() {
+        mostrarPanel(PanelType.REGISTRAR_RESULTADOS, e -> mostrarPanelOrganizador());
     }
 }

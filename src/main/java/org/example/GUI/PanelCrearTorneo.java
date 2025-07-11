@@ -15,7 +15,7 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable {
 
         JLabel titleLabel = new JLabel("Panel Crear Torneo", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
-        this.add(titleLabel, BorderLayout.NORTH);
+        this.add(titleLabel, BorderLayout.SOUTH);
     }
 
     @Override

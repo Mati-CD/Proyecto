@@ -34,7 +34,7 @@ public enum ActionGUI {
     IR_A_REGISTRAR_RESULTADOS("REGISTRAR_RESULTADOS") {
       @Override
       public void ejecutar(Navegador navegador) {
-
+        navegador.mostrarPanelRegistrarResultados();
       }
     },
     IR_A_USUARIO("USUARIO") {
@@ -47,6 +47,18 @@ public enum ActionGUI {
         @Override
         public void ejecutar(Navegador navegador) {
             navegador.mostrarPanelEstadoActualTorneo();
+        }
+    },
+    IR_A_PROXIMOS_ENCUENTROS("PROXIMOS_ENCUENTROS") {
+        @Override
+        public void ejecutar(Navegador navegador) {
+            navegador.mostrarPanelProximosEncuentros();
+        }
+    },
+    IR_A_ESTADISTICAS_GENERALES("ESTADISTICAS_GENERALES") {
+        @Override
+        public void ejecutar(Navegador navegador) {
+            navegador.mostrarPanelEstadisticasGenerales();
         }
     };
 

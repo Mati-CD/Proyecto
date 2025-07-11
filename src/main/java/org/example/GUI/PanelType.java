@@ -44,6 +44,24 @@ public enum PanelType {
         public PanelIniciarTorneo crearPanel() {
             return new PanelIniciarTorneo();
         }
+    },
+    REGISTRAR_RESULTADOS("REGISTRAR_RESULTADOS") {
+        @Override
+        public PanelRegistrarResultados crearPanel() {
+            return new PanelRegistrarResultados();
+        }
+    },
+    PROXIMOS_ENCUENTROS("PROXIMOS_ENCUENTROS") {
+        @Override
+        public PanelProximosEncuentros crearPanel() {
+            return new PanelProximosEncuentros();
+        }
+    },
+    ESTADISTICAS_GENERALES("ESTADISTICAS_GENERALES") {
+        @Override
+        public PanelEstadisticasGenerales crearPanel() {
+            return new PanelEstadisticasGenerales();
+        }
     };
 
     private final String id;

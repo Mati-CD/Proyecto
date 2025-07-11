@@ -51,5 +51,6 @@ public class OrganizadorButtons extends JPanel implements PanelButtonsGroup {
         crearTorneoBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_CREAR_TORNEO.getID()));
         inscribirParticipantesBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_INSCRIBIR_PARTICIPANTES.getID()));
         iniciarTorneoBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_INICIAR_TORNEO.getID()));
+        actualizarRegistroDeResultadosBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_REGISTRAR_RESULTADOS.getID()));
     }
 }

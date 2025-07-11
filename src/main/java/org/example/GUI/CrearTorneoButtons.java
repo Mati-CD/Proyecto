@@ -7,7 +7,7 @@ public class CrearTorneoButtons extends JPanel implements PanelButtonsGroup {
     private PanelButton irAtrasBtn;
 
     public CrearTorneoButtons() {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new BorderLayout());
         setOpaque(false);
 
         Font font = new Font("SansSerif", Font.BOLD, 18);
@@ -15,11 +15,11 @@ public class CrearTorneoButtons extends JPanel implements PanelButtonsGroup {
         // Crear Botones
         irAtrasBtn = new PanelButton("Volver atrás", font);
 
-        // Posicionar Botones
-        irAtrasBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        add(Box.createVerticalGlue());
-        add(irAtrasBtn);
+        // Posicionar botones
+        JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topLeftPanel.setOpaque(false);
+        topLeftPanel.add(irAtrasBtn);
+        add(topLeftPanel, BorderLayout.NORTH);
     }
 
     @Override
