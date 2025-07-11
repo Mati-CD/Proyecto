@@ -5,43 +5,43 @@ import javax.swing.*;
 public enum PanelID {
     INICIO("INICIO") {
         @Override
-        public JPanel crearPanel() {
+        public PanelInicio crearPanel() {
             return new PanelInicio();
         }
     },
     USUARIO("USUARIO") {
         @Override
-        public JPanel crearPanel() {
+        public PanelUsuario crearPanel() {
             return new PanelUsuario();
         }
     },
     ORGANIZADOR("ORGANIZADOR") {
         @Override
-        public JPanel crearPanel() {
+        public PanelOrganizador crearPanel() {
             return new PanelOrganizador();
         }
     },
     CREAR_TORNEO("CREAR_TORNEO") {
         @Override
-        public JPanel crearPanel() {
+        public PanelCrearTorneo crearPanel() {
             return new PanelCrearTorneo();
         }
     },
     INSCRIBIR_PARTICIPANTES("INSCRIBIR_PARTICIPANTES") {
         @Override
-        public JPanel crearPanel() {
+        public PanelInscribirParticipantes crearPanel() {
             return new PanelInscribirParticipantes();
         }
     },
     ESTADO_ACTUAL("ESTADO_ACTUAL") {
         @Override
-        public JPanel crearPanel() {
+        public PanelEstadoActualTorneo crearPanel() {
             return new PanelEstadoActualTorneo();
         }
     },
     INICIAR_TORNEO("INICIAR_TORNEO") {
         @Override
-        public JPanel crearPanel() {
+        public PanelIniciarTorneo crearPanel() {
             return new PanelIniciarTorneo();
         }
     };

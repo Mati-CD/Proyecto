@@ -45,6 +45,6 @@ public class UsuarioButtons extends JPanel implements PanelButtonsGroup{
     @Override
     public void setButtonActions(ActionAssigner actionAssigner) {
         irAInicioBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_INICIO.getID()));
-        verEstadoActualTorneoBtn.addActionListener(actionAssigner.getAction(ActionGUI.ESTADO_ACTUAL_TORNEO.getID()));
+        verEstadoActualTorneoBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ESTADO_ACTUAL_TORNEO.getID()));
     }
 }

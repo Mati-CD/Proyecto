@@ -48,8 +48,8 @@ public class OrganizadorButtons extends JPanel implements PanelButtonsGroup {
     @Override
     public void setButtonActions(ActionAssigner actionAssigner) {
         irAInicioBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_INICIO.getID()));
-        crearTorneoBtn.addActionListener(actionAssigner.getAction(ActionGUI.CREAR_TORNEO.getID()));
-        inscribirParticipantesBtn.addActionListener(actionAssigner.getAction(ActionGUI.INSCRIBIR_PARTICIPANTES.getID()));
-        iniciarTorneoBtn.addActionListener(actionAssigner.getAction(ActionGUI.INICIAR_TORNEO.getID()));
+        crearTorneoBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_CREAR_TORNEO.getID()));
+        inscribirParticipantesBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_INSCRIBIR_PARTICIPANTES.getID()));
+        iniciarTorneoBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_INICIAR_TORNEO.getID()));
     }
 }
