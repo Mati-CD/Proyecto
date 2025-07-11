@@ -2,27 +2,29 @@ package org.example.GUI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
+import java.util.EnumMap;
 
 public class PanelPrincipal extends JPanel {
     private JPanel panelActual;
-    private final HashMap<String, JPanel> panelContenedor;
+    private final EnumMap<PanelType, JPanel> panelContenedor;
 
     public PanelPrincipal() {
         super(new BorderLayout());
-        panelContenedor = new HashMap<>();
+        panelContenedor = new EnumMap<>(PanelType.class);
 
-        for (PanelID panel : PanelID.values()) {
-            panelContenedor.put(panel.getID(), panel.crearPanel());
+        for (PanelType panelType : PanelType.values()) {
+            panelContenedor.put(panelType, panelType.crearPanel());
         }
     }
 
-    public <T extends JPanel> T getPanel(String panelID, Class<T> panelType) {
-        JPanel panel = panelContenedor.get(panelID);
-        if (panelType.isInstance(panel)) {
-            return panelType.cast(panel);
+    @SuppressWarnings("unchecked")
+    public <T extends JPanel & PanelConfigurable> T getPanel(PanelType panelType) {
+        JPanel panel = panelContenedor.get(panelType);
+
+        if (panel == null) {
+            throw new IllegalArgumentException("Panel con ID (" + panelType.getID() + ") no es del tipo esperado o no existe.");
         }
-        throw new IllegalArgumentException("Panel con ID (" + panelID + ") no es del tipo esperado o no existe.");
+        return (T) panel;
     }
 
     public void cambiarPanel(JPanel nuevoPanel) {
