@@ -5,27 +5,52 @@ import java.util.List;
 
 public class Torneo {
     private final String nombre;
-    private final String disciplina;
     private final List<FaseTorneo> fases = new ArrayList<>();
     private final List<String> participantes = new ArrayList<>();
     private final List<TorneoObserver> observers = new ArrayList<>();
     private String campeon;
 
-    public Torneo(String nombre, String disciplina) {
+    public Torneo(String nombre) {
         this.nombre = nombre;
-        this.disciplina = disciplina;
     }
 
-    public void registrarObserver(TorneoObserver observer) {
-        observers.add(observer);
+    // Métodos de acceso
+    public String getNombre() {
+        return nombre;
     }
 
-    private void notificarObservers(String mensaje) {
-        for (TorneoObserver observer : observers) {
-            observer.actualizar(mensaje);
+    public List<String> getParticipantes() {
+        return new ArrayList<>(participantes);
+    }
+
+    public List<FaseTorneo> getFases() {
+        return new ArrayList<>(fases);
+    }
+
+    public FaseTorneo getFaseActual() {
+        return fases.isEmpty() ? null : fases.get(fases.size() - 1);
+    }
+
+    public String getCampeon() {
+        return campeon;
+    }
+
+    public boolean tieneCampeon() {
+        return campeon != null;
+    }
+
+    public List<Partido> getPartidosActuales() {
+        List<Partido> partidos = new ArrayList<>();
+        if (!fases.isEmpty()) {
+            FaseTorneo faseActual = getFaseActual();
+            for (TorneoComponent componente : faseActual.getComponentes()) {
+                partidos.add((Partido) componente);
+            }
         }
+        return partidos;
     }
 
+    // Gestión de participantes
     public void agregarParticipante(String nombre) {
         if (!participantes.contains(nombre)) {
             participantes.add(nombre);
@@ -33,6 +58,7 @@ public class Torneo {
         }
     }
 
+    // Inicio del torneo
     public void iniciarTorneo() {
         if (!esPotenciaDeDos(participantes.size())) {
             notificarObservers("El número de participantes debe ser potencia de 2 (2, 4, 8, 16...)");
@@ -42,12 +68,14 @@ public class Torneo {
         fases.clear();
         campeon = null;
         crearFaseInicial();
+        notificarObservers("Torneo iniciado con " + participantes.size() + " participantes");
     }
 
     private boolean esPotenciaDeDos(int numero) {
         return numero > 0 && (numero & (numero - 1)) == 0;
     }
 
+    // Gestión de fases
     private void crearFaseInicial() {
         int numParticipantes = participantes.size();
         String nombreFase = obtenerNombreFase(numParticipantes);
@@ -72,6 +100,7 @@ public class Torneo {
         };
     }
 
+    // Registro de resultados
     public void registrarResultado(Partido partido, String resultado) {
         partido.registrarResultado(resultado);
         notificarObservers("Resultado registrado: " + partido);
@@ -85,28 +114,24 @@ public class Torneo {
         }
     }
 
-    private boolean todosLosPartidosCompletados() {
-        return fases.get(fases.size()-1).getComponentes().stream()
-                .allMatch(c -> ((Partido)c).getGanador() != null);
-    }
+    public boolean todosLosPartidosCompletados() {
+        if (fases.isEmpty()) return false;
 
-    private boolean esFinal() {
-        return fases.get(fases.size()-1).getNombre().equals("Final");
-    }
-
-    private void crearSiguienteFase() {
-        List<String> ganadores = obtenerGanadoresUltimaFase();
-        String nombreFase;
-
-        if (ganadores.size() == 2) {
-            nombreFase = "Final";
-        } else if (ganadores.size() == 4) {
-            nombreFase = "Semifinales";
-        } else if (ganadores.size() == 8) {
-            nombreFase = "Cuartos de Final";
-        } else {
-            nombreFase = "Fase " + (fases.size() + 1);
+        for (TorneoComponent componente : getFaseActual().getComponentes()) {
+            if (((Partido)componente).getGanador() == null) {
+                return false;
+            }
         }
+        return true;
+    }
+
+    public boolean esFinal() {
+        return !fases.isEmpty() && getFaseActual().getNombre().equals("Final");
+    }
+
+    public void crearSiguienteFase() {
+        List<String> ganadores = obtenerGanadoresUltimaFase();
+        String nombreFase = obtenerNombreFase(ganadores.size());
 
         FaseTorneo nuevaFase = new FaseTorneo(nombreFase);
 
@@ -121,9 +146,9 @@ public class Torneo {
 
     private List<String> obtenerGanadoresUltimaFase() {
         List<String> ganadores = new ArrayList<>();
-        fases.get(fases.size()-1).getComponentes().forEach(c -> {
-            ganadores.add(((Partido)c).getGanador());
-        });
+        for (TorneoComponent componente : getFaseActual().getComponentes()) {
+            ganadores.add(((Partido)componente).getGanador());
+        }
         return ganadores;
     }
 
@@ -132,33 +157,27 @@ public class Torneo {
         notificarObservers("¡Campeón declarado: " + campeon + "!");
     }
 
-    public List<Partido> getPartidosActuales() {
-        if (fases.isEmpty()) return new ArrayList<>();
-        FaseTorneo faseActual = fases.get(fases.size() - 1);
-        List<Partido> partidos = new ArrayList<>();
-        for (TorneoComponent component : faseActual.getComponentes()) {
-            partidos.add((Partido) component);
+    // Sistema de observadores
+    public void registrarObserver(TorneoObserver observer) {
+        observers.add(observer);
+    }
+
+    private void notificarObservers(String mensaje) {
+        for (TorneoObserver observer : observers) {
+            observer.actualizar(mensaje);
         }
-        return partidos;
     }
 
-    public List<String> getParticipantes() {
-        return new ArrayList<>(participantes);
-    }
-
-    public boolean tieneCampeon() {
-        return campeon != null;
-    }
-
+    // Representación textual
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("=== ").append(nombre).append(" (").append(disciplina).append(") ===\n\n");
+        sb.append("=== ").append(nombre).append(" (").append(") ===\n\n");
 
         for (FaseTorneo fase : fases) {
             sb.append("=== ").append(fase.getNombre().toUpperCase()).append(" ===\n");
-            for (TorneoComponent component : fase.getComponentes()) {
-                sb.append("- ").append(component).append("\n");
+            for (TorneoComponent componente : fase.getComponentes()) {
+                sb.append("- ").append(componente).append("\n");
             }
             sb.append("\n");
         }
@@ -168,9 +187,6 @@ public class Torneo {
         }
 
         return sb.toString();
-    }
-    public FaseTorneo getFaseActual() {
-        return fases.isEmpty() ? null : fases.get(fases.size() - 1);
     }
 
     public String getEstructuraTexto() {

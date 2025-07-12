@@ -5,7 +5,7 @@ import java.util.List;
 
 public class FaseTorneo extends TorneoComponent {
     private final String nombre;
-    private final List<TorneoComponent> partidos = new ArrayList<>();
+    private final List<TorneoComponent> componentes = new ArrayList<>();
 
     public FaseTorneo(String nombre) {
         this.nombre = nombre;
@@ -18,11 +18,11 @@ public class FaseTorneo extends TorneoComponent {
 
     @Override
     public List<TorneoComponent> getComponentes() {
-        return new ArrayList<>(partidos);
+        return new ArrayList<>(componentes);
     }
 
     @Override
-    public void agregar(TorneoComponent component) {
-        partidos.add(component);
+    public void agregar(TorneoComponent componente) {
+        componentes.add(componente);
     }
 }
