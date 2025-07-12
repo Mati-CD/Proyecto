@@ -13,6 +13,7 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
     private JComboBox<Partido> partidosComboBox;
     private JComboBox<String> resultadoComboBox;
     private JTextArea infoTorneoArea;
+    private boolean listenersAdded = false;
 
     public PanelRegistrarResultados() {
         super(new BorderLayout());
@@ -76,28 +77,31 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
 
     @Override
     public void inicializar(ActionAssigner actionAssigner) {
-        irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
-        registrarBtn.addActionListener(e -> registrarResultado());
+        if (!listenersAdded) {
+            irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
+            registrarBtn.addActionListener(e -> registrarResultado());
 
-        // Agregar KeyListener para Enter en los combobox
-        KeyAdapter enterKeyAdapter = new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    registrarResultado();
+            KeyAdapter enterKeyAdapter = new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        registrarResultado();
+                    }
                 }
-            }
-        };
+            };
 
-        torneosComboBox.addKeyListener(enterKeyAdapter);
-        partidosComboBox.addKeyListener(enterKeyAdapter);
-        resultadoComboBox.addKeyListener(enterKeyAdapter);
+            torneosComboBox.addKeyListener(enterKeyAdapter);
+            partidosComboBox.addKeyListener(enterKeyAdapter);
+            resultadoComboBox.addKeyListener(enterKeyAdapter);
 
-        cargarTorneos();
-        torneosComboBox.addActionListener(e -> cargarPartidos());
+            cargarTorneosDisponibles();
+            torneosComboBox.addActionListener(e -> cargarPartidosDisponibles());
+
+            listenersAdded = true;
+        }
     }
 
-    private void cargarTorneos() {
+    private void cargarTorneosDisponibles() {
         DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
         for (Torneo torneo : PanelCrearTorneo.getTorneosCreados()) {
             if (!torneo.getFases().isEmpty()) {
@@ -107,7 +111,7 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         torneosComboBox.setModel(model);
     }
 
-    private void cargarPartidos() {
+    private void cargarPartidosDisponibles() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
         DefaultComboBoxModel<Partido> model = new DefaultComboBoxModel<>();
 
@@ -120,7 +124,7 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         }
 
         partidosComboBox.setModel(model);
-        actualizarInformacion();
+        actualizarInformacionTorneo();
     }
 
     private void registrarResultado() {
@@ -128,21 +132,26 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         Partido partido = (Partido) partidosComboBox.getSelectedItem();
 
         if (partido == null) {
-            JOptionPane.showMessageDialog(this, "Seleccione un partido", "Error", JOptionPane.ERROR_MESSAGE);
+            showMessageOnce("Seleccione un partido", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         String resultado = resultadoComboBox.getSelectedItem().toString().substring(0, 1);
         torneo.registrarResultado(partido, resultado);
 
-        cargarPartidos();
-        actualizarInformacion();
-
-        JOptionPane.showMessageDialog(this, "Resultado registrado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        cargarPartidosDisponibles();
+        actualizarInformacionTorneo();
+        showMessageOnce("Resultado registrado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private void actualizarInformacion() {
+    private void actualizarInformacionTorneo() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
         infoTorneoArea.setText(torneo != null ? torneo.getEstructuraTexto() : "");
+    }
+
+    private void showMessageOnce(String message, String title, int messageType) {
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this, message, title, messageType);
+        });
     }
 }

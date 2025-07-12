@@ -11,6 +11,7 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable {
     private PanelButton crearTorneoBtn;
     private JTextField nombreTorneoField;
     private static List<Torneo> torneosCreados = new ArrayList<>();
+    private boolean listenersAdded = false;
 
     public PanelCrearTorneo() {
         super(new BorderLayout());
@@ -63,8 +64,11 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable {
 
     @Override
     public void inicializar(ActionAssigner actionAssigner) {
-        irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
-        crearTorneoBtn.addActionListener(e -> crearTorneo());
+        if (!listenersAdded) {
+            irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
+            crearTorneoBtn.addActionListener(e -> crearTorneo());
+            listenersAdded = true;
+        }
         this.revalidate();
         this.repaint();
     }
@@ -73,16 +77,14 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable {
         String nombre = nombreTorneoField.getText().trim();
 
         if (nombre.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Por favor ingrese un nombre para el torneo",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            showMessageOnce("Por favor ingrese un nombre para el torneo", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         // Verificar si ya existe un torneo con ese nombre
         for (Torneo t : torneosCreados) {
             if (t.getNombre().equals(nombre)) {
-                JOptionPane.showMessageDialog(this, "Ya existe un torneo con ese nombre",
-                        "Error", JOptionPane.ERROR_MESSAGE);
+                showMessageOnce("Ya existe un torneo con ese nombre", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
         }
@@ -91,11 +93,15 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable {
         Torneo nuevoTorneo = new Torneo(nombre);
         torneosCreados.add(nuevoTorneo);
 
-        JOptionPane.showMessageDialog(this, "Torneo creado exitosamente:\n" +
-                        "Nombre: " + nombre,
+        showMessageOnce("Torneo creado exitosamente:\nNombre: " + nombre,
                 "Éxito", JOptionPane.INFORMATION_MESSAGE);
-
         nombreTorneoField.setText("");
+    }
+
+    private void showMessageOnce(String message, String title, int messageType) {
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this, message, title, messageType);
+        });
     }
 
     public static List<Torneo> getTorneosCreados() {

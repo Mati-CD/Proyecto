@@ -11,6 +11,7 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
     private JComboBox<Torneo> torneosComboBox;
     private DefaultListModel<String> participantesModel;
     private JList<String> participantesList;
+    private boolean initialized = false;
 
     public PanelInscribirParticipantes() {
         super(new BorderLayout());
@@ -20,19 +21,31 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         Font font = new Font("SansSerif", Font.BOLD, 16);
         Font titleFont = new Font("Arial", Font.BOLD, 24);
 
-        // Panel superior con botón de volver
+        // Inicializar componentes primero
         irAtrasBtn = new PanelButton("Volver atrás", font);
+        inscribirBtn = new PanelButton("Inscribir Participante", font);
+        nombreField = new JTextField(20);
+        torneosComboBox = new JComboBox<>();
+        participantesModel = new DefaultListModel<>();
+        participantesList = new JList<>(participantesModel);
+
+        // Configurar componentes
+        nombreField.setFont(font);
+        torneosComboBox.setFont(font);
+        participantesList.setFont(font);
+        participantesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        // Panel superior
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
         topPanel.add(irAtrasBtn, BorderLayout.WEST);
 
-        // Título centrado
         JLabel titleLabel = new JLabel("Inscribir Participantes", SwingConstants.CENTER);
         titleLabel.setFont(titleFont);
         topPanel.add(titleLabel, BorderLayout.CENTER);
         add(topPanel, BorderLayout.NORTH);
 
-        // Panel central con formulario
+        // Panel central
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setOpaque(false);
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
@@ -41,33 +54,19 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Selección de torneo
-        gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridx = 0; gbc.gridy = 0;
         formPanel.add(new JLabel("Seleccione torneo:"), gbc);
 
         gbc.gridx = 1;
-        torneosComboBox = new JComboBox<>();
-        torneosComboBox.setFont(font);
         formPanel.add(torneosComboBox, gbc);
 
-        // Campo: Nombre participante
-        gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridx = 0; gbc.gridy = 1;
         formPanel.add(new JLabel("Nombre participante:"), gbc);
 
         gbc.gridx = 1;
-        nombreField = new JTextField(20);
-        nombreField.setFont(font);
         formPanel.add(nombreField, gbc);
 
-        // Lista de participantes
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        participantesModel = new DefaultListModel<>();
-        participantesList = new JList<>(participantesModel);
-        participantesList.setFont(font);
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
         formPanel.add(new JLabel("Participantes inscritos:"), gbc);
 
         gbc.gridy = 3;
@@ -75,16 +74,33 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
 
         add(formPanel, BorderLayout.CENTER);
 
-        // Panel inferior con botón de inscripción
-        inscribirBtn = new PanelButton("Inscribir Participante", font);
+        // Panel inferior
         JPanel bottomPanel = new JPanel();
         bottomPanel.setOpaque(false);
         bottomPanel.add(inscribirBtn);
         add(bottomPanel, BorderLayout.SOUTH);
+
+        initialized = true;
     }
 
     @Override
     public void inicializar(ActionAssigner actionAssigner) {
+        if (!initialized) {
+            throw new IllegalStateException("Panel no ha sido inicializado correctamente");
+        }
+
+        // Limpiar listeners existentes para evitar duplicados
+        for (var listener : irAtrasBtn.getActionListeners()) {
+            irAtrasBtn.removeActionListener(listener);
+        }
+        for (var listener : inscribirBtn.getActionListeners()) {
+            inscribirBtn.removeActionListener(listener);
+        }
+        for (var listener : torneosComboBox.getActionListeners()) {
+            torneosComboBox.removeActionListener(listener);
+        }
+
+        // Configurar nuevos listeners
         irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
         inscribirBtn.addActionListener(e -> inscribirParticipante());
 

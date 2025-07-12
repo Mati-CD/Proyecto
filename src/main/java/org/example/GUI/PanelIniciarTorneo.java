@@ -12,6 +12,7 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
     private DefaultListModel<String> participantesModel;
     private JList<String> participantesList;
     private Torneo torneoSeleccionado;
+    private boolean listenersAdded = false;
 
     public PanelIniciarTorneo() {
         super(new BorderLayout());
@@ -85,22 +86,25 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
 
     @Override
     public void inicializar(ActionAssigner actionAssigner) {
-        irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
-        iniciarTorneoBtn.addActionListener(e -> iniciarTorneo());
+        if (!listenersAdded) {
+            irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
+            iniciarTorneoBtn.addActionListener(e -> iniciarTorneo());
 
-        // Cargar torneos disponibles
-        DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
-        for (Torneo torneo : PanelCrearTorneo.getTorneosCreados()) {
-            model.addElement(torneo);
+            // Cargar torneos disponibles
+            DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
+            for (Torneo torneo : PanelCrearTorneo.getTorneosCreados()) {
+                model.addElement(torneo);
+            }
+            torneosComboBox.setModel(model);
+            torneosComboBox.addActionListener(e -> actualizarInformacionTorneo());
+
+            listenersAdded = true;
         }
-        torneosComboBox.setModel(model);
-        torneosComboBox.addActionListener(e -> actualizarInfoTorneo());
-
         this.revalidate();
         this.repaint();
     }
 
-    private void actualizarInfoTorneo() {
+    private void actualizarInformacionTorneo() {
         torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
         if (torneoSeleccionado != null) {
             torneoSeleccionado.registrarObserver(this);
@@ -134,20 +138,17 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
 
     private void iniciarTorneo() {
         if (torneoSeleccionado == null) {
-            JOptionPane.showMessageDialog(this, "Seleccione un torneo primero",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            showMessageOnce("Seleccione un torneo primero", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try {
             torneoSeleccionado.iniciarTorneo();
             infoTorneoArea.setText(torneoSeleccionado.getEstructuraTexto());
-            JOptionPane.showMessageDialog(this, "Torneo iniciado correctamente!\n" +
-                            "Se han creado las fases iniciales.",
+            showMessageOnce("Torneo iniciado correctamente!\nSe han creado las fases iniciales.",
                     "Éxito", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
+            showMessageOnce(ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -156,6 +157,12 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
         SwingUtilities.invokeLater(() -> {
             infoTorneoArea.setText(torneoSeleccionado.getEstructuraTexto());
             JOptionPane.showMessageDialog(this, mensaje);
+        });
+    }
+
+    private void showMessageOnce(String message, String title, int messageType) {
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this, message, title, messageType);
         });
     }
 }
