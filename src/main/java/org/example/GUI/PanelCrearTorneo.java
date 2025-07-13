@@ -3,13 +3,17 @@ package org.example.GUI;
 import org.example.CodigoLogico.Torneo;
 import javax.swing.*;
 import java.awt.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class PanelCrearTorneo extends JPanel implements PanelConfigurable {
     private PanelButton irAtrasBtn;
     private PanelButton crearTorneoBtn;
     private JTextField nombreTorneoField;
+    private JTextField disciplinaField;
+    private JSpinner fechaSpinner;
     private static List<Torneo> torneosCreados = new ArrayList<>();
     private boolean listenersAdded = false;
 
@@ -33,7 +37,7 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable {
         topPanel.add(titleLabel, BorderLayout.CENTER);
         add(topPanel, BorderLayout.NORTH);
 
-        // Panel central con formulario simplificado
+        // Panel central con formulario
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setOpaque(false);
         formPanel.setBorder(BorderFactory.createEmptyBorder(30, 50, 30, 50));
@@ -42,7 +46,7 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable {
         gbc.insets = new Insets(15, 15, 15, 15);
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Solo campo para el nombre del torneo
+        // Campo para el nombre del torneo
         gbc.gridx = 0;
         gbc.gridy = 0;
         formPanel.add(new JLabel("Nombre del Torneo:"), gbc);
@@ -51,6 +55,28 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable {
         nombreTorneoField = new JTextField(20);
         nombreTorneoField.setFont(font);
         formPanel.add(nombreTorneoField, gbc);
+
+        // Campo para la disciplina
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        formPanel.add(new JLabel("Disciplina:"), gbc);
+
+        gbc.gridx = 1;
+        disciplinaField = new JTextField(20);
+        disciplinaField.setFont(font);
+        formPanel.add(disciplinaField, gbc);
+
+        // Selector de fecha
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        formPanel.add(new JLabel("Fecha del Torneo:"), gbc);
+
+        gbc.gridx = 1;
+        SpinnerDateModel dateModel = new SpinnerDateModel();
+        fechaSpinner = new JSpinner(dateModel);
+        fechaSpinner.setEditor(new JSpinner.DateEditor(fechaSpinner, "dd/MM/yyyy"));
+        fechaSpinner.setFont(font);
+        formPanel.add(fechaSpinner, gbc);
 
         add(formPanel, BorderLayout.CENTER);
 
@@ -75,9 +101,11 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable {
 
     private void crearTorneo() {
         String nombre = nombreTorneoField.getText().trim();
+        String disciplina = disciplinaField.getText().trim();
+        Date fecha = (Date) fechaSpinner.getValue();
 
-        if (nombre.isEmpty()) {
-            showMessageOnce("Por favor ingrese un nombre para el torneo", "Error", JOptionPane.ERROR_MESSAGE);
+        if (nombre.isEmpty() || disciplina.isEmpty()) {
+            showMessageOnce("Por favor complete todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -89,13 +117,20 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable {
             }
         }
 
-        // Crear torneo solo con el nombre
-        Torneo nuevoTorneo = new Torneo(nombre);
+        // Crear torneo con nombre, disciplina y fecha
+        Torneo nuevoTorneo = new Torneo(nombre, disciplina, fecha);
         torneosCreados.add(nuevoTorneo);
 
-        showMessageOnce("Torneo creado exitosamente:\nNombre: " + nombre,
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        showMessageOnce("Torneo creado exitosamente:\nNombre: " + nombre +
+                        "\nDisciplina: " + disciplina +
+                        "\nFecha: " + sdf.format(fecha),
                 "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+        // Limpiar campos después de crear
         nombreTorneoField.setText("");
+        disciplinaField.setText("");
+        fechaSpinner.setValue(new Date()); // Resetear a fecha actual
     }
 
     private void showMessageOnce(String message, String title, int messageType) {

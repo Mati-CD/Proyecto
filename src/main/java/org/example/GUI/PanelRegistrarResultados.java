@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.text.SimpleDateFormat;
 
 public class PanelRegistrarResultados extends JPanel implements PanelConfigurable {
     private PanelButton irAtrasBtn;
@@ -127,6 +128,23 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         actualizarInformacionTorneo();
     }
 
+    private void actualizarInformacionTorneo() {
+        Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
+        if (torneo != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+            StringBuilder info = new StringBuilder();
+
+            info.append("=== ").append(torneo.getNombre()).append(" ===\n");
+            info.append("Disciplina: ").append(torneo.getDisciplina()).append("\n");
+            info.append("Fecha: ").append(sdf.format(torneo.getFecha())).append("\n\n");
+            info.append(torneo.getEstructuraTexto());
+
+            infoTorneoArea.setText(info.toString());
+        } else {
+            infoTorneoArea.setText("");
+        }
+    }
+
     private void registrarResultado() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
         Partido partido = (Partido) partidosComboBox.getSelectedItem();
@@ -142,11 +160,6 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         cargarPartidosDisponibles();
         actualizarInformacionTorneo();
         showMessageOnce("Resultado registrado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private void actualizarInformacionTorneo() {
-        Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
-        infoTorneoArea.setText(torneo != null ? torneo.getEstructuraTexto() : "");
     }
 
     private void showMessageOnce(String message, String title, int messageType) {

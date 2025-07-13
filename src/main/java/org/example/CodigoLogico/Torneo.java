@@ -2,6 +2,7 @@ package org.example.CodigoLogico;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 public class Torneo {
     private final String nombre;
@@ -9,15 +10,24 @@ public class Torneo {
     private final List<String> participantes = new ArrayList<>();
     private final List<TorneoObserver> observers = new ArrayList<>();
     private String campeon;
+    private String disciplina;
+    private Date fecha;
 
-    public Torneo(String nombre) {
+    public Torneo(String nombre, String disciplina, Date fecha) {
         this.nombre = nombre;
+        this.disciplina = disciplina;
+        this.fecha = fecha;
     }
 
     // Métodos de acceso
     public String getNombre() {
         return nombre;
     }
+    public String getDisciplina() {
+        return disciplina; }
+
+    public Date getFecha() {
+        return fecha; }
 
     public List<String> getParticipantes() {
         return new ArrayList<>(participantes);

@@ -3,6 +3,7 @@ package org.example.GUI;
 import org.example.CodigoLogico.*;
 import javax.swing.*;
 import java.awt.*;
+import java.text.SimpleDateFormat;
 
 public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, TorneoObserver {
     private PanelButton irAtrasBtn;
@@ -114,9 +115,12 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
 
     private void mostrarInformacionTorneo() {
         StringBuilder info = new StringBuilder();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
         // Información básica
         info.append("=== ").append(torneoSeleccionado.getNombre()).append(" ===\n");
+        info.append("Disciplina: ").append(torneoSeleccionado.getDisciplina()).append("\n");
+        info.append("Fecha: ").append(sdf.format(torneoSeleccionado.getFecha())).append("\n");
         info.append("Participantes: ").append(torneoSeleccionado.getParticipantes().size()).append("\n\n");
 
         // Mostrar todas las fases
