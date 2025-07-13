@@ -6,20 +6,26 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         // Crear un torneo
-        Torneo torneo = new Torneo("Davis Cup", "Tennis",new Date() );
+        CrearTorneo t1 = new CrearTorneo("Davis Cup", "Tennis", "Individiual");
+        Torneo torneo = new Torneo(t1);
 
         // Registrar un observador simple que muestra notificaciones en consola
         torneo.registrarObserver(mensaje -> System.out.println("[NOTIFICACIÓN] " + mensaje));
 
-        // Agregar participantes
-        torneo.agregarParticipante("Rafael Nadal");
-        torneo.agregarParticipante("Novak Djokovic");
-        torneo.agregarParticipante("Roger Federer");
-        torneo.agregarParticipante("Nicolás Massú");
-        torneo.agregarParticipante("Carlos Alcaraz");
-        torneo.agregarParticipante("Nicolás Jarry");
-        torneo.agregarParticipante("Stefanos Tsitsipas");
-        torneo.agregarParticipante("Marcelo Ríos");
+        Inscripciones inscritos = new Inscripciones();
+        inscritos.add(new ParticipanteIndividual("Rafael Nadal", 38, "España"));
+        inscritos.add(new ParticipanteIndividual("Novak Djokovic", 37, "Serbia"));
+        inscritos.add(new ParticipanteIndividual("Novak Djokovic", 37, "Serbia"));
+        inscritos.add(new ParticipanteIndividual("Nicolás Massú", 45, "Chile"));
+        inscritos.add(new ParticipanteIndividual("Carlos Alcaraz", 21, "España"));
+        inscritos.add(new ParticipanteIndividual("Carlos Alcaraz", 21, "España"));
+        inscritos.add(new ParticipanteIndividual("Nicolás Jarry", 29, "Chile"));
+        inscritos.add(new ParticipanteIndividual("Stefanos Tsitsipas", 26, "Grecia"));
+        inscritos.add(new ParticipanteIndividual("Marcelo Ríos", 49, "Chile"));
+
+        for (Participante p : inscritos.getInscritos()) {
+            torneo.inscribirParticipante(p);
+        }
 
         // Iniciar el torneo
         System.out.println("\n=== INICIANDO TORNEO ===");

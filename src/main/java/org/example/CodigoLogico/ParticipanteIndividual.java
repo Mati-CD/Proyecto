@@ -2,9 +2,9 @@ package org.example.CodigoLogico;
 
 public class ParticipanteIndividual extends Participante{
     private String pais;
-    private String edad;
+    private int edad;
 
-    public ParticipanteIndividual(String nombre, String edad, String pais) {
+    public ParticipanteIndividual(String nombre, int edad, String pais) {
         super(nombre);
         this.pais = pais;
         this.edad = edad;
@@ -14,7 +14,7 @@ public class ParticipanteIndividual extends Participante{
         return pais;
     }
 
-    public String getEdad() {
+    public int getEdad() {
         return edad;
     }
 

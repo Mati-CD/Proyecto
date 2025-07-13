@@ -5,31 +5,27 @@ import java.util.List;
 import java.util.Date;
 
 public class Torneo {
-    private final String nombre;
     private final List<FaseTorneo> fases = new ArrayList<>();
-    private final List<String> participantes = new ArrayList<>();
+    private final List<Participante> participantes = new ArrayList<>();
     private final List<TorneoObserver> observers = new ArrayList<>();
     private String campeon;
-    private String disciplina;
-    private Date fecha;
+    private CrearTorneo torneo;
 
-    public Torneo(String nombre, String disciplina, Date fecha) {
-        this.nombre = nombre;
-        this.disciplina = disciplina;
-        this.fecha = fecha;
+    public Torneo(CrearTorneo torneo) {
+        this.torneo = torneo;
     }
 
     // Métodos de acceso
     public String getNombre() {
-        return nombre;
+        return torneo.getNombre();
     }
     public String getDisciplina() {
-        return disciplina; }
+        return torneo.getDisciplina(); }
 
     public Date getFecha() {
-        return fecha; }
+        return new Date(); }
 
-    public List<String> getParticipantes() {
+    public List<Participante> getParticipantes() {
         return new ArrayList<>(participantes);
     }
 
@@ -60,11 +56,12 @@ public class Torneo {
         return partidos;
     }
 
-    // Gestión de participantes
-    public void agregarParticipante(String nombre) {
-        if (!participantes.contains(nombre)) {
-            participantes.add(nombre);
-            notificarObservers("Participante agregado: " + nombre);
+    public void inscribirParticipante(Participante participante) {
+        if (!participantes.contains(participante)) {
+            participantes.add(participante);
+            notificarObservers("Participante inscrito: " + participante.getDatos());
+        } else {
+            notificarObservers("ERROR: Participante '" + participante.getNombre() + "' ya está inscrito.");
         }
     }
 
@@ -92,7 +89,9 @@ public class Torneo {
         FaseTorneo fase = new FaseTorneo(nombreFase);
 
         for (int i = 0; i < numParticipantes; i += 2) {
-            Partido partido = new Partido(participantes.get(i), participantes.get(i + 1), nombreFase);
+            String player1 = participantes.get(i).getNombre();
+            String player2 = participantes.get(i + 1).getNombre();
+            Partido partido = new Partido(player1, player2, nombreFase);
             fase.agregar(partido);
         }
 
@@ -182,7 +181,7 @@ public class Torneo {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("=== ").append(nombre).append(" (").append(") ===\n\n");
+        sb.append("=== ").append(torneo.getNombre()).append(" (").append(") ===\n\n");
 
         for (FaseTorneo fase : fases) {
             sb.append("=== ").append(fase.getNombre().toUpperCase()).append(" ===\n");
