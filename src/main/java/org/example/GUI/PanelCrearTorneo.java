@@ -1,18 +1,17 @@
 package org.example.GUI;
 
-import org.example.CodigoLogico.CrearTorneo;
-import org.example.CodigoLogico.GestorTorneos;
-import org.example.CodigoLogico.Torneo;
+import org.example.CodigoLogico.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-public class PanelCrearTorneo extends JPanel implements PanelConfigurable {
+public class PanelCrearTorneo extends JPanel implements PanelConfigurable, TorneoObserver {
     private GestorTorneos gestorTorneos;
     private PanelButton irAtrasBtn;
     private PanelButton crearTorneoBtn;
-    private PanelEntradaTorneo panelEntradaTorneo;
-    private boolean listenersAdded = false;
+    private PanelFormularioTorneo panelFormularioTorneo;
+    private boolean listenersActivos = false;
 
     public PanelCrearTorneo() {
         super(new BorderLayout());
@@ -41,10 +40,10 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable {
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setOpaque(false);
 
-        panelEntradaTorneo = new PanelEntradaTorneo();
+        panelFormularioTorneo = new PanelFormularioTorneo();
         JPanel centerLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         centerLeftPanel.setOpaque(false);
-        centerLeftPanel.add(panelEntradaTorneo);
+        centerLeftPanel.add(panelFormularioTorneo);
         centerPanel.add(centerLeftPanel, BorderLayout.WEST);
 
         add(centerPanel, BorderLayout.CENTER);
@@ -62,48 +61,45 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable {
     @Override
     public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         this.gestorTorneos = gestorTorneos;
-        if (!listenersAdded) {
+        this.gestorTorneos.registrarObserver(this);
+
+        if (!listenersActivos) {
             irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
             crearTorneoBtn.addActionListener(e -> clickCrearBtn(e, actionAssigner));
-            listenersAdded = true;
+            listenersActivos = true;
         }
         this.revalidate();
         this.repaint();
     }
 
+    @Override
+    public void actualizar(String mensaje) {
+        if (mensaje.contains("ERROR") || mensaje.contains("Ya existe un torneo")) {
+            GuiUtilidades.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (mensaje.contains("exitosamente")) {
+            GuiUtilidades.showMessageOnce(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            GuiUtilidades.showMessageOnce(this, mensaje, "Información", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
     private void clickCrearBtn(ActionEvent e, ActionAssigner actionAssigner) {
-        String nombre = panelEntradaTorneo.getNombre().trim();
-        String disciplina = panelEntradaTorneo.getDisciplina().trim();
-        String tipoDeInscripcion = panelEntradaTorneo.getTipoInscripcion();
+        String nombre = panelFormularioTorneo.getNombre().trim();
+        String disciplina = panelFormularioTorneo.getDisciplina().trim();
+        String tipoDeInscripcion = panelFormularioTorneo.getTipoInscripcion();
 
         if (nombre.isEmpty() || disciplina.isEmpty()) {
-            showMessageOnce("Por favor complete todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        if (gestorTorneos.torneoExiste(nombre)) {
-            showMessageOnce("Ya existe un torneo con este nombre", "Error", JOptionPane.ERROR_MESSAGE);
+            GuiUtilidades.showMessageOnce(this, "Por favor complete todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         // Crear torneo con nombre, disciplina y tipo de Inscripcion
-        CrearTorneo nuevoTorneo = new CrearTorneo(nombre, disciplina, tipoDeInscripcion);
-        Torneo torneo = new Torneo(nuevoTorneo);
+        Torneo torneo = new Torneo(nombre, disciplina, tipoDeInscripcion);
         gestorTorneos.add(torneo);
 
-        showMessageOnce("Torneo creado exitosamente:\nNombre: " + nombre +
-                        "\nDisciplina: " + disciplina +
-                        "\nTipo de Inscripción: " + tipoDeInscripcion,
-                "Éxito", JOptionPane.INFORMATION_MESSAGE);
-
-        // Limpiar campos después de crear
-        panelEntradaTorneo.clearFields();
-        actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()).actionPerformed(e);
-    }
-
-    private void showMessageOnce(String message, String title, int messageType) {
-        SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(this, message, title, messageType);
-        });
+        if (gestorTorneos.creadoConExito()) {
+            panelFormularioTorneo.clearFields();
+            actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()).actionPerformed(e);
+        }
     }
 }

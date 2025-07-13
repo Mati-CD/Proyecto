@@ -6,8 +6,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         // Crear un torneo
-        CrearTorneo t1 = new CrearTorneo("Davis Cup", "Tennis", "Individiual");
-        Torneo torneo = new Torneo(t1);
+        Torneo torneo = new Torneo("Davis Cup", "Tennis", "Individiual");
 
         // Registrar un observador simple que muestra notificaciones en consola
         torneo.registrarObserver(mensaje -> System.out.println("[NOTIFICACIÓN] " + mensaje));

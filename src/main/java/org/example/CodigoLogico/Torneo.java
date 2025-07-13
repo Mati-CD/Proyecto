@@ -2,25 +2,31 @@ package org.example.CodigoLogico;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Date;
 
-public class Torneo {
+public class Torneo extends ObserverController {
     private final List<FaseTorneo> fases = new ArrayList<>();
     private final List<Participante> participantes = new ArrayList<>();
-    private final List<TorneoObserver> observers = new ArrayList<>();
     private String campeon;
-    private CrearTorneo torneo;
+    private String nombre;
+    private String disciplina;
+    private String tipoDeInscripcion;
 
-    public Torneo(CrearTorneo torneo) {
-        this.torneo = torneo;
+    public Torneo(String nombre, String disciplina, String tipoDeInscripcion) {
+        this.nombre = nombre;
+        this.disciplina = disciplina;
+        this.tipoDeInscripcion = tipoDeInscripcion;
     }
 
     // Métodos de acceso
     public String getNombre() {
-        return torneo.getNombre();
+        return nombre;
     }
     public String getDisciplina() {
-        return torneo.getDisciplina(); }
+        return disciplina;
+    }
+    public String getTipoDeInscripcion() {
+        return tipoDeInscripcion;
+    }
 
     public List<Participante> getParticipantes() {
         return new ArrayList<>(participantes);
@@ -163,22 +169,11 @@ public class Torneo {
         notificarObservers("¡Campeón declarado: " + campeon + "!");
     }
 
-    // Sistema de observadores
-    public void registrarObserver(TorneoObserver observer) {
-        observers.add(observer);
-    }
-
-    private void notificarObservers(String mensaje) {
-        for (TorneoObserver observer : observers) {
-            observer.actualizar(mensaje);
-        }
-    }
-
     // Representación textual
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("=== ").append(torneo.getNombre()).append(" (").append(") ===\n\n");
+        sb.append("=== ").append(getNombre()).append(" (").append(") ===\n\n");
 
         for (FaseTorneo fase : fases) {
             sb.append("=== ").append(fase.getNombre().toUpperCase()).append(" ===\n");

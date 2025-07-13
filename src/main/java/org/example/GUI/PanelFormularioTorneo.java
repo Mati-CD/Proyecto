@@ -3,12 +3,12 @@ package org.example.GUI;
 import javax.swing.*;
 import java.awt.*;
 
-public class PanelEntradaTorneo extends JPanel {
+public class PanelFormularioTorneo extends JPanel {
     private JTextField fieldNombre;
     private JTextField fieldDisciplina;
     private JComboBox<String> comboTipoInscripcion;
 
-    public PanelEntradaTorneo() {
+    public PanelFormularioTorneo() {
         setOpaque(false);
         setLayout(new GridBagLayout());
 
