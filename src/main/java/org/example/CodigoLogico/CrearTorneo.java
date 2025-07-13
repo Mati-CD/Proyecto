@@ -1,16 +1,14 @@
 package org.example.CodigoLogico;
 
-import java.util.Date;
-
 public class CrearTorneo {
     private String nombre;
     private String disciplina;
     private String tipoDeInscripcion;
-    private Date fecha;
 
     public CrearTorneo(String nombre, String disciplina, String tipoDeInscripcion) {
         this.nombre = nombre;
         this.disciplina = disciplina;
+        this.tipoDeInscripcion = tipoDeInscripcion;
     }
 
     public String getNombre() {

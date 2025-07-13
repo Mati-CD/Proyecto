@@ -1,13 +1,17 @@
 package org.example.GUI;
 
+import org.example.CodigoLogico.GestorTorneos;
+import org.example.CodigoLogico.Participante;
+import org.example.CodigoLogico.ParticipanteIndividual;
 import org.example.CodigoLogico.Torneo;
 import javax.swing.*;
 import java.awt.*;
 
 public class PanelInscribirParticipantes extends JPanel implements PanelConfigurable {
+    private GestorTorneos gestorTorneos;
+    private PanelParticipanteInput panelParticipanteInput;
     private PanelButton irAtrasBtn;
     private PanelButton inscribirBtn;
-    private JTextField nombreField;
     private JComboBox<Torneo> torneosComboBox;
     private DefaultListModel<String> participantesModel;
     private JList<String> participantesList;
@@ -18,65 +22,72 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         setBackground(new Color(6, 153, 153));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        Font font = new Font("SansSerif", Font.BOLD, 16);
+        Font font = new Font("SansSerif", Font.BOLD, 14);
         Font titleFont = new Font("Arial", Font.BOLD, 24);
 
-        // Inicializar componentes primero
-        irAtrasBtn = new PanelButton("Volver atrás", font);
         inscribirBtn = new PanelButton("Inscribir Participante", font);
-        nombreField = new JTextField(20);
         torneosComboBox = new JComboBox<>();
         participantesModel = new DefaultListModel<>();
         participantesList = new JList<>(participantesModel);
+        panelParticipanteInput = new PanelParticipanteInput();
 
-        // Configurar componentes
-        nombreField.setFont(font);
         torneosComboBox.setFont(font);
         participantesList.setFont(font);
         participantesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // Panel superior
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
-        topPanel.add(irAtrasBtn, BorderLayout.WEST);
+
+        irAtrasBtn = new PanelButton("Volver atrás", font);
+        irAtrasBtn.setButtonPreferredSize(new Dimension(120, 30));
+        JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        topLeftPanel.setOpaque(false);
+        topLeftPanel.add(irAtrasBtn);
+        topPanel.add(topLeftPanel, BorderLayout.WEST);
 
         JLabel titleLabel = new JLabel("Inscribir Participantes", SwingConstants.CENTER);
         titleLabel.setFont(titleFont);
         topPanel.add(titleLabel, BorderLayout.CENTER);
+
         add(topPanel, BorderLayout.NORTH);
 
-        // Panel central
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setOpaque(false);
-        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+        JPanel centerPanel = new JPanel(new BorderLayout(50, 0));
+        centerPanel.setOpaque(false);
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.anchor = GridBagConstraints.WEST;
+        JPanel centerLeftPanel = new JPanel(new BorderLayout());
+        centerLeftPanel.setOpaque(false);
 
-        gbc.gridx = 0; gbc.gridy = 0;
-        formPanel.add(new JLabel("Seleccione torneo:"), gbc);
+        JPanel torneoSelectionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        torneoSelectionPanel.setOpaque(false);
+        JLabel labelSeleccionarTorneo = new JLabel("Seleccione torneo:");
+        labelSeleccionarTorneo.setFont(font);
+        torneoSelectionPanel.add(labelSeleccionarTorneo);
+        torneoSelectionPanel.add(torneosComboBox);
+        centerLeftPanel.add(torneoSelectionPanel, BorderLayout.NORTH);
 
-        gbc.gridx = 1;
-        formPanel.add(torneosComboBox, gbc);
+        centerLeftPanel.add(panelParticipanteInput, BorderLayout.CENTER);
+        centerPanel.add(centerLeftPanel, BorderLayout.WEST);
 
-        gbc.gridx = 0; gbc.gridy = 1;
-        formPanel.add(new JLabel("Nombre participante:"), gbc);
+        JPanel centerRightPanel = new JPanel(new BorderLayout());
+        centerRightPanel.setOpaque(false);
+        centerRightPanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 0, 0));
 
-        gbc.gridx = 1;
-        formPanel.add(nombreField, gbc);
+        JLabel labelParticipantesInscritos = new JLabel("Participantes inscritos:");
+        labelParticipantesInscritos.setFont(font);
+        centerRightPanel.add(labelParticipantesInscritos, BorderLayout.NORTH);
 
-        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
-        formPanel.add(new JLabel("Participantes inscritos:"), gbc);
+        JScrollPane scrollPane = new JScrollPane(participantesList);
+        scrollPane.setPreferredSize(new Dimension(280, 250));
+        centerRightPanel.add(scrollPane, BorderLayout.CENTER);
 
-        gbc.gridy = 3;
-        formPanel.add(new JScrollPane(participantesList), gbc);
+        centerPanel.add(centerRightPanel, BorderLayout.CENTER);
 
-        add(formPanel, BorderLayout.CENTER);
+        add(centerPanel, BorderLayout.CENTER);
 
-        // Panel inferior
-        JPanel bottomPanel = new JPanel();
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setOpaque(false);
+        inscribirBtn.setButtonPreferredSize(new Dimension(200, 50));
         bottomPanel.add(inscribirBtn);
         add(bottomPanel, BorderLayout.SOUTH);
 
@@ -84,7 +95,8 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
     }
 
     @Override
-    public void inicializar(ActionAssigner actionAssigner) {
+    public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
+        this.gestorTorneos = gestorTorneos;
         if (!initialized) {
             throw new IllegalStateException("Panel no ha sido inicializado correctamente");
         }
@@ -106,7 +118,7 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
 
         // Cargar torneos disponibles
         DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
-        for (Torneo torneo : PanelCrearTorneo.getTorneosCreados()) {
+        for (Torneo torneo : gestorTorneos.getTorneosCreados()) {
             model.addElement(torneo);
         }
         torneosComboBox.setModel(model);
@@ -118,7 +130,7 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
 
     private void inscribirParticipante() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
-        String nombre = nombreField.getText().trim();
+        String nombre = panelParticipanteInput.getNombreParticipante().trim();
 
         if (torneo == null) {
             JOptionPane.showMessageDialog(this, "Seleccione un torneo primero",
@@ -132,9 +144,11 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
             return;
         }
 
-        torneo.agregarParticipante(nombre);
-        participantesModel.addElement(nombre);
-        nombreField.setText("");
+        ParticipanteIndividual p = new ParticipanteIndividual(nombre, 0, null);
+
+        torneo.inscribirParticipante(p);
+        participantesModel.addElement(p.getNombre());
+        panelParticipanteInput.clearFields();
         JOptionPane.showMessageDialog(this, "Participante inscrito correctamente",
                 "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
@@ -144,8 +158,8 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         participantesModel.clear();
 
         if (torneo != null) {
-            for (String participante : torneo.getParticipantes()) {
-                participantesModel.addElement(participante);
+            for (Participante participante : torneo.getParticipantes()) {
+                participantesModel.addElement(participante.getNombre());
             }
         }
     }

@@ -8,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.text.SimpleDateFormat;
 
 public class PanelRegistrarResultados extends JPanel implements PanelConfigurable {
+    private GestorTorneos gestorTorneos;
     private PanelButton irAtrasBtn;
     private PanelButton registrarBtn;
     private JComboBox<Torneo> torneosComboBox;
@@ -77,7 +78,8 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
     }
 
     @Override
-    public void inicializar(ActionAssigner actionAssigner) {
+    public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
+        this.gestorTorneos = gestorTorneos;
         if (!listenersAdded) {
             irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
             registrarBtn.addActionListener(e -> registrarResultado());
@@ -104,7 +106,7 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
 
     private void cargarTorneosDisponibles() {
         DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
-        for (Torneo torneo : PanelCrearTorneo.getTorneosCreados()) {
+        for (Torneo torneo : gestorTorneos.getTorneosCreados()) {
             if (!torneo.getFases().isEmpty()) {
                 model.addElement(torneo);
             }
@@ -136,7 +138,6 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
 
             info.append("=== ").append(torneo.getNombre()).append(" ===\n");
             info.append("Disciplina: ").append(torneo.getDisciplina()).append("\n");
-            info.append("Fecha: ").append(sdf.format(torneo.getFecha())).append("\n\n");
             info.append(torneo.getEstructuraTexto());
 
             infoTorneoArea.setText(info.toString());

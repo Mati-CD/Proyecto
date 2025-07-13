@@ -22,9 +22,6 @@ public class Torneo {
     public String getDisciplina() {
         return torneo.getDisciplina(); }
 
-    public Date getFecha() {
-        return new Date(); }
-
     public List<Participante> getParticipantes() {
         return new ArrayList<>(participantes);
     }

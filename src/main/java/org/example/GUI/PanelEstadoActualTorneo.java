@@ -1,5 +1,7 @@
 package org.example.GUI;
 
+import org.example.CodigoLogico.GestorTorneos;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -24,7 +26,7 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
     }
 
     @Override
-    public void inicializar(ActionAssigner actionAssigner) {
+    public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_USUARIO.getID()));
 
         this.revalidate();

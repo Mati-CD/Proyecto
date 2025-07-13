@@ -1,5 +1,7 @@
 package org.example.GUI;
 
+import org.example.CodigoLogico.GestorTorneos;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -28,7 +30,7 @@ public class PanelUsuario extends JPanel implements PanelConfigurable {
     }
 
     @Override
-    public void inicializar(ActionAssigner actionAssigner) {
+    public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         irAInicioBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_INICIO.getID()));
         buttonsGroup.getVerEstadoActualTorneoBtn().addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ESTADO_ACTUAL_TORNEO.getID()));
         buttonsGroup.getVerProxEncuentrosBtn().addActionListener(actionAssigner.getAction(ActionGUI.IR_A_PROXIMOS_ENCUENTROS.getID()));

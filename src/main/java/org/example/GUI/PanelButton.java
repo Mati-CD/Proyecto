@@ -8,5 +8,7 @@ public class PanelButton extends JButton {
         super(label);
         this.setFont(font);
     }
-
+    public void setButtonPreferredSize(Dimension preferredSize) {
+        setPreferredSize(preferredSize);
+    }
 }

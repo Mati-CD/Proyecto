@@ -6,6 +6,7 @@ import java.awt.*;
 import java.text.SimpleDateFormat;
 
 public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, TorneoObserver {
+    private GestorTorneos gestorTorneos;
     private PanelButton irAtrasBtn;
     private PanelButton iniciarTorneoBtn;
     private JComboBox<Torneo> torneosComboBox;
@@ -86,14 +87,15 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
     }
 
     @Override
-    public void inicializar(ActionAssigner actionAssigner) {
+    public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
+        this.gestorTorneos = gestorTorneos;
         if (!listenersAdded) {
             irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
             iniciarTorneoBtn.addActionListener(e -> iniciarTorneo());
 
             // Cargar torneos disponibles
             DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
-            for (Torneo torneo : PanelCrearTorneo.getTorneosCreados()) {
+            for (Torneo torneo : gestorTorneos.getTorneosCreados()) {
                 model.addElement(torneo);
             }
             torneosComboBox.setModel(model);
@@ -120,7 +122,6 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
         // Información básica
         info.append("=== ").append(torneoSeleccionado.getNombre()).append(" ===\n");
         info.append("Disciplina: ").append(torneoSeleccionado.getDisciplina()).append("\n");
-        info.append("Fecha: ").append(sdf.format(torneoSeleccionado.getFecha())).append("\n");
         info.append("Participantes: ").append(torneoSeleccionado.getParticipantes().size()).append("\n\n");
 
         // Mostrar todas las fases

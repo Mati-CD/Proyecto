@@ -1,5 +1,7 @@
 package org.example.GUI;
 
+import org.example.CodigoLogico.GestorTorneos;
+
 import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.util.Stack;
@@ -10,11 +12,13 @@ public class Navegador {
 
     // actionAssigner es un objeto que implementa ActionAssigner
     private ActionAssigner actionAssigner;
+    private GestorTorneos gestorTorneos;
 
     public Navegador(PanelPrincipal panelPrincipal) {
         this.panelPrincipal = panelPrincipal;
         this.historial = new Stack<>();
         this.actionAssigner = new AbstractActionAssigner(this) {};
+        this.gestorTorneos = new GestorTorneos();
     }
 
     private <T extends JPanel & PanelConfigurable> void mostrarPanel(
@@ -26,7 +30,7 @@ public class Navegador {
         }
 
         T panel = panelPrincipal.getPanel(panelType);
-        panel.inicializar(actionAssigner);
+        panel.inicializar(actionAssigner, gestorTorneos);
         panelPrincipal.cambiarPanel(panel);
     }
 
@@ -36,7 +40,7 @@ public class Navegador {
         PanelInicio panelInicio = panelPrincipal.getPanel(PanelType.INICIO);
 
         // Inicializar
-        panelInicio.inicializar(actionAssigner);
+        panelInicio.inicializar(actionAssigner, gestorTorneos);
         panelPrincipal.cambiarPanel(panelInicio);
     }
 
