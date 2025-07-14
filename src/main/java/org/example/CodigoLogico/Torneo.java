@@ -3,7 +3,12 @@ package org.example.CodigoLogico;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Clase principal que representa un torneo, incluyendo participantes, fases y lógica de desarrollo.
+ * Extiende {@link ObserverController} para enviar notificaciones a los observadores.
+ */
 public class Torneo extends ObserverController {
+
     private final List<FaseTorneo> fases = new ArrayList<>();
     private final List<Participante> participantes;
     private String campeon;
@@ -11,6 +16,13 @@ public class Torneo extends ObserverController {
     private String disciplina;
     private String tipoDeInscripcion;
 
+    /**
+     * Constructor para crear un nuevo torneo.
+     *
+     * @param nombre nombre del torneo
+     * @param disciplina disciplina o deporte del torneo
+     * @param tipoDeInscripcion tipo de inscripción (ej: "Individual", "Grupal")
+     */
     public Torneo(String nombre, String disciplina, String tipoDeInscripcion) {
         this.nombre = nombre;
         this.disciplina = disciplina;
@@ -19,15 +31,12 @@ public class Torneo extends ObserverController {
     }
 
     // Métodos de acceso
-    public String getNombre() {
-        return nombre;
-    }
-    public String getDisciplina() {
-        return disciplina;
-    }
-    public String getTipoDeInscripcion() {
-        return tipoDeInscripcion;
-    }
+
+    public String getNombre() { return nombre; }
+
+    public String getDisciplina() { return disciplina; }
+
+    public String getTipoDeInscripcion() { return tipoDeInscripcion; }
 
     public List<Participante> getParticipantes() {
         return new ArrayList<>(participantes);
@@ -49,6 +58,11 @@ public class Torneo extends ObserverController {
         return campeon != null;
     }
 
+    /**
+     * Retorna los partidos de la fase actual del torneo.
+     *
+     * @return lista de partidos activos
+     */
     public List<Partido> getPartidosActuales() {
         List<Partido> partidos = new ArrayList<>();
         if (!fases.isEmpty()) {
@@ -60,22 +74,20 @@ public class Torneo extends ObserverController {
         return partidos;
     }
 
-    /*public void inscribirParticipante(Participante participante) {
-        if (!participantes.contains(participante)) {
-            participantes.add(participante);
-            notificarObservers("Participante inscrito: " + participante.getDatos());
-        } else {
-            notificarObservers("ERROR: Participante '" + participante.getNombre() + "' ya está inscrito.");
-        }
-    }*/
-
+    /**
+     * Agrega un participante al torneo si no está ya inscrito.
+     *
+     * @param participante participante a agregar
+     */
     void addParticipante(Participante participante) {
         if (!participantes.contains(participante)) {
             participantes.add(participante);
         }
     }
 
-    // Inicio del torneo
+    /**
+     * Inicia el torneo validando la cantidad de participantes e iniciando la fase inicial.
+     */
     public void iniciarTorneo() {
         if (!esPotenciaDeDos(participantes.size())) {
             notificarObservers("El número de participantes debe ser potencia de 2 (2, 4, 8, 16...)");
@@ -88,11 +100,21 @@ public class Torneo extends ObserverController {
         notificarObservers("Torneo iniciado con " + participantes.size() + " participantes");
     }
 
+    /**
+     * Verifica si el número dado es una potencia de dos.
+     *
+     * @param numero número a verificar
+     * @return true si es potencia de dos
+     */
     private boolean esPotenciaDeDos(int numero) {
         return numero > 0 && (numero & (numero - 1)) == 0;
     }
 
     // Gestión de fases
+
+    /**
+     * Crea la primera fase del torneo emparejando a los participantes.
+     */
     private void crearFaseInicial() {
         int numParticipantes = participantes.size();
         String nombreFase = obtenerNombreFase(numParticipantes);
@@ -109,6 +131,12 @@ public class Torneo extends ObserverController {
         notificarObservers(nombreFase + " programada");
     }
 
+    /**
+     * Devuelve el nombre adecuado para una fase según el número de participantes.
+     *
+     * @param numParticipantes cantidad de jugadores en la fase
+     * @return nombre de la fase
+     */
     private String obtenerNombreFase(int numParticipantes) {
         return switch (numParticipantes) {
             case 2 -> "Final";
@@ -120,6 +148,13 @@ public class Torneo extends ObserverController {
     }
 
     // Registro de resultados
+
+    /**
+     * Registra el resultado de un partido y avanza el torneo si es necesario.
+     *
+     * @param partido partido cuyo resultado se registrará
+     * @param resultado resultado del partido
+     */
     public void registrarResultado(Partido partido, String resultado) {
         partido.registrarResultado(resultado);
         notificarObservers("Resultado registrado: " + partido);
@@ -133,17 +168,27 @@ public class Torneo extends ObserverController {
         }
     }
 
+    /**
+     * Verifica si todos los partidos de la fase actual tienen un ganador.
+     *
+     * @return true si todos los partidos están completados
+     */
     public boolean todosLosPartidosCompletados() {
         if (fases.isEmpty()) return false;
 
         for (TorneoComponent componente : getFaseActual().getComponentes()) {
-            if (((Partido)componente).getGanador() == null) {
+            if (((Partido) componente).getGanador() == null) {
                 return false;
             }
         }
         return true;
     }
 
+    /**
+     * Verifica si la fase actual corresponde a la final.
+     *
+     * @return true si la fase actual es la final
+     */
     public boolean esFinal() {
         return !fases.isEmpty() && getFaseActual().getNombre().equals("Final");
     }
@@ -153,7 +198,6 @@ public class Torneo extends ObserverController {
         String nombreFase = obtenerNombreFase(ganadores.size());
 
         FaseTorneo nuevaFase = new FaseTorneo(nombreFase);
-
         for (int i = 0; i < ganadores.size(); i += 2) {
             Partido partido = new Partido(ganadores.get(i), ganadores.get(i + 1), nombreFase);
             nuevaFase.agregar(partido);
@@ -163,20 +207,34 @@ public class Torneo extends ObserverController {
         notificarObservers(nuevaFase.getNombre() + " programada");
     }
 
+    /**
+     * Obtiene los ganadores de la última fase jugada.
+     *
+     * @return lista de nombres de los ganadores
+     */
     private List<String> obtenerGanadoresUltimaFase() {
         List<String> ganadores = new ArrayList<>();
         for (TorneoComponent componente : getFaseActual().getComponentes()) {
-            ganadores.add(((Partido)componente).getGanador());
+            ganadores.add(((Partido) componente).getGanador());
         }
         return ganadores;
     }
 
+    /**
+     * Declara al campeón del torneo con base en el último partido ganado.
+     */
     private void declararCampeon() {
         campeon = obtenerGanadoresUltimaFase().get(0);
         notificarObservers("¡Campeón declarado: " + campeon + "!");
     }
 
     // Representación textual
+
+    /**
+     * Devuelve una representación textual completa del torneo, incluyendo fases y campeón.
+     *
+     * @return estructura textual del torneo
+     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -197,6 +255,11 @@ public class Torneo extends ObserverController {
         return sb.toString();
     }
 
+    /**
+     * Retorna la estructura del torneo como cadena de texto.
+     *
+     * @return resumen completo del torneo
+     */
     public String getEstructuraTexto() {
         return this.toString();
     }
