@@ -5,38 +5,15 @@ package org.example.CodigoLogico;
  * Incluye información adicional como país y edad.
  */
 public class ParticipanteIndividual extends Participante {
-    private String pais;
-    private int edad;
 
     /**
      * Crea un participante individual con su nombre, edad y país.
      *
      * @param nombre nombre del participante
-     * @param edad edad del participante
-     * @param pais país de origen del participante
      */
-    public ParticipanteIndividual(String nombre, int edad, String pais) {
+    public ParticipanteIndividual(String nombre) {
         super(nombre);
-        this.pais = pais;
-        this.edad = edad;
-    }
 
-    /**
-     * Devuelve el país del participante.
-     *
-     * @return país de origen
-     */
-    public String getPais() {
-        return pais;
-    }
-
-    /**
-     * Devuelve la edad del participante.
-     *
-     * @return edad del participante
-     */
-    public int getEdad() {
-        return edad;
     }
 
     /**
@@ -56,8 +33,7 @@ public class ParticipanteIndividual extends Participante {
      */
     @Override
     public String getDatos() {
-        String paisStr = (pais == null || pais.isEmpty()) ? "Sin país" : pais;
-        return getNombre() + " (Individual - " + paisStr + " - " + edad + " años - " + getCorreo() + ")";
+        return getNombre() + " (Individual - " + getCorreo() + ")";
     }
 
     /**
@@ -67,6 +43,6 @@ public class ParticipanteIndividual extends Participante {
      */
     @Override
     public String toString() {
-        return getNombre() + " (" + (pais != null ? pais : "Sin país") + ")";
+        return getNombre();
     }
 }

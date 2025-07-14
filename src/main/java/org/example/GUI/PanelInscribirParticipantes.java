@@ -159,23 +159,12 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
 
     private void clickInscribirBtn() {
         String nombre = panelFormularioInscripcion.getNombre();
-        String pais = panelFormularioInscripcion.getPais();
-        int edad = panelFormularioInscripcion.getEdad();
         String correo = panelFormularioInscripcion.getCorreo();
 
-        if (nombre.isEmpty() || pais.isEmpty() || correo.isEmpty()) {
+        if (nombre.isEmpty()  || correo.isEmpty()) {
             GuiUtilidades.showMessageOnce(this, "Por favor complete todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        if (edad == -1) {
-            GuiUtilidades.showMessageOnce(this, "La edad debe ser un número.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        if (edad <= 0) {
-            GuiUtilidades.showMessageOnce(this, "La edad debe ser positiva.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
         if (torneoSeleccionado == null || gestorTorneos.getTorneosCreados().isEmpty()) {
             GuiUtilidades.showMessageOnce(this, "No hay torneos creados para inscribir participantes." +
@@ -184,7 +173,7 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         }
 
         // Crear un participante con los datos
-        ParticipanteIndividual p = new ParticipanteIndividual(nombre, edad, pais);
+        ParticipanteIndividual p = new ParticipanteIndividual(nombre);
         gestorTorneos.addParticipanteATorneo(torneoSeleccionado.getNombre(), p);
 
         if (gestorTorneos.getInscritoConExito()) {
