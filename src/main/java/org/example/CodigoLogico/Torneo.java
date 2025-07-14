@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Torneo extends ObserverController {
     private final List<FaseTorneo> fases = new ArrayList<>();
-    private final List<Participante> participantes = new ArrayList<>();
+    private final List<Participante> participantes;
     private String campeon;
     private String nombre;
     private String disciplina;
@@ -15,6 +15,7 @@ public class Torneo extends ObserverController {
         this.nombre = nombre;
         this.disciplina = disciplina;
         this.tipoDeInscripcion = tipoDeInscripcion;
+        participantes = new ArrayList<>();
     }
 
     // Métodos de acceso
@@ -59,12 +60,18 @@ public class Torneo extends ObserverController {
         return partidos;
     }
 
-    public void inscribirParticipante(Participante participante) {
+    /*public void inscribirParticipante(Participante participante) {
         if (!participantes.contains(participante)) {
             participantes.add(participante);
             notificarObservers("Participante inscrito: " + participante.getDatos());
         } else {
             notificarObservers("ERROR: Participante '" + participante.getNombre() + "' ya está inscrito.");
+        }
+    }*/
+
+    void addParticipante(Participante participante) {
+        if (!participantes.contains(participante)) {
+            participantes.add(participante);
         }
     }
 

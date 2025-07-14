@@ -95,9 +95,9 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable, Torne
 
         // Crear torneo con nombre, disciplina y tipo de Inscripcion
         Torneo torneo = new Torneo(nombre, disciplina, tipoDeInscripcion);
-        gestorTorneos.add(torneo);
+        gestorTorneos.addTorneo(torneo);
 
-        if (gestorTorneos.creadoConExito()) {
+        if (gestorTorneos.getCreadoConExito()) {
             panelFormularioTorneo.clearFields();
             actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()).actionPerformed(e);
         }
