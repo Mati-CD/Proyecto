@@ -6,7 +6,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         // Crear un torneo
-        Torneo torneo = new Torneo("Davis Cup", "Tennis", "Individiual");
+        Torneo torneo = new Torneo("Davis Cup", "Tennis", "Individiual", 8);
 
         // Registrar un observador simple que muestra notificaciones en consola
         torneo.registrarObserver(mensaje -> System.out.println("[NOTIFICACIÓN] " + mensaje));
@@ -21,6 +21,7 @@ public class Main {
         inscritos.add(new ParticipanteIndividual("Nicolás Jarry", 29, "Chile"));
         inscritos.add(new ParticipanteIndividual("Stefanos Tsitsipas", 26, "Grecia"));
         inscritos.add(new ParticipanteIndividual("Marcelo Ríos", 49, "Chile"));
+        inscritos.add(new ParticipanteIndividual("Roger Federer", 42, "Suiza"));
 
         for (Participante p : inscritos.getInscritos()) {
             torneo.addParticipante(p);

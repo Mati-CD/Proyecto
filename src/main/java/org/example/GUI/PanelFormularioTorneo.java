@@ -7,6 +7,7 @@ public class PanelFormularioTorneo extends JPanel {
     private JTextField fieldNombre;
     private JTextField fieldDisciplina;
     private JComboBox<String> comboTipoInscripcion;
+    private JComboBox<Integer> comboNumParticipantes;
 
     public PanelFormularioTorneo() {
         setOpaque(false);
@@ -21,20 +22,16 @@ public class PanelFormularioTorneo extends JPanel {
         Dimension preferredComboSize = new Dimension(220, preferredHeight);
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0, 0, 150, 0);
-
-        gbc.gridx = 0;
+        gbc.insets = new Insets(0, 0, 100, 0);
         gbc.anchor = GridBagConstraints.EAST;
         gbc.weightx = 0.0;
         gbc.fill = GridBagConstraints.NONE;
 
         GridBagConstraints gbcField = new GridBagConstraints();
-        gbcField.gridx = 1;
+        gbcField.insets = new Insets(0, 10, 100, 0);
         gbcField.anchor = GridBagConstraints.WEST;
         gbcField.weightx = 1.0;
         gbcField.fill = GridBagConstraints.HORIZONTAL;
-
-        gbcField.insets = new Insets(0, 10, 150, 0);
 
         // Nombre
         gbc.gridy = 0;
@@ -61,7 +58,7 @@ public class PanelFormularioTorneo extends JPanel {
         add(fieldDisciplina, gbcField);
 
         // Tipo de inscripcion
-        gbc.gridy = 2; // Fila 2
+        gbc.gridy = 2;
         JLabel labelTipoInscripcion = new JLabel("Tipo de Inscripción:");
         labelTipoInscripcion.setFont(font1);
         add(labelTipoInscripcion, gbc);
@@ -72,6 +69,20 @@ public class PanelFormularioTorneo extends JPanel {
         comboTipoInscripcion.setFont(font1);
         comboTipoInscripcion.setPreferredSize(preferredComboSize);
         add(comboTipoInscripcion, gbcField);
+
+        // Número de Participantes
+        gbc.gridy = 3;
+        JLabel labelNumParticipantes = new JLabel("Número de Participantes:"); //
+        labelNumParticipantes.setFont(font1);
+        add(labelNumParticipantes, gbc);
+
+        gbcField.gridy = 3;
+        Integer[] numParticipantesOpciones = {2, 4, 8, 16, 32};
+        comboNumParticipantes = new JComboBox<>(numParticipantesOpciones);
+        comboNumParticipantes.setFont(font1);
+        comboNumParticipantes.setPreferredSize(preferredComboSize);
+        comboNumParticipantes.setSelectedIndex(0);
+        add(comboNumParticipantes, gbcField);
     }
 
     public String getNombre() {
@@ -86,8 +97,14 @@ public class PanelFormularioTorneo extends JPanel {
         return (String) comboTipoInscripcion.getSelectedItem();
     }
 
+    public int getNumParticipantes() {
+        return (Integer) comboNumParticipantes.getSelectedItem();
+    }
+
     public void clearFields() {
         fieldNombre.setText("");
         fieldDisciplina.setText("");
+        comboTipoInscripcion.setSelectedIndex(0);
+        comboNumParticipantes.setSelectedIndex(0);
     }
 }

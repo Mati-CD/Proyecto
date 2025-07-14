@@ -74,7 +74,7 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable, Torne
 
     @Override
     public void actualizar(String mensaje) {
-        if (mensaje.contains("ERROR") || mensaje.contains("Ya existe un torneo")) {
+        if (mensaje.contains("Ya existe un torneo con el nombre")) {
             GuiUtilidades.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
         } else if (mensaje.contains("Torneo creado exitosamente:")) {
             GuiUtilidades.showMessageOnce(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
@@ -85,14 +85,15 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable, Torne
         String nombre = panelFormularioTorneo.getNombre().trim();
         String disciplina = panelFormularioTorneo.getDisciplina().trim();
         String tipoDeInscripcion = panelFormularioTorneo.getTipoInscripcion();
+        int numParticipantes = panelFormularioTorneo.getNumParticipantes();
 
         if (nombre.isEmpty() || disciplina.isEmpty()) {
             GuiUtilidades.showMessageOnce(this, "Por favor complete todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Crear torneo con nombre, disciplina y tipo de Inscripcion
-        Torneo torneo = new Torneo(nombre, disciplina, tipoDeInscripcion);
+        // Crear torneo con nombre, disciplina, tipo de Inscripcion y numero de participantes
+        Torneo torneo = new Torneo(nombre, disciplina, tipoDeInscripcion, numParticipantes);
         gestorTorneos.addTorneo(torneo);
 
         if (gestorTorneos.getCreadoConExito()) {

@@ -1,6 +1,7 @@
 package org.example.CodigoLogico;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -8,13 +9,13 @@ import java.util.List;
  * Extiende {@link ObserverController} para enviar notificaciones a los observadores.
  */
 public class Torneo extends ObserverController {
-
     private final List<FaseTorneo> fases = new ArrayList<>();
     private final List<Participante> participantes;
     private String campeon;
     private String nombre;
     private String disciplina;
     private String tipoDeInscripcion;
+    private int numParticipantes;
 
     /**
      * Constructor para crear un nuevo torneo.
@@ -23,20 +24,30 @@ public class Torneo extends ObserverController {
      * @param disciplina disciplina o deporte del torneo
      * @param tipoDeInscripcion tipo de inscripción (ej: "Individual", "Grupal")
      */
-    public Torneo(String nombre, String disciplina, String tipoDeInscripcion) {
+
+    public Torneo(String nombre, String disciplina, String tipoDeInscripcion, int numParticipantes) {
         this.nombre = nombre;
         this.disciplina = disciplina;
         this.tipoDeInscripcion = tipoDeInscripcion;
+        this.numParticipantes = numParticipantes;
         participantes = new ArrayList<>();
     }
 
-    // Métodos de acceso
+    public String getNombre() {
+        return nombre;
+    }
 
-    public String getNombre() { return nombre; }
+    public String getDisciplina() {
+        return disciplina;
+    }
 
-    public String getDisciplina() { return disciplina; }
+    public String getTipoDeInscripcion() {
+        return tipoDeInscripcion;
+    }
 
-    public String getTipoDeInscripcion() { return tipoDeInscripcion; }
+    public int getNumParticipantes() {
+        return numParticipantes;
+    }
 
     public List<Participante> getParticipantes() {
         return new ArrayList<>(participantes);
@@ -85,29 +96,23 @@ public class Torneo extends ObserverController {
         }
     }
 
-    /**
-     * Inicia el torneo validando la cantidad de participantes e iniciando la fase inicial.
-     */
-    public void iniciarTorneo() {
-        if (!esPotenciaDeDos(participantes.size())) {
-            notificarObservers("El número de participantes debe ser potencia de 2 (2, 4, 8, 16...)");
-            return;
-        }
-
-        fases.clear();
-        campeon = null;
-        crearFaseInicial();
-        notificarObservers("Torneo iniciado con " + participantes.size() + " participantes");
+    public boolean removeParticipante(Participante participante) {
+        return participantes.remove(participante);
     }
 
     /**
-     * Verifica si el número dado es una potencia de dos.
-     *
-     * @param numero número a verificar
-     * @return true si es potencia de dos
+     * Inicia el torneo validando la cantidad de participantes e iniciando la fase inicial.
      */
-    private boolean esPotenciaDeDos(int numero) {
-        return numero > 0 && (numero & (numero - 1)) == 0;
+    // Inicio del torneo
+    public void iniciarTorneo() {
+
+        fases.clear();
+        campeon = null;
+
+        Collections.shuffle(this.participantes);
+
+        crearFaseInicial();
+        notificarObservers("Torneo iniciado con " + participantes.size() + " participantes");
     }
 
     // Gestión de fases
