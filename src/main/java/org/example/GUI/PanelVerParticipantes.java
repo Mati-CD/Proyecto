@@ -4,6 +4,10 @@ import org.example.CodigoLogico.*;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Panel que permite visualizar los participantes inscritos en un torneo seleccionado.
+ * Se actualiza automáticamente cuando hay cambios en el torneo (implementa TorneoObserver).
+ */
 public class PanelVerParticipantes extends JPanel implements PanelConfigurable, TorneoObserver {
     private GestorTorneos gestorTorneos;
     private PanelButton irAtrasBtn;
@@ -11,6 +15,9 @@ public class PanelVerParticipantes extends JPanel implements PanelConfigurable, 
     private JTextArea participantesArea;
     private boolean listenersAdded = false;
 
+    /**
+     * Constructor que arma la interfaz de selección de torneo y vista de participantes.
+     */
     public PanelVerParticipantes() {
         super(new BorderLayout());
         setBackground(new Color(200, 150, 200));
@@ -56,6 +63,12 @@ public class PanelVerParticipantes extends JPanel implements PanelConfigurable, 
         add(centerPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Inicializa el panel con los datos necesarios.
+     *
+     * @param actionAssigner Encargado de asignar las acciones a los botones.
+     * @param gestorTorneos Objeto que maneja los torneos disponibles y sus datos.
+     */
     @Override
     public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         this.gestorTorneos = gestorTorneos;
@@ -79,6 +92,7 @@ public class PanelVerParticipantes extends JPanel implements PanelConfigurable, 
         this.repaint();
     }
 
+    // Carga los participantes del torneo seleccionado en el área de texto
     private void actualizarParticipantes() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
         StringBuilder sb = new StringBuilder();
@@ -98,6 +112,11 @@ public class PanelVerParticipantes extends JPanel implements PanelConfigurable, 
         participantesArea.setText(sb.toString());
     }
 
+    /**
+     * Método que se llama cuando se actualiza algún torneo observado.
+     *
+     * @param mensaje Texto recibido desde el observable.
+     */
     @Override
     public void actualizar(String mensaje) {
         SwingUtilities.invokeLater(() -> {

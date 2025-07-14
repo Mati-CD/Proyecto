@@ -5,17 +5,26 @@ import org.example.CodigoLogico.GestorTorneos;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Panel que representa la vista principal del organizador,
+ * incluyendo botones para las acciones clave como crear torneos,
+ * inscribir participantes e iniciar torneos.
+ */
 public class PanelOrganizador extends JPanel implements PanelConfigurable {
     private OrganizadorButtons buttonsGroup;
     private PanelButton irAInicioBtn;
 
+    /**
+     * Constructor que inicializa y configura los componentes del panel.
+     */
     public PanelOrganizador() {
         super(new BorderLayout());
         setBackground(new Color(200, 255, 200));
 
         Font font1 = new Font("Arial", Font.BOLD, 12);
         irAInicioBtn = new PanelButton("Volver al Inicio", font1);
-        // Posicionar boton
+
+        // Posicionar botón
         JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topLeftPanel.setOpaque(false);
         topLeftPanel.add(irAInicioBtn);
@@ -29,6 +38,12 @@ public class PanelOrganizador extends JPanel implements PanelConfigurable {
         add(centerLeftPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Inicializa el panel, asignando acciones a los botones según el controlador recibido.
+     *
+     * @param actionAssigner el asignador de acciones que contiene los mapeos a ejecutar
+     * @param gestorTorneos  el gestor central de torneos utilizado por la aplicación
+     */
     @Override
     public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         irAInicioBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_INICIO.getID()));
@@ -41,3 +56,4 @@ public class PanelOrganizador extends JPanel implements PanelConfigurable {
         this.repaint();
     }
 }
+

@@ -7,6 +7,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.text.SimpleDateFormat;
 
+/**
+ * Panel que permite al usuario registrar el resultado de un partido en un torneo.
+ * Incluye selección de torneo, partido y resultado, además de mostrar información del torneo.
+ */
 public class PanelRegistrarResultados extends JPanel implements PanelConfigurable {
     private GestorTorneos gestorTorneos;
     private PanelButton irAtrasBtn;
@@ -17,6 +21,9 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
     private JTextArea infoTorneoArea;
     private boolean listenersAdded = false;
 
+    /**
+     * Crea e inicializa todos los componentes visuales del panel.
+     */
     public PanelRegistrarResultados() {
         super(new BorderLayout());
         setBackground(new Color(26, 94, 24));
@@ -24,7 +31,6 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
 
         Font font = new Font("SansSerif", Font.BOLD, 16);
 
-        // Configuración de componentes
         irAtrasBtn = new PanelButton("Volver atrás", font);
         registrarBtn = new PanelButton("Registrar Resultado", font);
 
@@ -38,7 +44,6 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         infoTorneoArea.setBackground(new Color(26, 94, 24));
         infoTorneoArea.setForeground(Color.WHITE);
 
-        // Organización de la interfaz
         JPanel formPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         formPanel.setOpaque(false);
 
@@ -49,27 +54,29 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         formPanel.add(createLabel("Resultado:"));
         formPanel.add(resultadoComboBox);
 
-        // Panel para el botón de registrar
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         buttonPanel.setOpaque(false);
         buttonPanel.add(registrarBtn);
 
-        // Agregar componentes al panel principal
         add(irAtrasBtn, BorderLayout.NORTH);
         add(formPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
         add(new JScrollPane(infoTorneoArea), BorderLayout.EAST);
 
-        // Configurar el botón de registrar como botón por defecto
         JRootPane rootPane = SwingUtilities.getRootPane(this);
         if (rootPane != null) {
             rootPane.setDefaultButton(registrarBtn);
         }
 
-        // Permitir confirmar con Enter en el comboBox de resultados
         resultadoComboBox.addActionListener(e -> registrarResultado());
     }
 
+    /**
+     * Crea una etiqueta con formato estándar.
+     *
+     * @param text Texto a mostrar.
+     * @return JLabel configurada con el texto dado.
+     */
     private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
         label.setForeground(Color.WHITE);
@@ -77,6 +84,12 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         return label;
     }
 
+    /**
+     * Inicializa el panel asignando acciones y cargando torneos.
+     *
+     * @param actionAssigner Asignador de acciones para los botones.
+     * @param gestorTorneos Gestor que maneja los torneos.
+     */
     @Override
     public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         this.gestorTorneos = gestorTorneos;
@@ -104,6 +117,9 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         }
     }
 
+    /**
+     * Carga en el comboBox los torneos que tienen al menos una fase creada.
+     */
     private void cargarTorneosDisponibles() {
         DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
         for (Torneo torneo : gestorTorneos.getTorneosCreados()) {
@@ -114,6 +130,9 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         torneosComboBox.setModel(model);
     }
 
+    /**
+     * Carga en el comboBox los partidos que aún no tienen resultados del torneo seleccionado.
+     */
     private void cargarPartidosDisponibles() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
         DefaultComboBoxModel<Partido> model = new DefaultComboBoxModel<>();
@@ -130,6 +149,9 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         actualizarInformacionTorneo();
     }
 
+    /**
+     * Muestra en el área de texto información básica del torneo seleccionado.
+     */
     private void actualizarInformacionTorneo() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
         if (torneo != null) {
@@ -146,6 +168,9 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         }
     }
 
+    /**
+     * Registra el resultado seleccionado para el partido actual y muestra mensaje de éxito o error.
+     */
     private void registrarResultado() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
         Partido partido = (Partido) partidosComboBox.getSelectedItem();
@@ -163,6 +188,13 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         showMessageOnce("Resultado registrado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Muestra un mensaje de diálogo en el hilo de interfaz.
+     *
+     * @param message Mensaje a mostrar.
+     * @param title Título del cuadro de diálogo.
+     * @param messageType Tipo de mensaje (JOptionPane).
+     */
     private void showMessageOnce(String message, String title, int messageType) {
         SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(this, message, title, messageType);

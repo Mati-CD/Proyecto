@@ -5,6 +5,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Panel que permite visualizar los próximos encuentros de los torneos disponibles.
+ */
 public class PanelProximosEncuentros extends JPanel implements PanelConfigurable, TorneoObserver {
     private GestorTorneos gestorTorneos;
     private PanelButton irAtrasBtn;
@@ -13,6 +16,9 @@ public class PanelProximosEncuentros extends JPanel implements PanelConfigurable
     private DefaultListModel<String> encuentrosModel;
     private boolean listenersAdded = false;
 
+    /**
+     * Constructor que inicializa los componentes gráficos del panel.
+     */
     public PanelProximosEncuentros() {
         super(new BorderLayout());
         setBackground(new Color(179, 85, 3));
@@ -21,29 +27,24 @@ public class PanelProximosEncuentros extends JPanel implements PanelConfigurable
         Font font = new Font("SansSerif", Font.BOLD, 16);
         Font titleFont = new Font("Arial", Font.BOLD, 24);
 
-        // Panel superior
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
 
-        // Botón de volver
         irAtrasBtn = new PanelButton("Volver atrás", font);
         JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topLeftPanel.setOpaque(false);
         topLeftPanel.add(irAtrasBtn);
         topPanel.add(topLeftPanel, BorderLayout.WEST);
 
-        // Título
         JLabel titleLabel = new JLabel("Próximos Encuentros", SwingConstants.CENTER);
         titleLabel.setFont(titleFont);
         topPanel.add(titleLabel, BorderLayout.CENTER);
         add(topPanel, BorderLayout.NORTH);
 
-        // Panel central
         JPanel centerPanel = new JPanel(new BorderLayout(10, 10));
         centerPanel.setOpaque(false);
         centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
-        // Selección de torneo
         JPanel torneoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         torneoPanel.setOpaque(false);
         torneoPanel.add(new JLabel("Seleccione torneo:"));
@@ -52,7 +53,6 @@ public class PanelProximosEncuentros extends JPanel implements PanelConfigurable
         torneoPanel.add(torneosComboBox);
         centerPanel.add(torneoPanel, BorderLayout.NORTH);
 
-        // Lista de próximos encuentros
         encuentrosModel = new DefaultListModel<>();
         encuentrosList = new JList<>(encuentrosModel);
         encuentrosList.setFont(font);
@@ -62,6 +62,12 @@ public class PanelProximosEncuentros extends JPanel implements PanelConfigurable
         add(centerPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Inicializa el panel con las acciones asignadas y registra observadores.
+     *
+     * @param actionAssigner objeto que asigna acciones a los botones
+     * @param gestorTorneos  gestor del sistema de torneos
+     */
     @Override
     public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         this.gestorTorneos = gestorTorneos;
@@ -69,7 +75,6 @@ public class PanelProximosEncuentros extends JPanel implements PanelConfigurable
         if (!listenersAdded) {
             irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_USUARIO.getID()));
 
-            // Cargar torneos disponibles
             DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
             for (Torneo torneo : gestorTorneos.getTorneosCreados()) {
                 model.addElement(torneo);
@@ -86,6 +91,9 @@ public class PanelProximosEncuentros extends JPanel implements PanelConfigurable
         this.repaint();
     }
 
+    /**
+     * Actualiza la lista de encuentros según el torneo seleccionado.
+     */
     private void actualizarProximosEncuentros() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
         encuentrosModel.clear();
@@ -115,10 +123,13 @@ public class PanelProximosEncuentros extends JPanel implements PanelConfigurable
         }
     }
 
+    /**
+     * Método llamado al recibir notificación desde el observable.
+     *
+     * @param mensaje mensaje emitido por el torneo
+     */
     @Override
     public void actualizar(String mensaje) {
-        SwingUtilities.invokeLater(() -> {
-            actualizarProximosEncuentros();
-        });
+        SwingUtilities.invokeLater(this::actualizarProximosEncuentros);
     }
 }

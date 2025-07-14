@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Panel que muestra estadísticas generales de un torneo seleccionado desde un comboBox.
+ */
 public class PanelEstadisticasGenerales extends JPanel implements PanelConfigurable, TorneoObserver {
     private GestorTorneos gestorTorneos;
     private PanelButton irAtrasBtn;
@@ -14,6 +17,9 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
     private JTextArea estadisticasArea;
     private boolean listenersAdded = false;
 
+    /**
+     * Construye el panel de estadísticas generales con su interfaz gráfica.
+     */
     public PanelEstadisticasGenerales() {
         super(new BorderLayout());
         setBackground(new Color(104, 120, 1));
@@ -22,29 +28,24 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
         Font font = new Font("SansSerif", Font.BOLD, 16);
         Font titleFont = new Font("Arial", Font.BOLD, 24);
 
-        // Panel superior
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
 
-        // Botón de volver
         irAtrasBtn = new PanelButton("Volver atrás", font);
         JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topLeftPanel.setOpaque(false);
         topLeftPanel.add(irAtrasBtn);
         topPanel.add(topLeftPanel, BorderLayout.WEST);
 
-        // Título
         JLabel titleLabel = new JLabel("Estadísticas Generales", SwingConstants.CENTER);
         titleLabel.setFont(titleFont);
         topPanel.add(titleLabel, BorderLayout.CENTER);
         add(topPanel, BorderLayout.NORTH);
 
-        // Panel central
         JPanel centerPanel = new JPanel(new BorderLayout(10, 10));
         centerPanel.setOpaque(false);
         centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
-        // Selección de torneo
         JPanel torneoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         torneoPanel.setOpaque(false);
         torneoPanel.add(new JLabel("Seleccione torneo:"));
@@ -53,7 +54,6 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
         torneoPanel.add(torneosComboBox);
         centerPanel.add(torneoPanel, BorderLayout.NORTH);
 
-        // Área de texto para estadísticas
         estadisticasArea = new JTextArea();
         estadisticasArea.setEditable(false);
         estadisticasArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
@@ -65,6 +65,12 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
         add(centerPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Inicializa el panel cargando los torneos y asignando acciones a los botones.
+     *
+     * @param actionAssigner objeto que permite obtener acciones asociadas a eventos
+     * @param gestorTorneos gestor que contiene la lógica de los torneos
+     */
     @Override
     public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         this.gestorTorneos = gestorTorneos;
@@ -72,7 +78,6 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
         if (!listenersAdded) {
             irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_USUARIO.getID()));
 
-            // Cargar torneos disponibles
             DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
             for (Torneo torneo : gestorTorneos.getTorneosCreados()) {
                 model.addElement(torneo);
@@ -89,19 +94,20 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
         this.repaint();
     }
 
+    /**
+     * Actualiza el área de texto con estadísticas del torneo seleccionado.
+     */
     private void actualizarEstadisticas() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
         StringBuilder sb = new StringBuilder();
 
         if (torneo != null) {
-            // Estadísticas básicas del torneo
             sb.append("=== ESTADÍSTICAS GENERALES ===\n\n");
             sb.append("Torneo: ").append(torneo.getNombre()).append("\n");
             sb.append("Disciplina: ").append(torneo.getDisciplina()).append("\n");
             sb.append("Tipo de inscripción: ").append(torneo.getTipoDeInscripcion()).append("\n");
             sb.append("Total participantes: ").append(torneo.getParticipantes().size()).append("\n");
 
-            // Estado del torneo
             if (torneo.tieneCampeon()) {
                 sb.append("\nEstado: Finalizado\n");
                 sb.append("Campeón: ").append(torneo.getCampeon()).append("\n");
@@ -112,7 +118,6 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
                 sb.append("\nEstado: Sin iniciar\n");
             }
 
-            // Estadísticas de partidos
             int partidosJugados = 0;
             int partidosPendientes = 0;
             Map<String, Integer> victoriasPorParticipante = new HashMap<>();
@@ -135,7 +140,6 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
             sb.append("Pendientes: ").append(partidosPendientes).append("\n");
             sb.append("Total: ").append(partidosJugados + partidosPendientes).append("\n");
 
-            // Estadísticas de participantes
             if (!victoriasPorParticipante.isEmpty()) {
                 sb.append("\n=== PARTICIPANTES DESTACADOS ===\n");
                 victoriasPorParticipante.entrySet().stream()
@@ -145,7 +149,6 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
                                 .append(entry.getValue()).append(" victoria(s)\n"));
             }
 
-            // Porcentaje de avance del torneo
             if (partidosJugados + partidosPendientes > 0) {
                 double porcentaje = (double) partidosJugados / (partidosJugados + partidosPendientes) * 100;
                 sb.append("\nAvance del torneo: ").append(String.format("%.1f", porcentaje)).append("%\n");
@@ -157,6 +160,11 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
         estadisticasArea.setText(sb.toString());
     }
 
+    /**
+     * Actualiza el panel con el mensaje recibido del observable.
+     *
+     * @param mensaje mensaje emitido desde el torneo observado
+     */
     @Override
     public void actualizar(String mensaje) {
         SwingUtilities.invokeLater(() -> {

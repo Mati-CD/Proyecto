@@ -5,6 +5,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Panel que muestra el estado actual de un torneo, incluyendo sus fases y partidos.
+ */
 public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable, TorneoObserver {
     private GestorTorneos gestorTorneos;
     private PanelButton irAtrasBtn;
@@ -12,6 +15,9 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
     private JTextArea estadoTorneoArea;
     private boolean listenersAdded = false;
 
+    /**
+     * Crea el panel con el diseño gráfico correspondiente al estado actual del torneo.
+     */
     public PanelEstadoActualTorneo() {
         super(new BorderLayout());
         setBackground(new Color(0, 32, 142));
@@ -20,29 +26,24 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
         Font font = new Font("SansSerif", Font.BOLD, 16);
         Font titleFont = new Font("Arial", Font.BOLD, 24);
 
-        // Panel superior
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
 
-        // Botón de volver
         irAtrasBtn = new PanelButton("Volver atrás", font);
         JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topLeftPanel.setOpaque(false);
         topLeftPanel.add(irAtrasBtn);
         topPanel.add(topLeftPanel, BorderLayout.WEST);
 
-        // Título
         JLabel titleLabel = new JLabel("Estado Actual del Torneo", SwingConstants.CENTER);
         titleLabel.setFont(titleFont);
         topPanel.add(titleLabel, BorderLayout.CENTER);
         add(topPanel, BorderLayout.NORTH);
 
-        // Panel central
         JPanel centerPanel = new JPanel(new BorderLayout(10, 10));
         centerPanel.setOpaque(false);
         centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
-        // Selección de torneo
         JPanel torneoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         torneoPanel.setOpaque(false);
         torneoPanel.add(new JLabel("Seleccione torneo:"));
@@ -51,7 +52,6 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
         torneoPanel.add(torneosComboBox);
         centerPanel.add(torneoPanel, BorderLayout.NORTH);
 
-        // Área de texto para mostrar el estado
         estadoTorneoArea = new JTextArea();
         estadoTorneoArea.setEditable(false);
         estadoTorneoArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
@@ -63,6 +63,12 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
         add(centerPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Inicializa el panel con el gestor de torneos y asigna las acciones necesarias.
+     *
+     * @param actionAssigner objeto que asigna las acciones de interfaz gráfica
+     * @param gestorTorneos objeto que contiene la lógica del torneo
+     */
     @Override
     public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         this.gestorTorneos = gestorTorneos;
@@ -70,7 +76,6 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
         if (!listenersAdded) {
             irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_USUARIO.getID()));
 
-            // Cargar torneos disponibles
             DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
             for (Torneo torneo : gestorTorneos.getTorneosCreados()) {
                 model.addElement(torneo);
@@ -87,12 +92,14 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
         this.repaint();
     }
 
+    /**
+     * Actualiza el estado mostrado del torneo seleccionado, incluyendo su fase y resultados.
+     */
     private void actualizarEstadoTorneo() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
         if (torneo != null) {
             StringBuilder sb = new StringBuilder();
 
-            // Información básica del torneo
             sb.append("=== ").append(torneo.getNombre()).append(" ===\n");
             sb.append("Disciplina: ").append(torneo.getDisciplina()).append("\n");
             sb.append("Tipo de inscripción: ").append(torneo.getTipoDeInscripcion()).append("\n");
@@ -106,7 +113,6 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
                 sb.append("\nEstado actual: Sin iniciar\n");
             }
 
-            // Mostrar todas las fases con sus partidos
             for (FaseTorneo fase : torneo.getFases()) {
                 sb.append("\n=== ").append(fase.getNombre().toUpperCase()).append(" ===\n");
                 for (TorneoComponent componente : fase.getComponentes()) {
@@ -125,6 +131,11 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
         }
     }
 
+    /**
+     * Actualiza el contenido del panel cuando se recibe un mensaje del observable.
+     *
+     * @param mensaje mensaje enviado por el observable
+     */
     @Override
     public void actualizar(String mensaje) {
         SwingUtilities.invokeLater(() -> {

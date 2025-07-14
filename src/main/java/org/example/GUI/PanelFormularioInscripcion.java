@@ -3,12 +3,18 @@ package org.example.GUI;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Panel de formulario para ingresar datos de inscripción individual.
+ */
 public class PanelFormularioInscripcion extends JPanel {
     private JTextField fieldNombre;
     private JTextField fieldPais;
     private JTextField fieldEdad;
     private JTextField fieldCorreoUsuario;
 
+    /**
+     * Crea e inicializa el formulario con los campos necesarios para inscribir un participante.
+     */
     public PanelFormularioInscripcion() {
         setOpaque(false);
         setLayout(new GridBagLayout());
@@ -22,7 +28,6 @@ public class PanelFormularioInscripcion extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 5, 10, 5);
 
-        // Nombre
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -31,7 +36,6 @@ public class PanelFormularioInscripcion extends JPanel {
         add(labelNombre, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
@@ -40,7 +44,6 @@ public class PanelFormularioInscripcion extends JPanel {
         fieldNombre.setPreferredSize(preferredFieldSize);
         add(fieldNombre, gbc);
 
-        // Datos de Contacto
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 2;
@@ -53,7 +56,6 @@ public class PanelFormularioInscripcion extends JPanel {
         gbc.gridwidth = 1;
         gbc.insets = new Insets(10, 5, 10, 5);
 
-        // País
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.EAST;
@@ -62,7 +64,6 @@ public class PanelFormularioInscripcion extends JPanel {
         add(labelPais, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         fieldPais = new JTextField(15);
@@ -70,7 +71,6 @@ public class PanelFormularioInscripcion extends JPanel {
         fieldPais.setPreferredSize(preferredFieldSize);
         add(fieldPais, gbc);
 
-        // Edad
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.EAST;
@@ -79,7 +79,6 @@ public class PanelFormularioInscripcion extends JPanel {
         add(labelEdad, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 3;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         fieldEdad = new JTextField(15);
@@ -87,7 +86,6 @@ public class PanelFormularioInscripcion extends JPanel {
         fieldEdad.setPreferredSize(preferredFieldSize);
         add(fieldEdad, gbc);
 
-        // Correo
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.anchor = GridBagConstraints.EAST;
@@ -96,11 +94,9 @@ public class PanelFormularioInscripcion extends JPanel {
         add(labelCorreo, gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 4;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Campo de correo y "@gmail.com"
         JPanel correoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         correoPanel.setOpaque(false);
         fieldCorreoUsuario = new JTextField(10);
@@ -113,14 +109,23 @@ public class PanelFormularioInscripcion extends JPanel {
         add(correoPanel, gbc);
     }
 
+    /**
+     * @return el nombre ingresado en el formulario
+     */
     public String getNombre() {
         return fieldNombre.getText().trim();
     }
 
+    /**
+     * @return el país ingresado en el formulario
+     */
     public String getPais() {
         return fieldPais.getText().trim();
     }
 
+    /**
+     * @return la edad ingresada como número entero, o -1 si el valor no es válido
+     */
     public int getEdad() {
         try {
             return Integer.parseInt(fieldEdad.getText().trim());
@@ -129,10 +134,16 @@ public class PanelFormularioInscripcion extends JPanel {
         }
     }
 
+    /**
+     * @return el correo electrónico ingresado en el formulario con sufijo @gmail.com
+     */
     public String getCorreo() {
         return fieldCorreoUsuario.getText().trim() + "@gmail.com";
     }
 
+    /**
+     * Limpia todos los campos del formulario.
+     */
     public void clearFields() {
         fieldNombre.setText("");
         fieldPais.setText("");
