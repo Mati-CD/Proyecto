@@ -62,6 +62,12 @@ public enum PanelType {
         public PanelEstadisticasGenerales crearPanel() {
             return new PanelEstadisticasGenerales();
         }
+    },
+    VER_PARTICIPANTES("VER_PARTICIPANTES") {
+        @Override
+        public PanelVerParticipantes crearPanel() {
+            return new PanelVerParticipantes();
+        }
     };
 
     private final String id;

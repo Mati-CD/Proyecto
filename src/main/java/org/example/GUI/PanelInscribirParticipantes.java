@@ -1,9 +1,6 @@
 package org.example.GUI;
 
-import org.example.CodigoLogico.GestorTorneos;
-import org.example.CodigoLogico.Participante;
-import org.example.CodigoLogico.ParticipanteIndividual;
-import org.example.CodigoLogico.Torneo;
+import org.example.CodigoLogico.*;
 import javax.swing.*;
 import java.awt.*;
 
@@ -101,7 +98,6 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
             throw new IllegalStateException("Panel no ha sido inicializado correctamente");
         }
 
-        // Limpiar listeners existentes para evitar duplicados
         for (var listener : irAtrasBtn.getActionListeners()) {
             irAtrasBtn.removeActionListener(listener);
         }
@@ -112,11 +108,9 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
             torneosComboBox.removeActionListener(listener);
         }
 
-        // Configurar nuevos listeners
         irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
         inscribirBtn.addActionListener(e -> inscribirParticipante());
 
-        // Cargar torneos disponibles
         DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
         for (Torneo torneo : gestorTorneos.getTorneosCreados()) {
             model.addElement(torneo);
@@ -131,6 +125,8 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
     private void inscribirParticipante() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
         String nombre = panelParticipanteInput.getNombreParticipante().trim();
+        String edadStr = panelParticipanteInput.getEdadParticipante().trim();
+        String pais = panelParticipanteInput.getPaisParticipante().trim();
 
         if (torneo == null) {
             JOptionPane.showMessageDialog(this, "Seleccione un torneo primero",
@@ -144,13 +140,19 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
             return;
         }
 
-        ParticipanteIndividual p = new ParticipanteIndividual(nombre, 0, null);
+        try {
+            int edad = edadStr.isEmpty() ? 0 : Integer.parseInt(edadStr);
+            ParticipanteIndividual p = new ParticipanteIndividual(nombre, edad, pais.isEmpty() ? null : pais);
 
-        torneo.inscribirParticipante(p);
-        participantesModel.addElement(p.getNombre());
-        panelParticipanteInput.clearFields();
-        JOptionPane.showMessageDialog(this, "Participante inscrito correctamente",
-                "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            torneo.inscribirParticipante(p);
+            participantesModel.addElement(p.getNombre());
+            panelParticipanteInput.clearFields();
+            JOptionPane.showMessageDialog(this, "Participante inscrito correctamente",
+                    "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "La edad debe ser un número válido",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void actualizarListaParticipantes() {

@@ -3,47 +3,40 @@ package org.example.GUI;
 import org.example.CodigoLogico.*;
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
-public class PanelProximosEncuentros extends JPanel implements PanelConfigurable, TorneoObserver {
+public class PanelVerParticipantes extends JPanel implements PanelConfigurable, TorneoObserver {
     private GestorTorneos gestorTorneos;
     private PanelButton irAtrasBtn;
     private JComboBox<Torneo> torneosComboBox;
-    private JList<String> encuentrosList;
-    private DefaultListModel<String> encuentrosModel;
+    private JTextArea participantesArea;
     private boolean listenersAdded = false;
 
-    public PanelProximosEncuentros() {
+    public PanelVerParticipantes() {
         super(new BorderLayout());
-        setBackground(new Color(179, 85, 3));
+        setBackground(new Color(200, 150, 200));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         Font font = new Font("SansSerif", Font.BOLD, 16);
         Font titleFont = new Font("Arial", Font.BOLD, 24);
 
-        // Panel superior
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
 
-        // Botón de volver
         irAtrasBtn = new PanelButton("Volver atrás", font);
         JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topLeftPanel.setOpaque(false);
         topLeftPanel.add(irAtrasBtn);
         topPanel.add(topLeftPanel, BorderLayout.WEST);
 
-        // Título
-        JLabel titleLabel = new JLabel("Próximos Encuentros", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Datos de Participantes", SwingConstants.CENTER);
         titleLabel.setFont(titleFont);
         topPanel.add(titleLabel, BorderLayout.CENTER);
         add(topPanel, BorderLayout.NORTH);
 
-        // Panel central
         JPanel centerPanel = new JPanel(new BorderLayout(10, 10));
         centerPanel.setOpaque(false);
         centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
-        // Selección de torneo
         JPanel torneoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         torneoPanel.setOpaque(false);
         torneoPanel.add(new JLabel("Seleccione torneo:"));
@@ -52,12 +45,13 @@ public class PanelProximosEncuentros extends JPanel implements PanelConfigurable
         torneoPanel.add(torneosComboBox);
         centerPanel.add(torneoPanel, BorderLayout.NORTH);
 
-        // Lista de próximos encuentros
-        encuentrosModel = new DefaultListModel<>();
-        encuentrosList = new JList<>(encuentrosModel);
-        encuentrosList.setFont(font);
-        encuentrosList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        centerPanel.add(new JScrollPane(encuentrosList), BorderLayout.CENTER);
+        participantesArea = new JTextArea();
+        participantesArea.setEditable(false);
+        participantesArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        participantesArea.setLineWrap(true);
+        participantesArea.setWrapStyleWord(true);
+        participantesArea.setBackground(new Color(240, 240, 240));
+        centerPanel.add(new JScrollPane(participantesArea), BorderLayout.CENTER);
 
         add(centerPanel, BorderLayout.CENTER);
     }
@@ -69,56 +63,45 @@ public class PanelProximosEncuentros extends JPanel implements PanelConfigurable
         if (!listenersAdded) {
             irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_USUARIO.getID()));
 
-            // Cargar torneos disponibles
             DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
             for (Torneo torneo : gestorTorneos.getTorneosCreados()) {
                 model.addElement(torneo);
                 torneo.registrarObserver(this);
             }
             torneosComboBox.setModel(model);
-            torneosComboBox.addActionListener(e -> actualizarProximosEncuentros());
+            torneosComboBox.addActionListener(e -> actualizarParticipantes());
 
             listenersAdded = true;
         }
 
-        actualizarProximosEncuentros();
+        actualizarParticipantes();
         this.revalidate();
         this.repaint();
     }
 
-    private void actualizarProximosEncuentros() {
+    private void actualizarParticipantes() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
-        encuentrosModel.clear();
+        StringBuilder sb = new StringBuilder();
 
-        if (torneo != null && !torneo.getFases().isEmpty()) {
-            FaseTorneo faseActual = torneo.getFaseActual();
+        if (torneo != null) {
+            sb.append("=== PARTICIPANTES DEL TORNEO ===\n\n");
+            sb.append("Torneo: ").append(torneo.getNombre()).append("\n");
+            sb.append("Total participantes: ").append(torneo.getParticipantes().size()).append("\n\n");
 
-            if (faseActual != null) {
-                for (TorneoComponent componente : faseActual.getComponentes()) {
-                    Partido partido = (Partido) componente;
-                    if (!partido.tieneResultado()) {
-                        encuentrosModel.addElement(partido.getJugador1() + " vs " + partido.getJugador2());
-                    }
-                }
-            }
-
-            if (encuentrosModel.isEmpty()) {
-                encuentrosModel.addElement("No hay próximos encuentros pendientes");
-                if (torneo.tieneCampeon()) {
-                    encuentrosModel.addElement("El torneo ha finalizado");
-                } else {
-                    encuentrosModel.addElement("Esperando siguiente fase...");
-                }
+            for (Participante participante : torneo.getParticipantes()) {
+                sb.append(participante.getDatos()).append("\n\n");
             }
         } else {
-            encuentrosModel.addElement("Seleccione un torneo iniciado");
+            sb.append("No hay torneos disponibles");
         }
+
+        participantesArea.setText(sb.toString());
     }
 
     @Override
     public void actualizar(String mensaje) {
         SwingUtilities.invokeLater(() -> {
-            actualizarProximosEncuentros();
+            actualizarParticipantes();
         });
     }
 }

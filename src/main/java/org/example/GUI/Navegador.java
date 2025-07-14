@@ -56,6 +56,9 @@ public class Navegador {
     public void mostrarPanelEstadisticasGenerales() {
         mostrarPanel(PanelType.ESTADISTICAS_GENERALES, e -> mostrarPanelUsuario());
     }
+    public void mostrarPanelVerParticipantes() {
+        mostrarPanel(PanelType.VER_PARTICIPANTES, e -> mostrarPanelUsuario());
+    }
     public void mostrarPanelOrganizador() {
         mostrarPanel(PanelType.ORGANIZADOR, e -> mostrarPanelInicio());
     }
