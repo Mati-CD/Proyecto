@@ -76,10 +76,8 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable, Torne
     public void actualizar(String mensaje) {
         if (mensaje.contains("ERROR") || mensaje.contains("Ya existe un torneo")) {
             GuiUtilidades.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (mensaje.contains("exitosamente")) {
+        } else if (mensaje.contains("Torneo creado exitosamente:")) {
             GuiUtilidades.showMessageOnce(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            GuiUtilidades.showMessageOnce(this, mensaje, "Información", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 

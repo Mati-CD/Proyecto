@@ -57,12 +57,13 @@ public class GestorTorneos extends ObserverController {
             return;
         }
         if (torneo.getParticipantes().contains(participante)) {
-            notificarObservers("ERROR: Participante '" + participante.getNombre() + "' ya está inscrito en el torneo '" + nombreTorneo + "'.");
+            notificarObservers("ERROR: El participante '" + participante.getNombre() + "' ya está inscrito en el torneo '" + nombreTorneo + "'.");
             return;
         }
 
         torneo.addParticipante(participante);
-        notificarObservers("Participante '" + participante.getNombre() + "' inscrito exitosamente en el torneo '" + nombreTorneo + "'.");
+        String mensaje = "Participante inscrito exitosamente: \nNombre: " + participante.getNombre();;
+        notificarObservers(mensaje);
         inscritoConExito = true;
     }
 

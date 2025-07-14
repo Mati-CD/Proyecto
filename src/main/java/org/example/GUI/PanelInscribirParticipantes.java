@@ -1,18 +1,21 @@
 package org.example.GUI;
 
 import org.example.CodigoLogico.*;
+import java.util.List;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
-public class PanelInscribirParticipantes extends JPanel implements PanelConfigurable {
+public class PanelInscribirParticipantes extends JPanel implements PanelConfigurable, TorneoObserver {
     private GestorTorneos gestorTorneos;
-    private PanelParticipanteInput panelParticipanteInput;
+    private PanelFormularioInscripcion panelFormularioInscripcion;
     private PanelButton irAtrasBtn;
     private PanelButton inscribirBtn;
     private JComboBox<Torneo> torneosComboBox;
     private DefaultListModel<String> participantesModel;
     private JList<String> participantesList;
-    private boolean initialized = false;
+    private boolean listenersActivos = false;
 
     public PanelInscribirParticipantes() {
         super(new BorderLayout());
@@ -22,16 +25,17 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         Font font = new Font("SansSerif", Font.BOLD, 14);
         Font titleFont = new Font("Arial", Font.BOLD, 24);
 
+        // Componentes
         inscribirBtn = new PanelButton("Inscribir Participante", font);
         torneosComboBox = new JComboBox<>();
         participantesModel = new DefaultListModel<>();
         participantesList = new JList<>(participantesModel);
-        panelParticipanteInput = new PanelParticipanteInput();
-
+        panelFormularioInscripcion = new PanelFormularioInscripcion();
         torneosComboBox.setFont(font);
         participantesList.setFont(font);
         participantesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+        // Panel Superior
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
 
@@ -48,120 +52,162 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
 
         add(topPanel, BorderLayout.NORTH);
 
+        // Panel Central
         JPanel centerPanel = new JPanel(new BorderLayout(50, 0));
         centerPanel.setOpaque(false);
         centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
+        // Panel Central Izquierdo
         JPanel centerLeftPanel = new JPanel(new BorderLayout());
         centerLeftPanel.setOpaque(false);
+        centerLeftPanel.add(panelFormularioInscripcion, BorderLayout.CENTER);
 
-        JPanel torneoSelectionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        torneoSelectionPanel.setOpaque(false);
-        JLabel labelSeleccionarTorneo = new JLabel("Seleccione torneo:");
-        labelSeleccionarTorneo.setFont(font);
-        torneoSelectionPanel.add(labelSeleccionarTorneo);
-        torneoSelectionPanel.add(torneosComboBox);
-        centerLeftPanel.add(torneoSelectionPanel, BorderLayout.NORTH);
+        // Panel Izquierdo Inferior
+        JPanel leftButtomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        leftButtomPanel.setOpaque(false);
+        inscribirBtn.setButtonPreferredSize(new Dimension(200, 50));
+        leftButtomPanel.add(inscribirBtn);
+        centerLeftPanel.add(leftButtomPanel, BorderLayout.SOUTH);
 
-        centerLeftPanel.add(panelParticipanteInput, BorderLayout.CENTER);
         centerPanel.add(centerLeftPanel, BorderLayout.WEST);
 
+        // Panel Central Derecho
         JPanel centerRightPanel = new JPanel(new BorderLayout());
         centerRightPanel.setOpaque(false);
         centerRightPanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 0, 0));
 
+        JPanel topRightPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        topRightPanel.setOpaque(false);
+
+        JLabel labelSeleccionarTorneo = new JLabel("Seleccione torneo:");
+        labelSeleccionarTorneo.setFont(font);
+        topRightPanel.add(labelSeleccionarTorneo);
+        topRightPanel.add(torneosComboBox);
+        centerRightPanel.add(topRightPanel, BorderLayout.NORTH);
+
+        // Lista de participantes
         JLabel labelParticipantesInscritos = new JLabel("Participantes inscritos:");
         labelParticipantesInscritos.setFont(font);
-        centerRightPanel.add(labelParticipantesInscritos, BorderLayout.NORTH);
+        labelParticipantesInscritos.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JScrollPane scrollPane = new JScrollPane(participantesList);
-        scrollPane.setPreferredSize(new Dimension(280, 250));
-        centerRightPanel.add(scrollPane, BorderLayout.CENTER);
+        scrollPane.setPreferredSize(new Dimension(300, 500));
+        scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JPanel participantesListPanel = new JPanel();
+        participantesListPanel.setLayout(new BoxLayout(participantesListPanel, BoxLayout.Y_AXIS));
+        participantesListPanel.setOpaque(false);
+
+        participantesListPanel.add(labelParticipantesInscritos);
+        participantesListPanel.add(scrollPane);
+
+        JPanel wrapperParticipantesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        wrapperParticipantesPanel.setOpaque(false);
+        wrapperParticipantesPanel.setBorder(BorderFactory.createEmptyBorder(50, 0, 0, 0));
+        wrapperParticipantesPanel.add(participantesListPanel);
+
+        centerRightPanel.add(wrapperParticipantesPanel, BorderLayout.CENTER);
 
         centerPanel.add(centerRightPanel, BorderLayout.CENTER);
 
         add(centerPanel, BorderLayout.CENTER);
-
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        bottomPanel.setOpaque(false);
-        inscribirBtn.setButtonPreferredSize(new Dimension(200, 50));
-        bottomPanel.add(inscribirBtn);
-        add(bottomPanel, BorderLayout.SOUTH);
-
-        initialized = true;
     }
 
     @Override
     public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         this.gestorTorneos = gestorTorneos;
-        if (!initialized) {
-            throw new IllegalStateException("Panel no ha sido inicializado correctamente");
-        }
+        this.gestorTorneos.registrarObserver(this);
 
-        for (var listener : irAtrasBtn.getActionListeners()) {
-            irAtrasBtn.removeActionListener(listener);
-        }
-        for (var listener : inscribirBtn.getActionListeners()) {
-            inscribirBtn.removeActionListener(listener);
-        }
-        for (var listener : torneosComboBox.getActionListeners()) {
-            torneosComboBox.removeActionListener(listener);
-        }
+        if(!listenersActivos) {
+            irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
+            inscribirBtn.addActionListener(e -> clickInscribirBtn());
+            torneosComboBox.addActionListener(e -> cargarParticipantesTorneoSeleccionado());
 
-        irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
-        inscribirBtn.addActionListener(e -> inscribirParticipante());
-
-        DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
-        for (Torneo torneo : gestorTorneos.getTorneosCreados()) {
-            model.addElement(torneo);
+            listenersActivos = true;
         }
-        torneosComboBox.setModel(model);
-        torneosComboBox.addActionListener(e -> actualizarListaParticipantes());
+        cargarTorneosEnComboBox();
+        cargarParticipantesTorneoSeleccionado();
 
         this.revalidate();
         this.repaint();
     }
 
-    private void inscribirParticipante() {
-        Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
-        String nombre = panelParticipanteInput.getNombreParticipante().trim();
-        String edadStr = panelParticipanteInput.getEdadParticipante().trim();
-        String pais = panelParticipanteInput.getPaisParticipante().trim();
-
-        if (torneo == null) {
-            JOptionPane.showMessageDialog(this, "Seleccione un torneo primero",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        if (nombre.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Ingrese un nombre válido",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        try {
-            int edad = edadStr.isEmpty() ? 0 : Integer.parseInt(edadStr);
-            ParticipanteIndividual p = new ParticipanteIndividual(nombre, edad, pais.isEmpty() ? null : pais);
-
-            torneo.inscribirParticipante(p);
-            participantesModel.addElement(p.getNombre());
-            panelParticipanteInput.clearFields();
-            JOptionPane.showMessageDialog(this, "Participante inscrito correctamente",
-                    "Éxito", JOptionPane.INFORMATION_MESSAGE);
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "La edad debe ser un número válido",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+    @Override
+    public void actualizar(String mensaje) {
+        if (mensaje.contains("ERROR")) {
+            GuiUtilidades.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (mensaje.contains("Participante inscrito exitosamente:")) {
+            GuiUtilidades.showMessageOnce(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
-    private void actualizarListaParticipantes() {
-        Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
-        participantesModel.clear();
+    private void clickInscribirBtn() {
+        String nombre = panelFormularioInscripcion.getNombre();
+        String pais = panelFormularioInscripcion.getPais();
+        int edad = panelFormularioInscripcion.getEdad();
+        String correo = panelFormularioInscripcion.getCorreo();
 
-        if (torneo != null) {
-            for (Participante participante : torneo.getParticipantes()) {
-                participantesModel.addElement(participante.getNombre());
+        if (nombre.isEmpty() || pais.isEmpty() || correo.isEmpty()) {
+            GuiUtilidades.showMessageOnce(this, "Por favor complete todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
+        if (torneoSeleccionado == null) {
+            GuiUtilidades.showMessageOnce(this, "Por favor, seleccione un torneo antes de inscribir un participante.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Crear un participante con los datos
+        ParticipanteIndividual p = new ParticipanteIndividual(nombre, edad, pais);
+        gestorTorneos.addParticipanteATorneo(torneoSeleccionado.getNombre(), p);
+
+        if (gestorTorneos.getInscritoConExito()) {
+            panelFormularioInscripcion.clearFields();
+            cargarParticipantesTorneoSeleccionado();
+        }
+    }
+
+    private void cargarTorneosEnComboBox() {
+        Torneo seleccionAnteior = (Torneo) torneosComboBox.getSelectedItem();
+
+        torneosComboBox.removeAllItems();
+
+        List<Torneo> torneos = gestorTorneos.getTorneosCreados();
+
+        if (torneos.isEmpty()) {
+            torneosComboBox.setEnabled(false);
+            inscribirBtn.setEnabled(false);
+        }
+        else {
+            for (Torneo torneo : torneos) {
+                torneosComboBox.addItem(torneo);
+            }
+            torneosComboBox.setEnabled(true);
+            inscribirBtn.setEnabled(true);
+
+            if (seleccionAnteior != null && torneos.contains(seleccionAnteior)) {
+                torneosComboBox.setSelectedItem(seleccionAnteior);
+            }
+            else {
+                if (torneosComboBox.getItemCount() > 0) {
+                    torneosComboBox.setSelectedIndex(0);
+                }
+            }
+        }
+
+        // Después de cargar y seleccionar, la lista de participantes debe actualizarse
+        cargarParticipantesTorneoSeleccionado();
+    }
+
+    private void cargarParticipantesTorneoSeleccionado() {
+        participantesModel.clear();
+        Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
+
+        if (torneoSeleccionado != null && !torneoSeleccionado.getNombre().equals("No hay torneos creados")) {
+            List<Participante> participantes = gestorTorneos.getParticipantesDeTorneo(torneoSeleccionado.getNombre());
+            for (Participante p : participantes) {
+                participantesModel.addElement(p.getNombre());
             }
         }
     }

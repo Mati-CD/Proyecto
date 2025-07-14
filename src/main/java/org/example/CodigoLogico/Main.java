@@ -23,7 +23,7 @@ public class Main {
         inscritos.add(new ParticipanteIndividual("Marcelo Ríos", 49, "Chile"));
 
         for (Participante p : inscritos.getInscritos()) {
-            torneo.inscribirParticipante(p);
+            torneo.addParticipante(p);
         }
 
         // Iniciar el torneo
