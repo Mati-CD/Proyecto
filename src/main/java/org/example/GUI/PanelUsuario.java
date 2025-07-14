@@ -1,7 +1,6 @@
 package org.example.GUI;
 
 import org.example.CodigoLogico.GestorTorneos;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -35,6 +34,7 @@ public class PanelUsuario extends JPanel implements PanelConfigurable {
         buttonsGroup.getVerEstadoActualTorneoBtn().addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ESTADO_ACTUAL_TORNEO.getID()));
         buttonsGroup.getVerProxEncuentrosBtn().addActionListener(actionAssigner.getAction(ActionGUI.IR_A_PROXIMOS_ENCUENTROS.getID()));
         buttonsGroup.getVerEstadisticasBtn().addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ESTADISTICAS_GENERALES.getID()));
+        buttonsGroup.getVerParticipantesBtn().addActionListener(actionAssigner.getAction(ActionGUI.IR_A_VER_PARTICIPANTES.getID()));
 
         this.revalidate();
         this.repaint();

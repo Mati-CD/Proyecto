@@ -1,6 +1,6 @@
 package org.example.CodigoLogico;
 
-public class ParticipanteIndividual extends Participante{
+public class ParticipanteIndividual extends Participante {
     private String pais;
     private int edad;
 
@@ -25,11 +25,12 @@ public class ParticipanteIndividual extends Participante{
 
     @Override
     public String getDatos() {
-        return getNombre() + " (Individual - " + pais + " - " + edad + " años - " + getCorreo() + ")";
+        String paisStr = (pais == null || pais.isEmpty()) ? "Sin país" : pais;
+        return getNombre() + " (Individual - " + paisStr + " - " + edad + " años - " + getCorreo() + ")";
     }
 
     @Override
     public String toString() {
-        return getNombre() + " (" + pais + ")";
+        return getNombre() + " (" + (pais != null ? pais : "Sin país") + ")";
     }
 }

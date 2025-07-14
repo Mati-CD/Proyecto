@@ -32,10 +32,10 @@ public enum ActionGUI {
         }
     },
     IR_A_REGISTRAR_RESULTADOS("REGISTRAR_RESULTADOS") {
-      @Override
-      public void ejecutar(Navegador navegador) {
-        navegador.mostrarPanelRegistrarResultados();
-      }
+        @Override
+        public void ejecutar(Navegador navegador) {
+            navegador.mostrarPanelRegistrarResultados();
+        }
     },
     IR_A_USUARIO("USUARIO") {
         @Override
@@ -59,6 +59,12 @@ public enum ActionGUI {
         @Override
         public void ejecutar(Navegador navegador) {
             navegador.mostrarPanelEstadisticasGenerales();
+        }
+    },
+    IR_A_VER_PARTICIPANTES("VER_PARTICIPANTES") {
+        @Override
+        public void ejecutar(Navegador navegador) {
+            navegador.mostrarPanelVerParticipantes();
         }
     };
 
