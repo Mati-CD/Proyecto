@@ -121,12 +121,15 @@ public class Torneo extends ObserverController {
      * Inicia el torneo validando la cantidad de participantes e iniciando la fase inicial.
      */
     public void iniciarTorneo(List<Participante> participantesSorteados) {
+        if (!fases.isEmpty()) {
+            notificarObservers("El torneo '" + nombre + "' ya ha sido iniciado.");
+            return;
+        }
         if (participantesSorteados.size() != numParticipantes) {
             notificarObservers("La lista de participantes para iniciar el torneo tiene una cantidad incorrecta. Se esperaban " + numParticipantes + " y se recibieron " + participantesSorteados.size() + ".");
             return;
         }
 
-        fases.clear();
         campeon = null;
         this.participantes.clear();
         this.participantes.addAll(participantesSorteados);

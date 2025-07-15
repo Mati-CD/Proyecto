@@ -9,28 +9,33 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
     private PanelButton irAtrasBtn;
     private PanelButton eliminarBtn;
     private JComboBox<Torneo> torneosComboBox;
+    private boolean listenersActivos = false;
 
     public PanelEliminarTorneo() {
         super(new BorderLayout());
         setBackground(new Color(200, 50, 50));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        Font font = new Font("SansSerif", Font.BOLD, 16);
+        Font font = new Font("SansSerif", Font.BOLD, 14);
+        Font font1 = new Font("Arial", Font.BOLD, 12);
         Font titleFont = new Font("Arial", Font.BOLD, 24);
 
+        // Inicializar Componentes
+        irAtrasBtn = new PanelButton("Volver atrás", font1);
+        irAtrasBtn.setButtonPreferredSize(new Dimension(120, 30));
+        eliminarBtn = new PanelButton("Eliminar Torneo", font);
+        eliminarBtn.setButtonPreferredSize(new Dimension(200, 50));
+        eliminarBtn.setBackground(Color.RED);
+        eliminarBtn.setForeground(Color.WHITE);
+        torneosComboBox = new JComboBox<>();
+        torneosComboBox.setFont(font);
+        torneosComboBox.setRenderer(new GuiUtils.TorneoComboBoxRenderer());
+
         // Panel superior
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setOpaque(false);
-
-        irAtrasBtn = new PanelButton("Volver atrás", font);
-        JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        topLeftPanel.setOpaque(false);
-        topLeftPanel.add(irAtrasBtn);
-        topPanel.add(topLeftPanel, BorderLayout.WEST);
-
-        JLabel titleLabel = new JLabel("Eliminar Torneo", SwingConstants.CENTER);
-        titleLabel.setFont(titleFont);
-        topPanel.add(titleLabel, BorderLayout.CENTER);
+        JPanel topPanel = GuiUtils.crearPanelDeEncabezado(irAtrasBtn,
+                "Eliminar Torneo",
+                titleFont,
+                null
+        );
         add(topPanel, BorderLayout.NORTH);
 
         // Panel central
@@ -41,17 +46,11 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
         JPanel comboPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         comboPanel.setOpaque(false);
         comboPanel.add(new JLabel("Seleccione torneo a eliminar:"));
-        torneosComboBox = new JComboBox<>();
-        torneosComboBox.setFont(font);
         comboPanel.add(torneosComboBox);
         centerPanel.add(comboPanel);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.setOpaque(false);
-        eliminarBtn = new PanelButton("Eliminar Torneo", font);
-        eliminarBtn.setButtonPreferredSize(new Dimension(200, 50));
-        eliminarBtn.setBackground(Color.RED);
-        eliminarBtn.setForeground(Color.WHITE);
         buttonPanel.add(eliminarBtn);
         centerPanel.add(buttonPanel);
 
@@ -63,18 +62,26 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
         this.gestorTorneos = gestorTorneos;
         this.gestorTorneos.registrarObserver(this);
 
-        irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
-        eliminarBtn.addActionListener(e -> eliminarTorneo());
+        if (!listenersActivos) {
+            irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
+            eliminarBtn.addActionListener(e -> eliminarTorneo());
+            listenersActivos = true;
+        }
 
         cargarTorneos();
+        this.revalidate();
+        this.repaint();
     }
 
     @Override
     public void actualizar(String mensaje) {
-        if (mensaje.contains("ERROR")) {
-            GuiUtilidades.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (mensaje.contains("eliminado exitosamente")) {
-            GuiUtilidades.showMessageOnce(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        if (mensaje.contains("No se puede eliminar un torneo")) {
+            GuiUtils.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (mensaje.contains("No se encontró el torneo")) {
+            GuiUtils.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        else if (mensaje.contains("eliminado exitosamente")) {
+            GuiUtils.showMessageOnce(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
             cargarTorneos();
         }
     }
@@ -89,7 +96,7 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
     private void eliminarTorneo() {
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
         if (torneoSeleccionado == null) {
-            GuiUtilidades.showMessageOnce(this, "Por favor seleccione un torneo", "Error", JOptionPane.ERROR_MESSAGE);
+            GuiUtils.showMessageOnce(this, "Por favor seleccione un torneo", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 

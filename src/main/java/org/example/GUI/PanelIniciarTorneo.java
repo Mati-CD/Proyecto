@@ -18,6 +18,7 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
     private MatchesDisplayPanel bracketDisplayPanel;
     private GestorTorneos gestorTorneos;
     private boolean listenersActivos = false;
+    private Torneo actualObservedTorneo = null;
 
     /**
      * Constructor que configura el panel gráfico.
@@ -26,21 +27,29 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
     public PanelIniciarTorneo() {
         super(new BorderLayout());
         setBackground(new Color(88, 150, 234));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        Font font = new Font("SansSerif", Font.BOLD, 16);
+        Font font = new Font("SansSerif", Font.BOLD, 14);
+        Font font1 = new Font("SansSerif", Font.BOLD, 12);
         Font titleFont = new Font("Arial", Font.BOLD, 24);
 
-        // Panel superior con botón de volver
-        irAtrasBtn = new PanelButton("Volver atrás", font);
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setOpaque(false);
-        topPanel.add(irAtrasBtn, BorderLayout.WEST);
+        // Inicializar Componentes
+        irAtrasBtn = new PanelButton("Volver atrás", font1);
+        irAtrasBtn.setButtonPreferredSize(new Dimension(120, 30));
+        crearBracketBtn = new PanelButton("Crear Bracket", font);
+        crearBracketBtn.setButtonPreferredSize(new Dimension(250, 50));
+        iniciarTorneoBtn = new PanelButton("Iniciar Torneo", font);
+        iniciarTorneoBtn.setButtonPreferredSize(new Dimension(200, 50));
+        bracketDisplayPanel = new MatchesDisplayPanel();
+        torneosComboBox = new JComboBox<>();
+        torneosComboBox.setFont(font);
+        torneosComboBox.setRenderer(new GuiUtils.TorneoComboBoxRenderer());
 
-        // Título centrado
-        JLabel titleLabel = new JLabel("Iniciar Torneo", SwingConstants.CENTER);
-        titleLabel.setFont(titleFont);
-        topPanel.add(titleLabel, BorderLayout.CENTER);
+        // Panel supeior
+        JPanel topPanel = GuiUtils.crearPanelDeEncabezado(irAtrasBtn,
+                "Iniciar Torneo",
+                titleFont,
+                null
+        );
         add(topPanel, BorderLayout.NORTH);
 
         JPanel centerPanel = new JPanel(new BorderLayout());
@@ -48,28 +57,18 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
 
         JPanel comboPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         comboPanel.setOpaque(false);
-        JLabel selectTorneoLabel = new JLabel("Seleccione Torneo:");
-        selectTorneoLabel.setFont(font);
-        torneosComboBox = new JComboBox<>();
-        torneosComboBox.setFont(font);
-        comboPanel.add(selectTorneoLabel);
+        JLabel labelSeleccionarTorneo = new JLabel("Seleccione Torneo:");
+        labelSeleccionarTorneo.setFont(font);
+        comboPanel.add(labelSeleccionarTorneo);
         comboPanel.add(torneosComboBox);
-        centerPanel.add(comboPanel, BorderLayout.NORTH);
 
-        bracketDisplayPanel = new MatchesDisplayPanel();
+        centerPanel.add(comboPanel, BorderLayout.NORTH);
         centerPanel.add(bracketDisplayPanel, BorderLayout.CENTER);
         add(centerPanel, BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setOpaque(false);
-
-        // Boton de generar bracket
-        crearBracketBtn = new PanelButton("Generar Bracket", font);
-        crearBracketBtn.setButtonPreferredSize(new Dimension(250, 50));
         bottomPanel.add(crearBracketBtn);
-
-        iniciarTorneoBtn = new PanelButton("Iniciar Torneo", font);
-        iniciarTorneoBtn.setButtonPreferredSize(new Dimension(200, 50));
         bottomPanel.add(iniciarTorneoBtn);
 
         add(bottomPanel, BorderLayout.SOUTH);
@@ -90,7 +89,7 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
             irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
             crearBracketBtn.addActionListener(e -> clickGenerarBracket());
             iniciarTorneoBtn.addActionListener(e -> clickIniciarTorneo());
-            torneosComboBox.addActionListener(e -> cargarParticipantesTorneoSeleccionado());
+            torneosComboBox.addActionListener(e -> actualizarTorneoSeleccionado());
             listenersActivos = true;
         }
         cargarTorneosEnComboBox();
@@ -100,25 +99,31 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
     }
 
     /**
-     * Método invocado cuando hay una actualización desde el modelo observado.
-     * (No implementado por ahora).
+     * Metodo invocado cuando hay una actualización desde el modelo observado.
      *
      * @param mensaje Mensaje de actualización.
      */
     @Override
     public void actualizar(String mensaje) {
         if (mensaje.contains("No se puede generar un nuevo bracket")) {
-            GuiUtilidades.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+            GuiUtils.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
         } else if (mensaje.contains("Para generar un bracket del torneo '") && mensaje.contains("se requieren ") && mensaje.contains("participantes.") && mensaje.contains("Actualmente hay")) {
-            GuiUtilidades.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+            GuiUtils.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (mensaje.contains("ya ha sido iniciado")) {
+            GuiUtils.showMessageOnce(this, mensaje, "Advertencia", JOptionPane.WARNING_MESSAGE);
         } else if (mensaje.contains("una cantidad incorrecta. Se esperaban")) {
-            GuiUtilidades.showMessageOnce(this, mensaje, "Advertencia", JOptionPane.WARNING_MESSAGE);
+            GuiUtils.showMessageOnce(this, mensaje, "Advertencia", JOptionPane.WARNING_MESSAGE);
         } else if (mensaje.contains("iniciado con")){
-            GuiUtilidades.showMessageOnce(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            GuiUtils.showMessageOnce(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
     private void cargarTorneosEnComboBox() {
+        if (actualObservedTorneo != null) {
+            actualObservedTorneo.removerObserver(this);
+            actualObservedTorneo = null;
+        }
+
         Torneo seleccionAnterior = (Torneo) torneosComboBox.getSelectedItem();
         torneosComboBox.removeAllItems();
         List<Torneo> torneos = gestorTorneos.getTorneosCreados();
@@ -142,14 +147,14 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
             }
         }
         // Siempre llama a cargarParticipantesParaVisualizacion() después de actualizar el ComboBox
-        cargarParticipantesTorneoSeleccionado();
+        actualizarTorneoSeleccionado();
     }
 
     private void clickGenerarBracket() {
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
 
         if (torneoSeleccionado == null) {
-            GuiUtilidades.showMessageOnce(this, "Por favor, seleccione un torneo para generar el bracket.", "Error", JOptionPane.ERROR_MESSAGE);
+            GuiUtils.showMessageOnce(this, "Por favor, seleccione un torneo para generar el bracket.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -165,12 +170,18 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
 
         if (torneoSeleccionado == null) {
-            GuiUtilidades.showMessageOnce(this, "Porfavor seleccione un torneo para iniciar.", "Error", JOptionPane.ERROR_MESSAGE);
+            GuiUtils.showMessageOnce(this, "Porfavor seleccione un torneo para iniciar.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (!torneoSeleccionado.getFases().isEmpty()) {
+            GuiUtils.showMessageOnce(this, "El torneo '" + torneoSeleccionado.getNombre() + "' ya ha sido iniciado.", "Advertencia", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         if (sorteoBracketActual == null || sorteoBracketActual.isEmpty() || sorteoBracketActual.size() != torneoSeleccionado.getNumParticipantes()) {
-            sorteoBracketActual = torneoSeleccionado.getParticipantes();
+            GuiUtils.showMessageOnce(this, "Porfavor genere un bracket antes de iniciar el torneo.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
         }
 
         int confirmar = JOptionPane.showConfirmDialog(this,
@@ -183,15 +194,31 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
         }
     }
 
-    private void cargarParticipantesTorneoSeleccionado() {
+    private void actualizarTorneoSeleccionado() {
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
 
+        if (actualObservedTorneo != null && actualObservedTorneo != torneoSeleccionado) {
+            actualObservedTorneo.removerObserver(this);
+        }
+
         if (torneoSeleccionado != null) {
+            if (actualObservedTorneo != torneoSeleccionado) {
+                torneoSeleccionado.registrarObserver(this);
+                actualObservedTorneo = torneoSeleccionado;
+            }
             bracketDisplayPanel.setNumParticipantes(torneoSeleccionado.getNumParticipantes());
             bracketDisplayPanel.setBracketGenerado(false);
-        } else {
+            this.sorteoBracketActual = null;
+        }
+        else {
             bracketDisplayPanel.setNumParticipantes(0);
             bracketDisplayPanel.setBracketGenerado(false);
+            this.sorteoBracketActual = null;
+
+            if (actualObservedTorneo != null) {
+                actualObservedTorneo.removerObserver(this);
+                actualObservedTorneo = null;
+            }
         }
     }
 }

@@ -62,7 +62,7 @@ public class GestorTorneos extends ObserverController {
      */
     public void addTorneo(Torneo torneo) {
         if (torneoExiste(torneo.getNombre())) {
-            notificarObservers("ERROR: Ya existe un torneo con el nombre '" + torneo.getNombre() + "'.");
+            notificarObservers("Ya existe un torneo con el nombre '" + torneo.getNombre() + "'.");
             creadoConExito = false;
             return;
         }
@@ -85,19 +85,19 @@ public class GestorTorneos extends ObserverController {
         Torneo torneo = buscarTorneoPorNombre(nombreTorneo);
 
         if (torneo == null) {
-            notificarObservers("ERROR: No se encontró el torneo '" + nombreTorneo + "' para la inscripción.");
+            notificarObservers("No se encontró el torneo '" + nombreTorneo + "' para la inscripción.");
             return;
         }
         if (participante == null) {
-            notificarObservers("ERROR: El participante a inscribir no puede ser nulo.");
+            notificarObservers("El participante a inscribir no puede ser nulo.");
             return;
         }
         if (torneo.getParticipantes().contains(participante)) {
-            notificarObservers("ERROR: El participante '" + participante.getNombre() + "' ya está inscrito en el torneo '" + nombreTorneo + "'.");
+            notificarObservers("El participante '" + participante.getNombre() + "' ya está inscrito en el torneo '" + nombreTorneo + "'.");
             return;
         }
         if (torneo.getParticipantes().size() + 1 > torneo.getNumParticipantes()) {
-            notificarObservers("ERROR: Ha alcanzado el máximo de inscritos para este torneo." +
+            notificarObservers("Ha alcanzado el máximo de inscritos para este torneo." +
                     "\nSi desea agregar un nuevo participante, tendrá que eliminar a uno de los inscritos.");
             return;
         }
@@ -118,22 +118,22 @@ public class GestorTorneos extends ObserverController {
         Torneo torneo = buscarTorneoPorNombre(nombreTorneo);
 
         if (torneo == null) {
-            notificarObservers("ERROR: No se encontró el torneo '" + nombreTorneo + "' para eliminar al participante.");
+            notificarObservers("No se encontró el torneo '" + nombreTorneo + "' para eliminar al participante.");
             return;
         }
         if (participante == null) {
-            notificarObservers("ERROR: El participante a eliminar no existe.");
+            notificarObservers("El participante a eliminar no existe.");
             return;
         }
         if (!torneo.getFases().isEmpty()) {
-            notificarObservers("ERROR: No se puede eliminar participantes de un torneo que ya ha iniciado.");
+            notificarObservers("No se puede eliminar participantes de un torneo que ya ha iniciado.");
             return;
         }
 
         if (torneo.removeParticipante(participante)) {
             notificarObservers("Participante '" + participante.getNombre() + "' eliminado exitosamente");
         } else {
-            notificarObservers("ERROR: El participante '" + participante.getNombre() + "' no se encontró en el torneo '" + nombreTorneo + "'.");
+            notificarObservers("El participante '" + participante.getNombre() + "' no se encontró en el torneo '" + nombreTorneo + "'.");
         }
     }
 
@@ -177,12 +177,12 @@ public class GestorTorneos extends ObserverController {
     public void eliminarTorneo(String nombreTorneo) {
         Torneo torneo = buscarTorneoPorNombre(nombreTorneo);
         if (torneo == null) {
-            notificarObservers("ERROR: No se encontró el torneo '" + nombreTorneo + "' para eliminar.");
+            notificarObservers("No se encontró el torneo '" + nombreTorneo + "' para eliminar.");
             return;
         }
 
         if (!torneo.getFases().isEmpty()) {
-            notificarObservers("ERROR: No se puede eliminar un torneo que ya ha comenzado.");
+            notificarObservers("No se puede eliminar un torneo que ya ha comenzado.");
             return;
         }
 

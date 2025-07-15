@@ -13,7 +13,7 @@ import java.awt.*;
 public class PanelOrganizador extends JPanel implements PanelConfigurable {
     private OrganizadorButtons buttonsGroup;
     private PanelButton irAInicioBtn;
-    private PanelButton eliminarTorneoBtn;  // Nuevo botón para eliminar torneos
+    private PanelButton eliminarTorneoBtn;
 
     /**
      * Constructor que inicializa y configura los componentes del panel.
@@ -23,27 +23,19 @@ public class PanelOrganizador extends JPanel implements PanelConfigurable {
         setBackground(new Color(200, 255, 200));
 
         Font font1 = new Font("Arial", Font.BOLD, 12);
+
         irAInicioBtn = new PanelButton("Volver al Inicio", font1);
+        irAInicioBtn.setButtonPreferredSize(new Dimension(120, 30));
         eliminarTorneoBtn = new PanelButton("Eliminar Torneo", font1);
-        eliminarTorneoBtn.setBackground(new Color(255, 100, 100)); // Color rojo para indicar acción importante
+        eliminarTorneoBtn.setButtonPreferredSize(new Dimension(130, 30));
+        eliminarTorneoBtn.setBackground(new Color(255, 100, 100));
         eliminarTorneoBtn.setForeground(Color.WHITE);
 
-        // Panel superior con botones de navegación
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setOpaque(false);
-
-        // Panel izquierdo con botón de volver
-        JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        topLeftPanel.setOpaque(false);
-        topLeftPanel.add(irAInicioBtn);
-        topPanel.add(topLeftPanel, BorderLayout.WEST);
-
-        // Panel derecho con botón de eliminar
-        JPanel topRightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        topRightPanel.setOpaque(false);
-        topRightPanel.add(eliminarTorneoBtn);
-        topPanel.add(topRightPanel, BorderLayout.EAST);
-
+        JPanel topPanel = GuiUtils.crearPanelDeEncabezado(irAInicioBtn,
+                "",
+                font1,
+                eliminarTorneoBtn
+        );
         add(topPanel, BorderLayout.NORTH);
 
         // Posicionar grupo de botones principales
@@ -67,7 +59,7 @@ public class PanelOrganizador extends JPanel implements PanelConfigurable {
         buttonsGroup.getInscribirParticipantesBtn().addActionListener(actionAssigner.getAction(ActionGUI.IR_A_INSCRIBIR_PARTICIPANTES.getID()));
         buttonsGroup.getIniciarTorneoBtn().addActionListener(actionAssigner.getAction(ActionGUI.IR_A_INICIAR_TORNEO.getID()));
         buttonsGroup.getActualizarRegistroDeResultadosBtn().addActionListener(actionAssigner.getAction(ActionGUI.IR_A_REGISTRAR_RESULTADOS.getID()));
-        eliminarTorneoBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ELIMINAR_TORNEO.getID()));  // Nueva acción para eliminar torneos
+        eliminarTorneoBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ELIMINAR_TORNEO.getID()));
 
         this.revalidate();
         this.repaint();

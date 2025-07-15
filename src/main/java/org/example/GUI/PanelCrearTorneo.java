@@ -25,34 +25,29 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable, Torne
     public PanelCrearTorneo() {
         super(new BorderLayout());
         setBackground(new Color(255, 255, 200));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         Font font = new Font("SansSerif", Font.BOLD, 12);
+        Font font1 = new Font("Arial", Font.BOLD, 12);
         Font titleFont = new Font("Arial", Font.BOLD, 24);
 
-        // Panel superior con botón de volver y título
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setOpaque(false);
-
-        irAtrasBtn = new PanelButton("Volver atrás", font);
+        // Inicializar Componenetes
+        irAtrasBtn = new PanelButton("Volver atrás", font1);
         irAtrasBtn.setButtonPreferredSize(new Dimension(120, 30));
+        panelFormularioTorneo = new PanelFormularioTorneo();
+        crearTorneoBtn = new PanelButton("Crear Torneo", font);
+        crearTorneoBtn.setButtonPreferredSize(new Dimension(200, 50));
 
-        JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        topLeftPanel.setOpaque(false);
-        topLeftPanel.add(irAtrasBtn);
-        topPanel.add(topLeftPanel, BorderLayout.WEST);
-
-        JLabel titleLabel = new JLabel("Crear Nuevo Torneo", SwingConstants.CENTER);
-        titleLabel.setFont(titleFont);
-        topPanel.add(titleLabel, BorderLayout.CENTER);
-
+        // Panel superior
+        JPanel topPanel = GuiUtils.crearPanelDeEncabezado(irAtrasBtn,
+                "Crear nuevo torneo",
+                titleFont,
+                null
+        );
         add(topPanel, BorderLayout.NORTH);
 
         // Panel central con el formulario
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setOpaque(false);
-
-        panelFormularioTorneo = new PanelFormularioTorneo();
 
         JPanel centerLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         centerLeftPanel.setOpaque(false);
@@ -64,9 +59,6 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable, Torne
         // Panel inferior con botón de crear
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setOpaque(false);
-
-        crearTorneoBtn = new PanelButton("Crear Torneo", font);
-        crearTorneoBtn.setButtonPreferredSize(new Dimension(200, 50));
         bottomPanel.add(crearTorneoBtn);
 
         add(bottomPanel, BorderLayout.SOUTH);
@@ -101,9 +93,9 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable, Torne
     @Override
     public void actualizar(String mensaje) {
         if (mensaje.contains("Ya existe un torneo con el nombre")) {
-            GuiUtilidades.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+            GuiUtils.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
         } else if (mensaje.contains("Torneo creado exitosamente:")) {
-            GuiUtilidades.showMessageOnce(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            GuiUtils.showMessageOnce(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -121,7 +113,7 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable, Torne
         int numParticipantes = panelFormularioTorneo.getNumParticipantes();
 
         if (nombre.isEmpty() || disciplina.isEmpty()) {
-            GuiUtilidades.showMessageOnce(this, "Por favor complete todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
+            GuiUtils.showMessageOnce(this, "Por favor complete todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
