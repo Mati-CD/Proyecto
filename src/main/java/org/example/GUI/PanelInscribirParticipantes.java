@@ -174,28 +174,48 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
 
     /**
      * Maneja el evento de inscripción de participante.
-     * Valida los campos ingresados y, si son correctos, intenta inscribir al participante en el torneo seleccionado.
-     *
-     * @throws IllegalArgumentException si los campos requeridos están vacíos.
+     * Valida los campos ingresados y, si son correctos, inscribe al participante.
      */
     private void clickInscribirBtn() {
+        // Obtener datos del formulario
         String nombre = panelFormularioInscripcion.getNombre();
-        String correo = panelFormularioInscripcion.getCorreo();
+        int edad = panelFormularioInscripcion.getEdad();
+        String pais = panelFormularioInscripcion.getPais();
+        String correoUsuario = panelFormularioInscripcion.getCorreo().replace("@gmail.com", "");
 
-        if (nombre.isEmpty() || correo.replace("@gmail.com", "").isEmpty()) {
-            GuiUtils.showMessageOnce(this, "Por favor complete todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
+        // Validar campos obligatorios
+        if (nombre.isEmpty() || pais.isEmpty() || correoUsuario.isEmpty()) {
+            GuiUtils.showMessageOnce(this,
+                    "Por favor complete todos los campos obligatorios",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
 
+        // Validar edad
+        if (edad <= 0) {
+            GuiUtils.showMessageOnce(this,
+                    "Por favor ingrese una edad válida (mayor a 0)",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Verificar torneo seleccionado
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
-        if (torneoSeleccionado == null || gestorTorneos.getTorneosCreados().isEmpty()) {
-            GuiUtils.showMessageOnce(this, "No hay torneos creados para inscribir participantes.\nPor favor, cree un torneo primero.", "Error", JOptionPane.ERROR_MESSAGE);
+        if (torneoSeleccionado == null) {
+            GuiUtils.showMessageOnce(this,
+                    "No hay torneos disponibles para inscribir participantes",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        ParticipanteIndividual p = new ParticipanteIndividual(nombre);
-        gestorTorneos.addParticipanteATorneo(torneoSeleccionado.getNombre(), p);
+        // Crear e inscribir participante
+        ParticipanteIndividual participante = new ParticipanteIndividual(nombre, edad, pais);
+        gestorTorneos.addParticipanteATorneo(torneoSeleccionado.getNombre(), participante);
 
+        // Limpiar formulario si la inscripción fue exitosa
         if (gestorTorneos.getInscritoConExito()) {
             panelFormularioInscripcion.clearFields();
             cargarParticipantesTorneoSeleccionado();

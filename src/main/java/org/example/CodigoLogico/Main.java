@@ -11,16 +11,14 @@ public class Main {
         torneo.registrarObserver(mensaje -> System.out.println("[NOTIFICACIÓN] " + mensaje));
 
         Inscripciones inscritos = new Inscripciones();
-        inscritos.add(new ParticipanteIndividual("Rafael Nadal"));
-        inscritos.add(new ParticipanteIndividual("Novak Djokovic"));
-        inscritos.add(new ParticipanteIndividual("Novak Djokovic"));
-        inscritos.add(new ParticipanteIndividual("Nicolás Massú"));
-        inscritos.add(new ParticipanteIndividual("Carlos Alcaraz"));
-        inscritos.add(new ParticipanteIndividual("Carlos Alcaraz"));
-        inscritos.add(new ParticipanteIndividual("Nicolás Jarry"));
-        inscritos.add(new ParticipanteIndividual("Stefanos Tsitsipas"));
-        inscritos.add(new ParticipanteIndividual("Marcelo Ríos"));
-        inscritos.add(new ParticipanteIndividual("Roger Federer"));
+        inscritos.add(new ParticipanteIndividual("Rafael Nadal",36,"España"));
+        inscritos.add(new ParticipanteIndividual("Novak Djokovic",35, "Serbia"));
+        inscritos.add(new ParticipanteIndividual("Nicolás Massú", 43, "Chile"));
+        inscritos.add(new ParticipanteIndividual("Carlos Alcaraz", 20, "España"));
+        inscritos.add(new ParticipanteIndividual("Nicolás Jarry", 27, "Chile"));
+        inscritos.add(new ParticipanteIndividual("Stefanos Tsitsipas", 24, "Grecia"));
+        inscritos.add(new ParticipanteIndividual("Marcelo Ríos", 47, "Chile"));
+        inscritos.add(new ParticipanteIndividual("Roger Federer", 41, "Suiza"));
 
         for (Participante p : inscritos.getInscritos()) {
             torneo.addParticipante(p);
