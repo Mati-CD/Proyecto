@@ -21,8 +21,12 @@ public class ParticipanteEquipo extends Participante {
      */
     public ParticipanteEquipo(String nombreEquipo, int cantidadMiembros) {
         super(nombreEquipo);
-        this.cantidadMiembros = cantidadMiembros;
-        this.miembros = new ArrayList<>();
+        this.cantidadMiembros = 11;
+        this.miembros = new ArrayList<>(11);
+    }
+
+    public void setCorreoEquipo(String correo) {
+        setCorreo(correo);
     }
 
     /**
@@ -31,7 +35,10 @@ public class ParticipanteEquipo extends Participante {
      * @param nombre nombre del nuevo integrante
      */
     public void addMiembro(String nombre) {
-        if (miembros.size() < cantidadMiembros && !miembros.contains(nombre)) {
+        if (miembros.size() >= 11) { // Cambiar el límite aquí
+            throw new IllegalStateException("El equipo ya tiene el máximo de 11 integrantes");
+        }
+        if (!miembros.contains(nombre)) {
             miembros.add(nombre);
         }
     }

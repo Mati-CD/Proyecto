@@ -21,6 +21,10 @@ public abstract class Participante {
         this.correo = nombre.toLowerCase().replace(" ", "") + "@gmail.com";
     }
 
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
     /**
      * Obtiene el nombre del participante.
      *
