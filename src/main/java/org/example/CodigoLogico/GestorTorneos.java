@@ -168,4 +168,25 @@ public class GestorTorneos extends ObserverController {
     public List<Torneo> getTorneosCreados() {
         return new ArrayList<>(torneosCreados);
     }
+
+    /**
+     * Elimina un torneo del sistema si existe.
+     *
+     * @param nombreTorneo el nombre del torneo a eliminar
+     */
+    public void eliminarTorneo(String nombreTorneo) {
+        Torneo torneo = buscarTorneoPorNombre(nombreTorneo);
+        if (torneo == null) {
+            notificarObservers("ERROR: No se encontró el torneo '" + nombreTorneo + "' para eliminar.");
+            return;
+        }
+
+        if (!torneo.getFases().isEmpty()) {
+            notificarObservers("ERROR: No se puede eliminar un torneo que ya ha comenzado.");
+            return;
+        }
+
+        torneosCreados.remove(torneo);
+        notificarObservers("Torneo '" + nombreTorneo + "' eliminado exitosamente.");
+    }
 }

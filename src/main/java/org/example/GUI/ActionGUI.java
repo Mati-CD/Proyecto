@@ -22,6 +22,15 @@ public enum ActionGUI {
         }
     },
 
+    // En ActionGUI.java
+    /** Usado para mostrar el panel de eliminación de torneo. */
+    IR_A_ELIMINAR_TORNEO("ELIMINAR_TORNEO") {
+        @Override
+        public void ejecutar(Navegador navegador) {
+            navegador.mostrarPanelEliminarTorneo();
+        }
+    },
+
     /** Usado para mostrar el panel de creación de torneo. */
     IR_A_CREAR_TORNEO("CREAR_TORNEO") {
         @Override
@@ -134,4 +143,5 @@ public enum ActionGUI {
         }
         return null;
     }
+
 }

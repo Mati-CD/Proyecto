@@ -105,4 +105,9 @@ public class Navegador {
     public void mostrarPanelRegistrarResultados() {
         mostrarPanel(PanelType.REGISTRAR_RESULTADOS, e -> mostrarPanelOrganizador());
     }
+
+    /** Muestra el panel para eliminar torneos. */
+    public void mostrarPanelEliminarTorneo() {
+        mostrarPanel(PanelType.ELIMINAR_TORNEO, e -> mostrarPanelOrganizador());
+    }
 }

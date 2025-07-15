@@ -31,6 +31,10 @@ public enum PanelType {
             return new PanelCrearTorneo();
         }
     },
+    ELIMINAR_TORNEO("ELIMINAR_TORNEO") {
+        @Override
+        public PanelEliminarTorneo crearPanel() { return new PanelEliminarTorneo();}
+    },
     INSCRIBIR_PARTICIPANTES("INSCRIBIR_PARTICIPANTES") {
         @Override
         public PanelInscribirParticipantes crearPanel() {
