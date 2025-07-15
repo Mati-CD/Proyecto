@@ -3,6 +3,7 @@ package org.example.GUI;
 import org.example.CodigoLogico.*;
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, TorneoObserver {
     private GestorTorneos gestorTorneos;
@@ -68,7 +69,8 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
             listenersActivos = true;
         }
 
-        cargarTorneos();
+        cargarTorneosEnComboBox();
+
         this.revalidate();
         this.repaint();
     }
@@ -82,14 +84,27 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
         }
         else if (mensaje.contains("eliminado exitosamente")) {
             GuiUtils.showMessageOnce(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
-            cargarTorneos();
         }
     }
 
-    private void cargarTorneos() {
+    private void cargarTorneosEnComboBox() {
+        Torneo seleccionAnterior = (Torneo) torneosComboBox.getSelectedItem();
         torneosComboBox.removeAllItems();
-        for (Torneo torneo : gestorTorneos.getTorneosCreados()) {
-            torneosComboBox.addItem(torneo);
+        List<Torneo> torneos = gestorTorneos.getTorneosCreados();
+
+        if (torneos.isEmpty()) {
+            torneosComboBox.setEnabled(false);
+        } else {
+            for (Torneo torneo : torneos) {
+                torneosComboBox.addItem(torneo);
+            }
+            torneosComboBox.setEnabled(true);
+
+            if (seleccionAnterior != null && torneos.contains(seleccionAnterior)) {
+                torneosComboBox.setSelectedItem(seleccionAnterior);
+            } else if (torneosComboBox.getItemCount() > 0) {
+                torneosComboBox.setSelectedIndex(0);
+            }
         }
     }
 
@@ -110,6 +125,7 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
 
         if (confirmacion == JOptionPane.YES_OPTION) {
             gestorTorneos.eliminarTorneo(torneoSeleccionado.getNombre());
+            cargarTorneosEnComboBox();
         }
     }
 }

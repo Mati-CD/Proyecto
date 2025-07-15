@@ -182,7 +182,7 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         String nombre = panelFormularioInscripcion.getNombre();
         String correo = panelFormularioInscripcion.getCorreo();
 
-        if (nombre.isEmpty() || correo.isEmpty()) {
+        if (nombre.isEmpty() || correo.replace("@gmail.com", "").isEmpty()) {
             GuiUtils.showMessageOnce(this, "Por favor complete todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }

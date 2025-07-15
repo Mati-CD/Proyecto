@@ -81,7 +81,6 @@ public class PanelFormularioInscripcion extends JPanel {
         return fieldNombre.getText().trim();
     }
 
-
     public String getCorreo() {
         return fieldCorreoUsuario.getText().trim() + "@gmail.com";
     }
