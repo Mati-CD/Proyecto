@@ -5,8 +5,6 @@ import java.awt.*;
 
 public class PanelFormularioInscripcion extends JPanel {
     private JTextField fieldNombre;
-    private JTextField fieldPais;
-    private JTextField fieldEdad;
     private JTextField fieldCorreoUsuario;
 
     public PanelFormularioInscripcion() {
@@ -53,40 +51,6 @@ public class PanelFormularioInscripcion extends JPanel {
         gbc.gridwidth = 1;
         gbc.insets = new Insets(10, 5, 10, 5);
 
-        // País
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.anchor = GridBagConstraints.EAST;
-        JLabel labelPais = new JLabel("País:");
-        labelPais.setFont(labelFont);
-        add(labelPais, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        fieldPais = new JTextField(15);
-        fieldPais.setFont(fieldFont);
-        fieldPais.setPreferredSize(preferredFieldSize);
-        add(fieldPais, gbc);
-
-        // Edad
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.anchor = GridBagConstraints.EAST;
-        JLabel labelEdad = new JLabel("Edad:");
-        labelEdad.setFont(labelFont);
-        add(labelEdad, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        fieldEdad = new JTextField(15);
-        fieldEdad.setFont(fieldFont);
-        fieldEdad.setPreferredSize(preferredFieldSize);
-        add(fieldEdad, gbc);
-
         // Correo
         gbc.gridx = 0;
         gbc.gridy = 4;
@@ -117,17 +81,6 @@ public class PanelFormularioInscripcion extends JPanel {
         return fieldNombre.getText().trim();
     }
 
-    public String getPais() {
-        return fieldPais.getText().trim();
-    }
-
-    public int getEdad() {
-        try {
-            return Integer.parseInt(fieldEdad.getText().trim());
-        } catch (NumberFormatException e) {
-            return -1;
-        }
-    }
 
     public String getCorreo() {
         return fieldCorreoUsuario.getText().trim() + "@gmail.com";
@@ -135,8 +88,6 @@ public class PanelFormularioInscripcion extends JPanel {
 
     public void clearFields() {
         fieldNombre.setText("");
-        fieldPais.setText("");
-        fieldEdad.setText("");
         fieldCorreoUsuario.setText("");
     }
 }
