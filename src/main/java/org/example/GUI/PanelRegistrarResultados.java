@@ -1,6 +1,7 @@
 package org.example.GUI;
 
 import org.example.CodigoLogico.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -21,11 +22,12 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
     private JTextArea infoTorneoArea;
     private boolean listenersAdded = false;
 
+
     /**
      * Crea e inicializa todos los componentes visuales del panel.
      */
     public PanelRegistrarResultados() {
-        super(new BorderLayout());
+        super(new BorderLayout(10, 10));
         setBackground(new Color(26, 94, 24));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
@@ -36,33 +38,52 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
 
         torneosComboBox = new JComboBox<>();
         partidosComboBox = new JComboBox<>();
-        resultadoComboBox = new JComboBox<>(new String[]{"1 - Gana primer jugador", "2 - Gana segundo jugador"});
+        resultadoComboBox = new JComboBox<>(new String[]{
+                "1 - Gana primer jugador",
+                "2 - Gana segundo jugador"
+        });
 
-        infoTorneoArea = new JTextArea();
+        // Área de información más grande
+        infoTorneoArea = new JTextArea(15, 35);
         infoTorneoArea.setEditable(false);
         infoTorneoArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
-        infoTorneoArea.setBackground(new Color(26, 94, 24));
+        infoTorneoArea.setBackground(new Color(46, 124, 44));
         infoTorneoArea.setForeground(Color.WHITE);
+        infoTorneoArea.setBorder(BorderFactory.createTitledBorder("Información del torneo"));
 
-        JPanel formPanel = new JPanel(new GridLayout(3, 2, 10, 10));
+        // Panel superior con botón volver atrás
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        topPanel.setOpaque(false);
+        topPanel.add(irAtrasBtn);
+        add(topPanel, BorderLayout.NORTH);
+
+        // Panel del formulario
+        JPanel formPanel = new JPanel();
+        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
         formPanel.setOpaque(false);
+        formPanel.setBorder(BorderFactory.createTitledBorder("Registro de resultado"));
+        formPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        formPanel.add(createLabel("Torneo:"));
-        formPanel.add(torneosComboBox);
-        formPanel.add(createLabel("Partido:"));
-        formPanel.add(partidosComboBox);
-        formPanel.add(createLabel("Resultado:"));
-        formPanel.add(resultadoComboBox);
+        formPanel.add(createLabeledComponent("Torneo:", torneosComboBox));
+        formPanel.add(Box.createVerticalStrut(10));
+        formPanel.add(createLabeledComponent("Partido:", partidosComboBox));
+        formPanel.add(Box.createVerticalStrut(10));
+        formPanel.add(createLabeledComponent("Resultado:", resultadoComboBox));
+        formPanel.add(Box.createVerticalStrut(20));
+        formPanel.add(registrarBtn);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        buttonPanel.setOpaque(false);
-        buttonPanel.add(registrarBtn);
+        // Panel central: formulario + área de información más ancha
+        JPanel centerPanel = new JPanel(new BorderLayout(10, 10));
+        centerPanel.setOpaque(false);
+        centerPanel.add(formPanel, BorderLayout.CENTER);
 
-        add(irAtrasBtn, BorderLayout.NORTH);
-        add(formPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
-        add(new JScrollPane(infoTorneoArea), BorderLayout.EAST);
+        JScrollPane scrollPane = new JScrollPane(infoTorneoArea);
+        scrollPane.setPreferredSize(new Dimension(350, 300));
+        centerPanel.add(scrollPane, BorderLayout.EAST);
 
+        add(centerPanel, BorderLayout.CENTER);
+
+        // Tecla ENTER como atajo
         JRootPane rootPane = SwingUtilities.getRootPane(this);
         if (rootPane != null) {
             rootPane.setDefaultButton(registrarBtn);
@@ -72,27 +93,33 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
     }
 
     /**
-     * Crea una etiqueta con formato estándar.
-     *
-     * @param text Texto a mostrar.
-     * @return JLabel configurada con el texto dado.
+     * Crea un componente etiquetado alineado a la izquierda con ancho extendido.
      */
-    private JLabel createLabel(String text) {
-        JLabel label = new JLabel(text);
+    private JPanel createLabeledComponent(String labelText, JComponent component) {
+        JLabel label = new JLabel(labelText);
         label.setForeground(Color.WHITE);
         label.setFont(new Font("SansSerif", Font.BOLD, 16));
-        return label;
+        label.setPreferredSize(new Dimension(100, 25));
+
+        component.setPreferredSize(new Dimension(440, 25));
+        component.setMaximumSize(new Dimension(440, 25));
+
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        panel.setOpaque(false);
+        panel.add(label);
+        panel.add(component);
+        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        return panel;
     }
 
     /**
-     * Inicializa el panel asignando acciones y cargando torneos.
-     *
-     * @param actionAssigner Asignador de acciones para los botones.
-     * @param gestorTorneos Gestor que maneja los torneos.
+     * Inicializa el panel y carga torneos.
      */
     @Override
     public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         this.gestorTorneos = gestorTorneos;
+
         if (!listenersAdded) {
             irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
             registrarBtn.addActionListener(e -> registrarResultado());
@@ -131,7 +158,7 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
     }
 
     /**
-     * Carga en el comboBox los partidos que aún no tienen resultados del torneo seleccionado.
+     * Carga partidos del torneo seleccionado que no tengan resultado.
      */
     private void cargarPartidosDisponibles() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
@@ -150,7 +177,7 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
     }
 
     /**
-     * Muestra en el área de texto información básica del torneo seleccionado.
+     * Actualiza el área de información con los datos del torneo seleccionado.
      */
     private void actualizarInformacionTorneo() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
@@ -169,7 +196,7 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
     }
 
     /**
-     * Registra el resultado seleccionado para el partido actual y muestra mensaje de éxito o error.
+     * Registra el resultado del partido seleccionado.
      */
     private void registrarResultado() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
@@ -189,11 +216,7 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
     }
 
     /**
-     * Muestra un mensaje de diálogo en el hilo de interfaz.
-     *
-     * @param message Mensaje a mostrar.
-     * @param title Título del cuadro de diálogo.
-     * @param messageType Tipo de mensaje (JOptionPane).
+     * Muestra un mensaje modal.
      */
     private void showMessageOnce(String message, String title, int messageType) {
         SwingUtilities.invokeLater(() -> {
