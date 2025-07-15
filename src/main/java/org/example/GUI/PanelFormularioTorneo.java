@@ -3,16 +3,22 @@ package org.example.GUI;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Panel de formulario para la creación de un torneo.
+ * Incluye campos para el nombre, disciplina, tipo de inscripción y número de participantes.
+ */
 public class PanelFormularioTorneo extends JPanel {
     private JTextField fieldNombre;
     private JTextField fieldDisciplina;
     private JComboBox<String> comboTipoInscripcion;
     private JComboBox<Integer> comboNumParticipantes;
 
+    /**
+     * Constructor que inicializa y dispone gráficamente los campos del formulario.
+     */
     public PanelFormularioTorneo() {
         setOpaque(false);
         setLayout(new GridBagLayout());
-
         setBorder(BorderFactory.createEmptyBorder(100, 50, 50, 50));
 
         Font font1 = new Font("SansSerif", Font.BOLD, 20);
@@ -33,7 +39,7 @@ public class PanelFormularioTorneo extends JPanel {
         gbcField.weightx = 1.0;
         gbcField.fill = GridBagConstraints.HORIZONTAL;
 
-        // Nombre
+        // Campo: Nombre del torneo
         gbc.gridy = 0;
         JLabel labelNombre = new JLabel("Nombre del Torneo:");
         labelNombre.setFont(font1);
@@ -45,7 +51,7 @@ public class PanelFormularioTorneo extends JPanel {
         fieldNombre.setPreferredSize(preferredFieldSize);
         add(fieldNombre, gbcField);
 
-        // Disciplina
+        // Campo: Disciplina
         gbc.gridy = 1;
         JLabel labelDisciplina = new JLabel("Disciplina:");
         labelDisciplina.setFont(font1);
@@ -57,7 +63,7 @@ public class PanelFormularioTorneo extends JPanel {
         fieldDisciplina.setPreferredSize(preferredFieldSize);
         add(fieldDisciplina, gbcField);
 
-        // Tipo de inscripcion
+        // Campo: Tipo de inscripción
         gbc.gridy = 2;
         JLabel labelTipoInscripcion = new JLabel("Tipo de Inscripción:");
         labelTipoInscripcion.setFont(font1);
@@ -70,9 +76,9 @@ public class PanelFormularioTorneo extends JPanel {
         comboTipoInscripcion.setPreferredSize(preferredComboSize);
         add(comboTipoInscripcion, gbcField);
 
-        // Número de Participantes
+        // Campo: Número de participantes
         gbc.gridy = 3;
-        JLabel labelNumParticipantes = new JLabel("Número de Participantes:"); //
+        JLabel labelNumParticipantes = new JLabel("Número de Participantes:");
         labelNumParticipantes.setFont(font1);
         add(labelNumParticipantes, gbc);
 
@@ -85,22 +91,46 @@ public class PanelFormularioTorneo extends JPanel {
         add(comboNumParticipantes, gbcField);
     }
 
+    /**
+     * Obtiene el texto ingresado en el campo "Nombre del Torneo".
+     *
+     * @return el nombre del torneo como String.
+     */
     public String getNombre() {
         return fieldNombre.getText();
     }
 
+    /**
+     * Obtiene el texto ingresado en el campo "Disciplina".
+     *
+     * @return la disciplina como String.
+     */
     public String getDisciplina() {
         return fieldDisciplina.getText();
     }
 
+    /**
+     * Retorna la opción seleccionada en el campo "Tipo de Inscripción".
+     *
+     * @return "Individual" o "Equipo".
+     */
     public String getTipoInscripcion() {
         return (String) comboTipoInscripcion.getSelectedItem();
     }
 
+    /**
+     * Retorna el número de participantes seleccionado.
+     *
+     * @return número de participantes como entero.
+     * @throws NullPointerException si no hay selección activa en el combo.
+     */
     public int getNumParticipantes() {
         return (Integer) comboNumParticipantes.getSelectedItem();
     }
 
+    /**
+     * Limpia todos los campos del formulario, restableciendo sus valores por defecto.
+     */
     public void clearFields() {
         fieldNombre.setText("");
         fieldDisciplina.setText("");
