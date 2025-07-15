@@ -1,6 +1,5 @@
 package org.example.CodigoLogico;
 
-import java.util.Date;
 import java.util.Scanner;
 
 public class Main {
@@ -29,7 +28,7 @@ public class Main {
 
         // Iniciar el torneo
         System.out.println("\n=== INICIANDO TORNEO ===");
-        torneo.iniciarTorneo();
+        torneo.iniciarTorneo(torneo.sorteoParticipantesRandom(torneo.getParticipantes()));
 
         // Mostrar estructura del torneo
         System.out.println(torneo.getEstructuraTexto());

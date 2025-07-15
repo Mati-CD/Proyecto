@@ -43,8 +43,88 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         participantesList.setFont(font);
         participantesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // Construcción de layout omitida aquí por brevedad, ya está en tu código
-        // Incluye topPanel, centerPanel con panel izquierdo y derecho
+        // Panel Superior
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setOpaque(false);
+
+        irAtrasBtn = new PanelButton("Volver atrás", font);
+        irAtrasBtn.setButtonPreferredSize(new Dimension(120, 30));
+        JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        topLeftPanel.setOpaque(false);
+        topLeftPanel.add(irAtrasBtn);
+        topPanel.add(topLeftPanel, BorderLayout.WEST);
+
+        JLabel titleLabel = new JLabel("Inscribir Participantes", SwingConstants.CENTER);
+        titleLabel.setFont(titleFont);
+        topPanel.add(titleLabel, BorderLayout.CENTER);
+
+        add(topPanel, BorderLayout.NORTH);
+
+        // Panel Central
+        JPanel centerPanel = new JPanel(new BorderLayout(50, 0));
+        centerPanel.setOpaque(false);
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+
+        // Panel Central Izquierdo
+        JPanel centerLeftPanel = new JPanel(new BorderLayout());
+        centerLeftPanel.setOpaque(false);
+        centerLeftPanel.add(panelFormularioInscripcion, BorderLayout.CENTER);
+
+        // Panel Izquierdo Inferior
+        JPanel leftButtomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        leftButtomPanel.setOpaque(false);
+        inscribirBtn.setButtonPreferredSize(new Dimension(200, 50));
+        leftButtomPanel.add(inscribirBtn);
+        centerLeftPanel.add(leftButtomPanel, BorderLayout.SOUTH);
+
+        centerPanel.add(centerLeftPanel, BorderLayout.WEST);
+
+        // Panel Central Derecho
+        JPanel centerRightPanel = new JPanel(new BorderLayout());
+        centerRightPanel.setOpaque(false);
+        centerRightPanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 0, 0));
+
+        JPanel topRightPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        topRightPanel.setOpaque(false);
+
+        JLabel labelSeleccionarTorneo = new JLabel("Seleccione torneo:");
+        labelSeleccionarTorneo.setFont(font);
+        topRightPanel.add(labelSeleccionarTorneo);
+        topRightPanel.add(torneosComboBox);
+        centerRightPanel.add(topRightPanel, BorderLayout.NORTH);
+
+        // Lista de participantes
+        JLabel labelParticipantesInscritos = new JLabel("Participantes inscritos");
+        labelParticipantesInscritos.setFont(font);
+        labelParticipantesInscritos.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JScrollPane scrollPane = new JScrollPane(participantesList);
+        scrollPane.setPreferredSize(new Dimension(300, 500));
+        scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JPanel participantesListPanel = new JPanel();
+        participantesListPanel.setLayout(new BoxLayout(participantesListPanel, BoxLayout.Y_AXIS));
+        participantesListPanel.setOpaque(false);
+
+        participantesListPanel.add(labelParticipantesInscritos);
+        participantesListPanel.add(scrollPane);
+
+        JPanel wrapperParticipantesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        wrapperParticipantesPanel.setOpaque(false);
+        wrapperParticipantesPanel.setBorder(BorderFactory.createEmptyBorder(50, 0, 0, 0));
+        wrapperParticipantesPanel.add(participantesListPanel);
+
+        centerRightPanel.add(wrapperParticipantesPanel, BorderLayout.CENTER);
+
+        JPanel rightBottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        rightBottomPanel.setOpaque(false);
+        removerBtn.setButtonPreferredSize(new Dimension(200, 50));
+        rightBottomPanel.add(removerBtn);
+        centerRightPanel.add(rightBottomPanel, BorderLayout.SOUTH);
+
+        centerPanel.add(centerRightPanel, BorderLayout.CENTER);
+
+        add(centerPanel, BorderLayout.CENTER);
     }
 
     /**
@@ -190,7 +270,7 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
                 torneosComboBox.setSelectedIndex(0);
             }
         }
-
+        // Siempre llama a cargarParticipantesParaVisualizacion() después de actualizar el ComboBox
         cargarParticipantesTorneoSeleccionado();
     }
 

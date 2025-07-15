@@ -100,19 +100,39 @@ public class Torneo extends ObserverController {
         return participantes.remove(participante);
     }
 
+    public List<Participante> sorteoParticipantesRandom(List<Participante> participantesActuales) {
+        if (!fases.isEmpty()) {
+            notificarObservers("No se puede generar un nuevo bracket porque el torneo '" + nombre + "' ya ha comenzado");
+            return null;
+        }
+
+        if (participantesActuales.size() != numParticipantes) {
+            notificarObservers("Para generar un bracket del torneo '" + nombre + "' se requieren " + numParticipantes + " participantes." +
+                    "\nActualmente hay " + participantesActuales.size() + ".");
+            return null;
+        }
+
+        List<Participante> participantesRandom = new ArrayList<>(participantesActuales);
+        Collections.shuffle(participantesRandom);
+        return participantesRandom;
+    }
+
     /**
      * Inicia el torneo validando la cantidad de participantes e iniciando la fase inicial.
      */
-    // Inicio del torneo
-    public void iniciarTorneo() {
+    public void iniciarTorneo(List<Participante> participantesSorteados) {
+        if (participantesSorteados.size() != numParticipantes) {
+            notificarObservers("La lista de participantes para iniciar el torneo tiene una cantidad incorrecta. Se esperaban " + numParticipantes + " y se recibieron " + participantesSorteados.size() + ".");
+            return;
+        }
 
         fases.clear();
         campeon = null;
-
-        Collections.shuffle(this.participantes);
+        this.participantes.clear();
+        this.participantes.addAll(participantesSorteados);
 
         crearFaseInicial();
-        notificarObservers("Torneo iniciado con " + participantes.size() + " participantes");
+        notificarObservers("Torneo '" + nombre + "' iniciado con " + this.participantes.size() + " participantes.");
     }
 
     // Gestión de fases
@@ -121,13 +141,13 @@ public class Torneo extends ObserverController {
      * Crea la primera fase del torneo emparejando a los participantes.
      */
     private void crearFaseInicial() {
-        int numParticipantes = participantes.size();
+        int numParticipantes = this.participantes.size();
         String nombreFase = obtenerNombreFase(numParticipantes);
         FaseTorneo fase = new FaseTorneo(nombreFase);
 
         for (int i = 0; i < numParticipantes; i += 2) {
-            String player1 = participantes.get(i).getNombre();
-            String player2 = participantes.get(i + 1).getNombre();
+            String player1 = this.participantes.get(i).getNombre();
+            String player2 = this.participantes.get(i + 1).getNombre();
             Partido partido = new Partido(player1, player2, nombreFase);
             fase.agregar(partido);
         }
