@@ -2,6 +2,7 @@ package org.example.GUI;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,57 +18,57 @@ public class PanelFormularioEquipo extends JPanel {
     private JList<String> integrantesList;
     private PanelButton agregarIntegranteBtn;
     private PanelButton eliminarIntegranteBtn;
+    private JLabel contadorIntegrantesLabel;
+
     private int maxIntegrantes;
 
-    public PanelFormularioEquipo(int maxIntegrantes) {
-        this.maxIntegrantes = 11;
+    private final Font labelFont = new Font("SansSerif", Font.BOLD, 16);
+    private final Font fieldFont = new Font("SansSerif", Font.PLAIN, 16);
+    private final int preferredHeight = fieldFont.getSize() + 10;
+    private final Dimension fieldSize = new Dimension(200, preferredHeight);
+
+    public PanelFormularioEquipo() {
         setOpaque(false);
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        Font labelFont = new Font("SansSerif", Font.BOLD, 16);
-        Font fieldFont = new Font("SansSerif", Font.PLAIN, 16);
-        int preferredHeight = fieldFont.getSize() + 10;
-        Dimension preferredFieldSize = new Dimension(200, preferredHeight);
-
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 5, 10, 5);
+        gbc.insets = new Insets(10, 5, 10, 5); // Espaciado entre componentes
 
-        // Campo: Nombre del equipo
+        // --- Sección: Nombre del Equipo ---
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.anchor = GridBagConstraints.EAST; // Alinea la etiqueta a la derecha de su celda
         JLabel labelNombre = new JLabel("Nombre del Equipo:");
         labelNombre.setFont(labelFont);
         add(labelNombre, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-        fieldNombreEquipo = new JTextField(15);
+        gbc.anchor = GridBagConstraints.WEST; // Alinea el campo a la izquierda de su celda
+        gbc.fill = GridBagConstraints.HORIZONTAL; // Permite que el campo se estire horizontalmente
+        gbc.weightx = 1.0; // Le da "peso" al campo para que ocupe el espacio disponible
+        fieldNombreEquipo = new JTextField(15); // Tamaño de columna inicial
         fieldNombreEquipo.setFont(fieldFont);
-        fieldNombreEquipo.setPreferredSize(preferredFieldSize);
+        fieldNombreEquipo.setPreferredSize(fieldSize);
         add(fieldNombreEquipo, gbc);
 
-        // Sección de Integrantes
+        // --- Sección: Integrantes del Equipo ---
         gbc.gridx = 0;
         gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        gbc.insets = new Insets(20, 5, 10, 5);
-        JLabel labelIntegrantes = new JLabel("Integrantes del Equipo:");
-        labelIntegrantes.setFont(new Font("SansSerif", Font.BOLD, 18));
-        labelIntegrantes.setHorizontalAlignment(SwingConstants.CENTER);
-        add(labelIntegrantes, gbc);
-
-        gbc.gridwidth = 1;
-        gbc.insets = new Insets(10, 5, 10, 5);
+        gbc.gridwidth = 2; // Ocupa dos columnas
+        gbc.insets = new Insets(20, 5, 10, 5); // Más espacio arriba
+        JLabel labelIntegrantesTitulo = new JLabel("Integrantes del Equipo:");
+        labelIntegrantesTitulo.setFont(new Font("SansSerif", Font.BOLD, 18));
+        labelIntegrantesTitulo.setHorizontalAlignment(SwingConstants.CENTER);
+        add(labelIntegrantesTitulo, gbc);
 
         // Campo para agregar nuevo integrante
         gbc.gridx = 0;
         gbc.gridy = 2;
+        gbc.gridwidth = 1; // Vuelve a una columna
         gbc.anchor = GridBagConstraints.EAST;
+        gbc.insets = new Insets(10, 5, 10, 5); // Vuelve al espaciado normal
         JLabel labelNuevoIntegrante = new JLabel("Agregar Integrante:");
         labelNuevoIntegrante.setFont(labelFont);
         add(labelNuevoIntegrante, gbc);
@@ -77,11 +78,11 @@ public class PanelFormularioEquipo extends JPanel {
         gbc.anchor = GridBagConstraints.WEST;
         fieldNuevoIntegrante = new JTextField(15);
         fieldNuevoIntegrante.setFont(fieldFont);
-        fieldNuevoIntegrante.setPreferredSize(preferredFieldSize);
+        fieldNuevoIntegrante.setPreferredSize(fieldSize);
         add(fieldNuevoIntegrante, gbc);
 
-        // Botones para agregar/eliminar integrantes
-        gbc.gridx = 1;
+        // Contenedor para botones "Agregar" y "Eliminar"
+        gbc.gridx = 1; // Ubicar en la segunda columna
         gbc.gridy = 3;
         JPanel botonesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         botonesPanel.setOpaque(false);
@@ -99,9 +100,9 @@ public class PanelFormularioEquipo extends JPanel {
         // Lista de integrantes
         gbc.gridx = 0;
         gbc.gridy = 4;
-        gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weighty = 1.0;
+        gbc.gridwidth = 2; // Ocupa ambas columnas
+        gbc.fill = GridBagConstraints.BOTH; // Permite que la lista se estire en ambas direcciones
+        gbc.weighty = 1.0; // Le da "peso" para que ocupe espacio vertical disponible
 
         integrantesModel = new DefaultListModel<>();
         integrantesList = new JList<>(integrantesModel);
@@ -109,27 +110,26 @@ public class PanelFormularioEquipo extends JPanel {
         integrantesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JScrollPane scrollPane = new JScrollPane(integrantesList);
-        scrollPane.setPreferredSize(new Dimension(300, 150));
+        scrollPane.setPreferredSize(new Dimension(300, 150)); // Tamaño preferido inicial para el scroll
         add(scrollPane, gbc);
 
-        // Contador de integrantes
+        // Contador de integrantes (se actualizará dinámicamente)
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.weighty = 0.0;
-        gbc.anchor = GridBagConstraints.CENTER;
-        JLabel contadorLabel = new JLabel("Máximo 11 integrantes");
-        contadorLabel.setFont(labelFont);
-        add(contadorLabel, gbc);
+        gbc.fill = GridBagConstraints.NONE; // No estirar
+        gbc.weighty = 0.0; // No dar peso vertical
+        gbc.anchor = GridBagConstraints.CENTER; // Centrar
+        contadorIntegrantesLabel = new JLabel("Número de Integrantes: 0 (Máx: -)"); // Texto inicial
+        contadorIntegrantesLabel.setFont(labelFont);
+        add(contadorIntegrantesLabel, gbc);
 
-        // Sección de Datos de Contacto
+        // --- Sección: Datos de Contacto ---
         gbc.gridx = 0;
         gbc.gridy = 6;
         gbc.gridwidth = 2;
-        gbc.insets = new Insets(20, 5, 15, 5);
+        gbc.insets = new Insets(20, 5, 15, 5); // Más espacio arriba
         gbc.anchor = GridBagConstraints.CENTER;
-
         JLabel labelDatosContacto = new JLabel("Datos de Contacto:");
         labelDatosContacto.setFont(new Font("SansSerif", Font.BOLD, 18));
         add(labelDatosContacto, gbc);
@@ -139,8 +139,7 @@ public class PanelFormularioEquipo extends JPanel {
         gbc.gridy = 7;
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
-        gbc.insets = new Insets(10, 5, 10, 5);
-
+        gbc.insets = new Insets(10, 5, 10, 5); // Vuelve al espaciado normal
         JLabel labelCorreo = new JLabel("Correo:");
         labelCorreo.setFont(labelFont);
         add(labelCorreo, gbc);
@@ -149,52 +148,33 @@ public class PanelFormularioEquipo extends JPanel {
         gbc.gridy = 7;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
+        gbc.weightx = 1.0; // Permite que el campo se estire
 
-        fieldCorreo = new JTextField(15);
+        // Usamos un JPanel interno para agrupar el JTextField y el "@gmail.com" estático
+        JPanel correoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        correoPanel.setOpaque(false);
+        fieldCorreo = new JTextField(10); // Ajusta el tamaño de columna
         fieldCorreo.setFont(fieldFont);
-        fieldCorreo.setPreferredSize(new Dimension(200, 30));
-        add(fieldCorreo, gbc);
-
-        // Listeners
-        agregarIntegranteBtn.addActionListener(e -> agregarIntegrante());
-        eliminarIntegranteBtn.addActionListener(e -> eliminarIntegrante());
+        fieldCorreo.setPreferredSize(new Dimension(fieldSize.width - 80, preferredHeight)); // Ajuste de tamaño
+        correoPanel.add(fieldCorreo);
+        JLabel gmailLabel = new JLabel("@gmail.com");
+        gmailLabel.setFont(fieldFont);
+        correoPanel.add(gmailLabel);
+        add(correoPanel, gbc);
     }
 
-    private void agregarIntegrante() {
-        String nombre = fieldNuevoIntegrante.getText().trim();
-        if (nombre.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Por favor ingrese un nombre", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        if (integrantesModel.size() >= maxIntegrantes) {
-            JOptionPane.showMessageDialog(this,
-                    "El equipo ya tiene el máximo de " + maxIntegrantes + " integrantes",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        if (integrantesModel.contains(nombre)) {
-            JOptionPane.showMessageDialog(this,
-                    "Este integrante ya está en el equipo",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        integrantesModel.addElement(nombre);
-        fieldNuevoIntegrante.setText("");
+    public void setMaxIntegrantes(int maxIntegrantes) {
+        this.maxIntegrantes = maxIntegrantes;
+        updateIntegrantesCountLabel();
     }
 
-    private void eliminarIntegrante() {
-        int selectedIndex = integrantesList.getSelectedIndex();
-        if (selectedIndex == -1) {
-            JOptionPane.showMessageDialog(this,
-                    "Seleccione un integrante para eliminar",
-                    "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+    public void updateIntegrantesCountLabel() {
+        if (maxIntegrantes > 0) {
+            contadorIntegrantesLabel.setText("Integrantes: " + integrantesModel.size() + " (Máx: " + maxIntegrantes + ")");
         }
-        integrantesModel.remove(selectedIndex);
+        else {
+            contadorIntegrantesLabel.setText("Integrantes: " + integrantesModel.size());
+        }
     }
 
     public String getNombreEquipo() {
@@ -203,7 +183,9 @@ public class PanelFormularioEquipo extends JPanel {
 
     public String getCorreo() {
         String correo = fieldCorreo.getText().trim();
-        if (!correo.endsWith("@gmail.com")) {
+        if (!correo.isEmpty() && !correo.contains("@") && !correo.endsWith("@gmail.com")) {
+            correo += "@gmail.com";
+        } else if (!correo.isEmpty() && !correo.endsWith("@gmail.com") && !correo.contains("@")) {
             correo += "@gmail.com";
         }
         return correo;
@@ -211,10 +193,30 @@ public class PanelFormularioEquipo extends JPanel {
 
     public List<String> getIntegrantes() {
         List<String> integrantes = new ArrayList<>();
-        for (int i = 0; i < integrantesModel.size(); i++) {
+        for (int i=0; i < integrantesModel.size(); i++) {
             integrantes.add(integrantesModel.getElementAt(i));
         }
         return integrantes;
+    }
+
+    public String getNuevoIntegrante() {
+        return fieldNuevoIntegrante.getText();
+    }
+
+    public int getSelectedIndexIntegrantesList() {
+        return integrantesList.getSelectedIndex();
+    }
+
+    public DefaultListModel<String> getIntegrantesModel() {
+        return integrantesModel;
+    }
+
+    public void addAgregarIntegranteListener(ActionListener actionListener) {
+        agregarIntegranteBtn.addActionListener(actionListener);
+    }
+
+    public void addEliminarIntegranteListener(ActionListener actionListener) {
+        eliminarIntegranteBtn.addActionListener(actionListener);
     }
 
     public void clearFields() {
@@ -222,5 +224,10 @@ public class PanelFormularioEquipo extends JPanel {
         fieldCorreo.setText("");
         fieldNuevoIntegrante.setText("");
         integrantesModel.clear();
+        updateIntegrantesCountLabel(); // Actualiza la etiqueta después de limpiar
+    }
+
+    public void clearNuevoIntegranteField() {
+        fieldNuevoIntegrante.setText("");
     }
 }

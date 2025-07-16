@@ -1,54 +1,69 @@
 package org.example.GUI;
 
 import org.example.CodigoLogico.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
 public class PanelInscribirParticipantes extends JPanel implements PanelConfigurable, TorneoObserver {
     private GestorTorneos gestorTorneos;
-    private JPanel panelFormularioContainer;
-    private PanelFormularioInscripcion panelFormularioIndividual;
-    private PanelFormularioEquipo panelFormularioEquipo;
     private PanelButton removerBtn;
     private PanelButton irAtrasBtn;
     private PanelButton inscribirBtn;
     private JComboBox<Torneo> torneosComboBox;
     private DefaultListModel<String> participantesModel;
     private JList<String> participantesList;
+    private JLabel contadorParticipantesLabel;
     private boolean listenersActivos = false;
 
+    private PanelFormularioIndividual panelFormularioIndividual;
+    private PanelFormularioEquipo panelFormularioEquipo;
+    private JPanel panelFormularioInscripcion;
+    private JPanel panelVacio;
+
+    private final Dimension size1 = new Dimension(200, 50);
+    private final Dimension size2 = new Dimension(120, 30);
+    private final Font componentFont1 = new Font("SansSerif", Font.BOLD, 14);
+    private final Font componentFont2 = new Font("Arial", Font.BOLD, 12);
+    private final Font titleFont = new Font("Arial", Font.BOLD, 24);
+
+    /**
+     * Constructor que inicializa los componentes gráficos del panel de inscripción.
+     */
     public PanelInscribirParticipantes() {
         super(new BorderLayout());
         setBackground(new Color(6, 153, 153));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        Font font = new Font("SansSerif", Font.BOLD, 14);
-        Font font1 = new Font("Arial", Font.BOLD, 12);
-        Font titleFont = new Font("Arial", Font.BOLD, 24);
-
         // Inicializar Componentes
-        inscribirBtn = new PanelButton("Inscribir Participante", font);
-        inscribirBtn.setButtonPreferredSize(new Dimension(200, 50));
-        removerBtn = new PanelButton("Eliminar participante", font);
-        removerBtn.setButtonPreferredSize(new Dimension(200, 50));
-        irAtrasBtn = new PanelButton("Volver atrás", font1);
-        irAtrasBtn.setButtonPreferredSize(new Dimension(120, 30));
+        inscribirBtn = new PanelButton("Inscribir Participante", componentFont1);
+        inscribirBtn.setButtonPreferredSize(size1);
+        removerBtn = new PanelButton("Eliminar participante", componentFont1);
+        removerBtn.setButtonPreferredSize(size1);
+        irAtrasBtn = new PanelButton("Volver atrás", componentFont2);
+        irAtrasBtn.setButtonPreferredSize(size2);
 
         torneosComboBox = new JComboBox<>();
-        torneosComboBox.setFont(font);
+        torneosComboBox.setFont(componentFont1);
         torneosComboBox.setRenderer(new GuiUtils.ComboBoxRenderer<>(Torneo::getNombre));
 
         participantesModel = new DefaultListModel<>();
         participantesList = new JList<>(participantesModel);
-        panelFormularioIndividual = new PanelFormularioInscripcion();
-        panelFormularioEquipo = new PanelFormularioEquipo(5);
-        panelFormularioContainer = new JPanel(new CardLayout());
-        panelFormularioContainer.add(panelFormularioIndividual, "INDIVIDUAL");
-        panelFormularioContainer.add(panelFormularioEquipo, "EQUIPO");
-
-        participantesList.setFont(font);
+        participantesList.setFont(componentFont1);
         participantesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        panelFormularioIndividual = new PanelFormularioIndividual();
+        panelFormularioEquipo = new PanelFormularioEquipo();
+
+        panelVacio = new JPanel();
+        panelVacio.setOpaque(false);
+
+        panelFormularioInscripcion = new JPanel(new CardLayout());
+        panelFormularioInscripcion.add(panelFormularioIndividual, "INDIVIDUAL");
+        panelFormularioInscripcion.add(panelFormularioEquipo, "EQUIPO");
+        panelFormularioInscripcion.add(panelVacio, "VACIO");
+
 
         // Panel superior
         JPanel topPanel = GuiUtils.crearPanelDeEncabezado(irAtrasBtn,
@@ -66,7 +81,7 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         // Panel Central Izquierdo
         JPanel centerLeftPanel = new JPanel(new BorderLayout());
         centerLeftPanel.setOpaque(false);
-        centerLeftPanel.add(panelFormularioContainer, BorderLayout.CENTER);
+        centerLeftPanel.add(panelFormularioInscripcion, BorderLayout.CENTER);
 
         // Panel Izquierdo Inferior
         JPanel leftButtomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -84,15 +99,19 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         JPanel comboPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         comboPanel.setOpaque(false);
         JLabel labelSeleccionarTorneo = new JLabel("Seleccione torneo:");
-        labelSeleccionarTorneo.setFont(font);
+        labelSeleccionarTorneo.setFont(componentFont1);
         comboPanel.add(labelSeleccionarTorneo);
         comboPanel.add(torneosComboBox);
         centerRightPanel.add(comboPanel, BorderLayout.NORTH);
 
         // Lista de participantes
         JLabel labelParticipantesInscritos = new JLabel("Participantes inscritos");
-        labelParticipantesInscritos.setFont(font);
+        labelParticipantesInscritos.setFont(componentFont1);
         labelParticipantesInscritos.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        contadorParticipantesLabel = new JLabel("0 de 0");
+        contadorParticipantesLabel.setFont(componentFont2);
+        contadorParticipantesLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JScrollPane scrollPane = new JScrollPane(participantesList);
         scrollPane.setPreferredSize(new Dimension(300, 500));
@@ -103,6 +122,9 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         participantesListPanel.setOpaque(false);
 
         participantesListPanel.add(labelParticipantesInscritos);
+        participantesListPanel.add(Box.createVerticalStrut(5));
+        participantesListPanel.add(contadorParticipantesLabel);
+        participantesListPanel.add(Box.createVerticalStrut(10));
         participantesListPanel.add(scrollPane);
 
         JPanel wrapperParticipantesPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -122,6 +144,12 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         add(centerPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Inicializa el panel configurando el gestor de torneos, registrando listeners y actualizando la UI.
+     *
+     * @param actionAssigner    Asignador de acciones que se encarga de delegar eventos de botones.
+     * @param gestorTorneos     Instancia de la lógica del sistema que gestiona los torneos.
+     */
     @Override
     public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         this.gestorTorneos = gestorTorneos;
@@ -129,15 +157,17 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
 
         if (!listenersActivos) {
             irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
-            inscribirBtn.addActionListener(e -> clickInscribirBtn());
+            inscribirBtn.addActionListener(e -> clickInscribirParticipanteBtn());
+            removerBtn.addActionListener(e -> clickEliminarParticipanteBtn());
             torneosComboBox.addActionListener(e -> {
                 cargarParticipantesTorneoSeleccionado();
                 actualizarFormularioSegunTorneo();
             });
-            removerBtn.addActionListener(e -> clickEliminarBtn());
+            panelFormularioEquipo.addAgregarIntegranteListener(e -> agregarIntegranteEquipo());
+            panelFormularioEquipo.addEliminarIntegranteListener(e -> eliminarIntegranteEquipo());
+
             listenersActivos = true;
         }
-
         cargarTorneosEnComboBox();
         cargarParticipantesTorneoSeleccionado();
         actualizarFormularioSegunTorneo();
@@ -146,19 +176,11 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         this.repaint();
     }
 
-    private void actualizarFormularioSegunTorneo() {
-        Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
-        CardLayout cl = (CardLayout) panelFormularioContainer.getLayout();
-
-        if (torneoSeleccionado != null && torneoSeleccionado.getTipoDeInscripcion().equalsIgnoreCase("equipo")) {
-            cl.show(panelFormularioContainer, "EQUIPO");
-            panelFormularioEquipo.clearFields();
-        } else {
-            cl.show(panelFormularioContainer, "INDIVIDUAL");
-            panelFormularioIndividual.clearFields();
-        }
-    }
-
+    /**
+     * Recibe notificaciones del gestor de torneos y muestra mensajes según el contenido recibido.
+     *
+     * @param mensaje Mensaje emitido por el gestor de torneos.
+     */
     @Override
     public void actualizar(String mensaje) {
         if (mensaje.contains("ya está inscrito en el torneo")) {
@@ -176,87 +198,99 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         }
     }
 
-    private void clickInscribirBtn() {
+    private void actualizarFormularioSegunTorneo() {
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
-        if (torneoSeleccionado == null) {
-            GuiUtils.showMessageOnce(this,
-                    "No hay torneos disponibles para inscribir participantes",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+        CardLayout cardLayout = (CardLayout) (panelFormularioInscripcion.getLayout());
+
+        if (torneoSeleccionado == null || (torneoSeleccionado.getNombre() != null && torneoSeleccionado.getNombre().equals("No hay torneos creados"))) {
+            cardLayout.show(panelFormularioInscripcion, "VACIO");
+            panelFormularioIndividual.clearFields();
+            panelFormularioEquipo.setMaxIntegrantes(0);
+            panelFormularioEquipo.clearFields();
+            actualizarContadorParticipantes();
+        }
+        else {
+            if (torneoSeleccionado.getTipoDeInscripcion().equalsIgnoreCase("equipo")) {
+                cardLayout.show(panelFormularioInscripcion, "EQUIPO");
+                panelFormularioEquipo.setMaxIntegrantes(torneoSeleccionado.getNumMiembrosEquipo());
+                panelFormularioEquipo.clearFields();
+            }
+            else {
+                cardLayout.show(panelFormularioInscripcion, "INDIVIDUAL");
+                panelFormularioIndividual.clearFields();
+            }
+        }
+    }
+
+    /**
+     * Maneja el evento de inscripción de participante.
+     * Valida los campos ingresados y, si son correctos, intenta inscribir al participante en el torneo seleccionado.
+     *
+     * @throws IllegalArgumentException si los campos requeridos están vacíos.
+     */
+    private void clickInscribirParticipanteBtn() {
+        Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
+        if (torneoSeleccionado == null || gestorTorneos.getTorneosCreados().isEmpty()) {
+            GuiUtils.showMessageOnce(this, "No hay torneos creados para inscribir participantes.\nPor favor, cree un torneo primero.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         Participante participante;
 
         if (torneoSeleccionado.getTipoDeInscripcion().equalsIgnoreCase("equipo")) {
-            // Validación para equipos
             String nombreEquipo = panelFormularioEquipo.getNombreEquipo();
             List<String> integrantes = panelFormularioEquipo.getIntegrantes();
             String correo = panelFormularioEquipo.getCorreo();
 
             if (nombreEquipo.isEmpty()) {
-                GuiUtils.showMessageOnce(this,
-                        "Por favor ingrese un nombre para el equipo",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                GuiUtils.showMessageOnce(this, "Por favor ingrese un nombre para el equipo.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
             if (integrantes.isEmpty()) {
-                GuiUtils.showMessageOnce(this,
-                        "El equipo debe tener al menos un integrante",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                GuiUtils.showMessageOnce(this, "El equipo debe tener al menos un integrante.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (integrantes.size() > torneoSeleccionado.getNumMiembrosEquipo()) {
+                GuiUtils.showMessageOnce(this, "El número de integrantes (" + integrantes.size() + ") excede el máximo permitido para este torneo (" + torneoSeleccionado.getNumMiembrosEquipo() + ").", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (correo.isEmpty() || !correo.endsWith("@gmail.com")) { // Agregamos una validación simple de formato
+                GuiUtils.showMessageOnce(this, "Por favor ingrese un correo válido para el equipo.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            if (correo.isEmpty()) {
-                GuiUtils.showMessageOnce(this,
-                        "Por favor ingrese un correo de contacto",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            // Crear equipo
-            ParticipanteEquipo equipo = new ParticipanteEquipo(nombreEquipo, integrantes.size());
-            for (String integrante : integrantes) {
-                equipo.addMiembro(integrante);
-            }
+            ParticipanteEquipo equipo = new ParticipanteEquipo(nombreEquipo, integrantes);
             equipo.setCorreo(correo);
             participante = equipo;
-        } else {
+        }
+        else {
             String nombre = panelFormularioIndividual.getNombre();
             int edad = panelFormularioIndividual.getEdad();
             String pais = panelFormularioIndividual.getPais();
+            String correo = panelFormularioIndividual.getCorreo();
 
             if (nombre.isEmpty() || pais.isEmpty()) {
-                GuiUtils.showMessageOnce(this,
-                        "Por favor complete todos los campos obligatorios",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                GuiUtils.showMessageOnce(this, "Por favor complete los campos de Nombre y País.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
             if (edad <= 0) {
-                GuiUtils.showMessageOnce(this,
-                        "Por favor ingrese una edad válida (mayor a 0)",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                GuiUtils.showMessageOnce(this, "Por favor ingrese una edad válida (mayor a 0).", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
+            if (!correo.endsWith("@gmail.com")) {
+                GuiUtils.showMessageOnce(this, "Por favor ingrese un correo válido (debe terminar en @gmail.com).", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             participante = new ParticipanteIndividual(nombre, edad, pais);
+            participante.setCorreo(correo);
         }
 
-        // Inscribir participante (individual o equipo)
         gestorTorneos.addParticipanteATorneo(torneoSeleccionado.getNombre(), participante);
-
-        // Limpiar formulario si la inscripción fue exitosa
         if (gestorTorneos.getInscritoConExito()) {
             if (torneoSeleccionado.getTipoDeInscripcion().equalsIgnoreCase("equipo")) {
                 panelFormularioEquipo.clearFields();
-            } else {
+            }
+            else {
                 panelFormularioIndividual.clearFields();
             }
             cargarParticipantesTorneoSeleccionado();
@@ -267,7 +301,7 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
      * Maneja el evento de eliminación del participante seleccionado de la lista.
      * Solicita confirmación antes de proceder a eliminarlo del torneo.
      */
-    private void clickEliminarBtn() {
+    private void clickEliminarParticipanteBtn() {
         int selectedIndex = participantesList.getSelectedIndex();
         if (selectedIndex == -1) {
             GuiUtils.showMessageOnce(this, "Por favor, seleccione un participante de la lista para eliminar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
@@ -300,7 +334,8 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
                 gestorTorneos.removeParticipanteDeTorneo(torneoSeleccionado.getNombre(), buscarParticipante);
                 cargarParticipantesTorneoSeleccionado();
             }
-        } else {
+        }
+        else {
             GuiUtils.showMessageOnce(this, "ERROR: No se pudo encontrar el participante seleccionado en la lista del torneo.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -312,7 +347,6 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
     private void cargarTorneosEnComboBox() {
         List<Torneo> torneos = gestorTorneos.getTorneosCreados();
         GuiUtils.cargarTorneosEnComboBox(torneosComboBox, torneos);
-        cargarParticipantesTorneoSeleccionado();
     }
 
     /**
@@ -325,8 +359,62 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         if (torneoSeleccionado != null && !torneoSeleccionado.getNombre().equals("No hay torneos creados")) {
             List<Participante> participantes = gestorTorneos.getParticipantesDeTorneo(torneoSeleccionado.getNombre());
             for (Participante p : participantes) {
-                participantesModel.addElement(p.getNombre());
+                participantesModel.addElement(p.getNombreForTorneo());
             }
+        }
+        actualizarContadorParticipantes();
+    }
+
+    private void agregarIntegranteEquipo() {
+        String nombre = panelFormularioEquipo.getNuevoIntegrante();
+        Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
+
+        if (torneoSeleccionado == null) {
+            GuiUtils.showMessageOnce(this, "Seleccione un torneo primero.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (nombre.isEmpty()) {
+            GuiUtils.showMessageOnce(this, "Por favor ingrese un nombre para el integrante.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (panelFormularioEquipo.getIntegrantesModel().size() >= torneoSeleccionado.getNumMiembrosEquipo()) {
+            GuiUtils.showMessageOnce(this,
+                    "El equipo ya tiene el máximo de " + torneoSeleccionado.getNumMiembrosEquipo() + " integrantes permitidos para este torneo.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (panelFormularioEquipo.getIntegrantesModel().contains(nombre)) {
+            GuiUtils.showMessageOnce(this,
+                    "Este integrante ya está en la lista del equipo.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        panelFormularioEquipo.getIntegrantesModel().addElement(nombre);
+        panelFormularioEquipo.clearNuevoIntegranteField();
+        panelFormularioEquipo.updateIntegrantesCountLabel();
+    }
+
+    private void eliminarIntegranteEquipo() {
+        int selectedIndex = panelFormularioEquipo.getSelectedIndexIntegrantesList();
+        if (selectedIndex == -1) {
+            GuiUtils.showMessageOnce(this,
+                    "Seleccione un integrante de la lista del equipo para eliminar.",
+                    "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        panelFormularioEquipo.getIntegrantesModel().remove(selectedIndex);
+        panelFormularioEquipo.updateIntegrantesCountLabel();
+    }
+
+    private void actualizarContadorParticipantes() {
+        Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
+        if (torneoSeleccionado != null) {
+            int actualCount = participantesModel.size();
+            int maxCount = torneoSeleccionado.getNumParticipantes();
+            contadorParticipantesLabel.setText(actualCount + " de " + maxCount);
+        } else {
+            contadorParticipantesLabel.setText("0 de 0");
         }
     }
 }

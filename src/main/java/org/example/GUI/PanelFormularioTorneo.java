@@ -1,7 +1,11 @@
 package org.example.GUI;
 
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Panel de formulario para la creación de un torneo.
@@ -12,120 +16,171 @@ public class PanelFormularioTorneo extends JPanel {
     private JTextField fieldDisciplina;
     private JComboBox<String> comboTipoInscripcion;
     private JComboBox<Integer> comboNumParticipantes;
+    private JTextField fieldNumMiembrosEquipo;
+    private JLabel labelNumMiembrosEquipo;
+
+    private final Dimension fieldYComboSize = new Dimension(280, 30);
+    private final Font tittleFont = new Font("SansSerif", Font.BOLD, 20);
+    private final Font componentFont = new Font("SansSerif", Font.BOLD, 18);
 
     /**
      * Constructor que inicializa y dispone gráficamente los campos del formulario.
      */
     public PanelFormularioTorneo() {
         setOpaque(false);
-        setLayout(new GridBagLayout());
-        setBorder(BorderFactory.createEmptyBorder(100, 50, 50, 50));
+        setLayout(new GridLayout(0, 2, 15, 80));
 
-        Font font1 = new Font("SansSerif", Font.BOLD, 20);
+        TitledBorder titledBorder = BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.WHITE, 1),
+                "Datos del Torneo",
+                TitledBorder.CENTER, TitledBorder.TOP,
+                tittleFont, Color.WHITE
+        );
+        setBorder(BorderFactory.createCompoundBorder(
+                titledBorder,
+                BorderFactory.createEmptyBorder(20, 20, 20, 20)
+        ));
 
-        int preferredHeight = font1.getSize() + 10;
-        Dimension preferredFieldSize = new Dimension(200, preferredHeight);
-        Dimension preferredComboSize = new Dimension(220, preferredHeight);
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0, 0, 100, 0);
-        gbc.anchor = GridBagConstraints.EAST;
-        gbc.weightx = 0.0;
-        gbc.fill = GridBagConstraints.NONE;
-
-        GridBagConstraints gbcField = new GridBagConstraints();
-        gbcField.insets = new Insets(0, 10, 100, 0);
-        gbcField.anchor = GridBagConstraints.WEST;
-        gbcField.weightx = 1.0;
-        gbcField.fill = GridBagConstraints.HORIZONTAL;
-
-        // Campo: Nombre del torneo
-        gbc.gridy = 0;
+        // Inicializar componentes
         JLabel labelNombre = new JLabel("Nombre del Torneo:");
-        labelNombre.setFont(font1);
-        add(labelNombre, gbc);
+        labelNombre.setFont(componentFont);
+        fieldNombre = new JTextField();
+        fieldNombre.setFont(componentFont);
+        fieldNombre.setPreferredSize(fieldYComboSize);
+        fieldNombre.setMaximumSize(fieldYComboSize);
 
-        gbcField.gridy = 0;
-        fieldNombre = new JTextField(20);
-        fieldNombre.setFont(font1);
-        fieldNombre.setPreferredSize(preferredFieldSize);
-        add(fieldNombre, gbcField);
-
-        // Campo: Disciplina
-        gbc.gridy = 1;
         JLabel labelDisciplina = new JLabel("Disciplina:");
-        labelDisciplina.setFont(font1);
-        add(labelDisciplina, gbc);
+        labelDisciplina.setFont(componentFont);
+        fieldDisciplina = new JTextField();
+        fieldDisciplina.setFont(componentFont);
+        fieldDisciplina.setPreferredSize(fieldYComboSize);
+        fieldDisciplina.setMaximumSize(fieldYComboSize);
 
-        gbcField.gridy = 1;
-        fieldDisciplina = new JTextField(20);
-        fieldDisciplina.setFont(font1);
-        fieldDisciplina.setPreferredSize(preferredFieldSize);
-        add(fieldDisciplina, gbcField);
-
-        // Campo: Tipo de inscripción
-        gbc.gridy = 2;
-        JLabel labelTipoInscripcion = new JLabel("Tipo de Inscripción:");
-        labelTipoInscripcion.setFont(font1);
-        add(labelTipoInscripcion, gbc);
-
-        gbcField.gridy = 2;
-        String[] tiposDeInscripcion = {"Individual", "Equipo"};
-        comboTipoInscripcion = new JComboBox<>(tiposDeInscripcion);
-        comboTipoInscripcion.setFont(font1);
-        comboTipoInscripcion.setPreferredSize(preferredComboSize);
-        add(comboTipoInscripcion, gbcField);
-
-        // Campo: Número de participantes
-        gbc.gridy = 3;
         JLabel labelNumParticipantes = new JLabel("Número de Participantes:");
-        labelNumParticipantes.setFont(font1);
-        add(labelNumParticipantes, gbc);
-
-        gbcField.gridy = 3;
+        labelNumParticipantes.setFont(componentFont);
         Integer[] numParticipantesOpciones = {2, 4, 8, 16, 32};
         comboNumParticipantes = new JComboBox<>(numParticipantesOpciones);
-        comboNumParticipantes.setFont(font1);
-        comboNumParticipantes.setPreferredSize(preferredComboSize);
+        comboNumParticipantes.setFont(componentFont);
+        comboNumParticipantes.setPreferredSize(fieldYComboSize);
+        comboNumParticipantes.setMaximumSize(fieldYComboSize);
         comboNumParticipantes.setSelectedIndex(0);
-        add(comboNumParticipantes, gbcField);
+
+        JLabel labelTipoInscripcion = new JLabel("Tipo de Inscripción:");
+        labelTipoInscripcion.setFont(componentFont);
+        String[] tiposDeInscripcion = {"Individual", "Equipo"};
+        comboTipoInscripcion = new JComboBox<>(tiposDeInscripcion);
+        comboTipoInscripcion.setFont(componentFont);
+        comboTipoInscripcion.setPreferredSize(fieldYComboSize);
+        comboTipoInscripcion.setMaximumSize(fieldYComboSize);
+        comboTipoInscripcion.setSelectedIndex(0);
+
+        labelNumMiembrosEquipo = new JLabel("Miembros por Equipo:");
+        labelNumMiembrosEquipo.setFont(componentFont);
+        fieldNumMiembrosEquipo = new JTextField();
+        fieldNumMiembrosEquipo.setFont(componentFont);
+        fieldNumMiembrosEquipo.setPreferredSize(fieldYComboSize);
+        fieldNumMiembrosEquipo.setMaximumSize(fieldYComboSize);
+        labelNumMiembrosEquipo.setVisible(false);
+        fieldNumMiembrosEquipo.setVisible(false);
+
+        JPanel labelNombreWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        labelNombreWrapper.setOpaque(false);
+        labelNombreWrapper.add(labelNombre);
+        add(labelNombreWrapper);
+
+        JPanel fieldNombreWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        fieldNombreWrapper.setOpaque(false);
+        fieldNombreWrapper.add(fieldNombre);
+        add(fieldNombreWrapper);
+
+        JPanel labelDisciplinaWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        labelDisciplinaWrapper.setOpaque(false);
+        labelDisciplinaWrapper.add(labelDisciplina);
+        add(labelDisciplinaWrapper);
+
+        JPanel fieldDisciplinaWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        fieldDisciplinaWrapper.setOpaque(false);
+        fieldDisciplinaWrapper.add(fieldDisciplina);
+        add(fieldDisciplinaWrapper);
+
+        JPanel labelNumParticipantesWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        labelNumParticipantesWrapper.setOpaque(false);
+        labelNumParticipantesWrapper.add(labelNumParticipantes);
+        add(labelNumParticipantesWrapper);
+
+        JPanel comboNumParticipantesWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        comboNumParticipantesWrapper.setOpaque(false);
+        comboNumParticipantesWrapper.add(comboNumParticipantes);
+        add(comboNumParticipantesWrapper);
+
+        JPanel labelTipoInscripcionWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        labelTipoInscripcionWrapper.setOpaque(false);
+        labelTipoInscripcionWrapper.add(labelTipoInscripcion);
+        add(labelTipoInscripcionWrapper);
+
+        JPanel comboTipoInscripcionWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        comboTipoInscripcionWrapper.setOpaque(false);
+        comboTipoInscripcionWrapper.add(comboTipoInscripcion);
+        add(comboTipoInscripcionWrapper);
+
+        JPanel currentLabelWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        currentLabelWrapper.setOpaque(false);
+        currentLabelWrapper.add(labelNumMiembrosEquipo);
+        add(currentLabelWrapper);
+
+        JPanel currentFieldWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        currentFieldWrapper.setOpaque(false);
+        currentFieldWrapper.add(fieldNumMiembrosEquipo);
+        add(currentFieldWrapper);
+
+        comboTipoInscripcion.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                actualizarVisibilidadMiembrosEquipo();
+            }
+        });
     }
 
     /**
-     * Obtiene el texto ingresado en el campo "Nombre del Torneo".
-     *
-     * @return el nombre del torneo como String.
+     * Actualiza la visibilidad del campo de miembros por equipo, esto
+     * controlado por el tipo de inscripción seleccionado.
      */
+    private void actualizarVisibilidadMiembrosEquipo() {
+        String tipoInscripcion = (String) comboTipoInscripcion.getSelectedItem();
+        boolean esEquipo = "Equipo".equals(tipoInscripcion);
+
+        labelNumMiembrosEquipo.setVisible(esEquipo);
+        fieldNumMiembrosEquipo.setVisible(esEquipo);
+
+        revalidate();
+        repaint();
+    }
+
     public String getNombre() {
         return fieldNombre.getText();
     }
 
-    /**
-     * Obtiene el texto ingresado en el campo "Disciplina".
-     *
-     * @return la disciplina como String.
-     */
     public String getDisciplina() {
         return fieldDisciplina.getText();
     }
 
-    /**
-     * Retorna la opción seleccionada en el campo "Tipo de Inscripción".
-     *
-     * @return "Individual" o "Equipo".
-     */
     public String getTipoInscripcion() {
         return (String) comboTipoInscripcion.getSelectedItem();
     }
 
-    /**
-     * Retorna el número de participantes seleccionado.
-     *
-     * @return número de participantes como entero.
-     * @throws NullPointerException si no hay selección activa en el combo.
-     */
     public int getNumParticipantes() {
         return (Integer) comboNumParticipantes.getSelectedItem();
+    }
+
+    public int getNumMiembrosEquipo() {
+        if ("Individual".equals(getTipoInscripcion())) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(fieldNumMiembrosEquipo.getText().trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     /**
@@ -136,5 +191,8 @@ public class PanelFormularioTorneo extends JPanel {
         fieldDisciplina.setText("");
         comboTipoInscripcion.setSelectedIndex(0);
         comboNumParticipantes.setSelectedIndex(0);
+        fieldNumMiembrosEquipo.setText("");
+
+        actualizarVisibilidadMiembrosEquipo();
     }
 }
