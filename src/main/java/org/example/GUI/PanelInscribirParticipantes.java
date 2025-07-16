@@ -21,7 +21,7 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
     public PanelInscribirParticipantes() {
         super(new BorderLayout());
         setBackground(new Color(6, 153, 153));
-        setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         Font font = new Font("SansSerif", Font.BOLD, 14);
         Font font1 = new Font("Arial", Font.BOLD, 12);
@@ -37,12 +37,12 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
 
         torneosComboBox = new JComboBox<>();
         torneosComboBox.setFont(font);
-        torneosComboBox.setRenderer(new GuiUtils.TorneoComboBoxRenderer());
+        torneosComboBox.setRenderer(new GuiUtils.ComboBoxRenderer<>(Torneo::getNombre));
 
         participantesModel = new DefaultListModel<>();
         participantesList = new JList<>(participantesModel);
         panelFormularioIndividual = new PanelFormularioInscripcion();
-        panelFormularioEquipo = new PanelFormularioEquipo(5); // Máximo 5 integrantes por defecto
+        panelFormularioEquipo = new PanelFormularioEquipo(5);
         panelFormularioContainer = new JPanel(new CardLayout());
         panelFormularioContainer.add(panelFormularioIndividual, "INDIVIDUAL");
         panelFormularioContainer.add(panelFormularioEquipo, "EQUIPO");
@@ -223,10 +223,9 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
             for (String integrante : integrantes) {
                 equipo.addMiembro(integrante);
             }
-            equipo.setCorreo(correo); // Necesitarás agregar este método a ParticipanteEquipo
+            equipo.setCorreo(correo);
             participante = equipo;
         } else {
-            // Validación para individual (mantenido igual)
             String nombre = panelFormularioIndividual.getNombre();
             int edad = panelFormularioIndividual.getEdad();
             String pais = panelFormularioIndividual.getPais();
@@ -311,25 +310,8 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
      * Intenta mantener la selección anterior si todavía existe.
      */
     private void cargarTorneosEnComboBox() {
-        Torneo seleccionAnterior = (Torneo) torneosComboBox.getSelectedItem();
-        torneosComboBox.removeAllItems();
         List<Torneo> torneos = gestorTorneos.getTorneosCreados();
-
-        if (torneos.isEmpty()) {
-            torneosComboBox.setEnabled(false);
-        } else {
-            for (Torneo torneo : torneos) {
-                torneosComboBox.addItem(torneo);
-            }
-            torneosComboBox.setEnabled(true);
-
-            if (seleccionAnterior != null && torneos.contains(seleccionAnterior)) {
-                torneosComboBox.setSelectedItem(seleccionAnterior);
-            } else if (torneosComboBox.getItemCount() > 0) {
-                torneosComboBox.setSelectedIndex(0);
-            }
-        }
-        // Siempre llama a cargarParticipantesParaVisualizacion() después de actualizar el ComboBox
+        GuiUtils.cargarTorneosEnComboBox(torneosComboBox, torneos);
         cargarParticipantesTorneoSeleccionado();
     }
 

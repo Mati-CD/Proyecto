@@ -136,6 +136,8 @@ public class Torneo extends ObserverController {
 
         crearFaseInicial();
         notificarObservers("Torneo '" + nombre + "' iniciado con " + this.participantes.size() + " participantes.");
+        notificarObservers(getFaseActual().getNombre() + " programada");
+        notificarObservers("EVENTO_SALTO_DE_LINEA:");
     }
 
     // Gestión de fases
@@ -156,7 +158,6 @@ public class Torneo extends ObserverController {
         }
 
         fases.add(fase);
-        notificarObservers(nombreFase + " programada");
     }
 
     /**
@@ -175,17 +176,23 @@ public class Torneo extends ObserverController {
         };
     }
 
-    // Registro de resultados
-
     /**
-     * Registra el resultado de un partido y avanza el torneo si es necesario.
+     * Registra el resultado de un partido dado el nombre del ganador y avanza el torneo si es necesario.
      *
-     * @param partido partido cuyo resultado se registrará
-     * @param resultado resultado del partido
+     * Después de registrar el resultado, notifica a los observadores sobre la finalización del partido.
+     * Si todos los partidos de la fase actual están completados, el torneo intentará avanzar a la siguiente fase
+     * o declarar un campeón si la fase actual era la final.
+     *
+     * @param partido El objeto Partido cuyo resultado se registrará. Debe ser un partido activo en el torneo.
+     * @param nombreGanador El nombre del jugador que ha ganado el partido.
+     * @throws IllegalStateException Si el resultado del partido ya ha sido registrado previamente.
+     * @throws IllegalArgumentException Si el nombreGanador proporcionado no corresponde a ninguno de los jugadores del partido.
      */
-    public void registrarResultado(Partido partido, String resultado) {
-        partido.registrarResultado(resultado);
-        notificarObservers("Resultado registrado: " + partido);
+    public void registrarResultado(Partido partido, String nombreGanador) {
+        partido.registrarResultado(nombreGanador);
+        notificarObservers("EVENTO_PARTIDO_FINALIZADO:Enfrentamiento " + partido.getJugador1() + " vs " + partido.getJugador2() + " finalizado.");
+        notificarObservers("EVENTO_GANADOR_SELECCIONADO:Has seleccionado a " + partido.getGanador() + " como ganador.");
+        notificarObservers("EVENTO_SALTO_DE_LINEA:");
 
         if (todosLosPartidosCompletados()) {
             if (esFinal()) {

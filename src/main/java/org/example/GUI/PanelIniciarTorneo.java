@@ -27,6 +27,7 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
     public PanelIniciarTorneo() {
         super(new BorderLayout());
         setBackground(new Color(88, 150, 234));
+        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         Font font = new Font("SansSerif", Font.BOLD, 14);
         Font font1 = new Font("SansSerif", Font.BOLD, 12);
@@ -42,7 +43,7 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
         bracketDisplayPanel = new MatchesDisplayPanel();
         torneosComboBox = new JComboBox<>();
         torneosComboBox.setFont(font);
-        torneosComboBox.setRenderer(new GuiUtils.TorneoComboBoxRenderer());
+        torneosComboBox.setRenderer(new GuiUtils.ComboBoxRenderer<>(Torneo::getNombre));
 
         // Panel supeior
         JPanel topPanel = GuiUtils.crearPanelDeEncabezado(irAtrasBtn,
@@ -89,7 +90,7 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
             irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
             crearBracketBtn.addActionListener(e -> clickGenerarBracket());
             iniciarTorneoBtn.addActionListener(e -> clickIniciarTorneo());
-            torneosComboBox.addActionListener(e -> actualizarTorneoSeleccionado());
+            torneosComboBox.addActionListener(e -> actualizarObserverDelTorneo());
             listenersActivos = true;
         }
         cargarTorneosEnComboBox();
@@ -147,7 +148,7 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
             }
         }
         // Siempre llama a cargarParticipantesParaVisualizacion() después de actualizar el ComboBox
-        actualizarTorneoSeleccionado();
+        actualizarObserverDelTorneo();
     }
 
     private void clickGenerarBracket() {
@@ -194,7 +195,7 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
         }
     }
 
-    private void actualizarTorneoSeleccionado() {
+    private void actualizarObserverDelTorneo() {
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
 
         if (actualObservedTorneo != null && actualObservedTorneo != torneoSeleccionado) {

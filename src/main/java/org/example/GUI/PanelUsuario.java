@@ -18,6 +18,7 @@ public class PanelUsuario extends JPanel implements PanelConfigurable {
     public PanelUsuario() {
         super(new BorderLayout());
         setBackground(new Color(200, 200, 255));
+        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         Font font1 = new Font("Arial", Font.BOLD, 12);
         irAInicioBtn = new PanelButton("Volver al Inicio", font1);

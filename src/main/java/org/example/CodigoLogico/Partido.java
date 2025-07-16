@@ -14,7 +14,6 @@ public class Partido extends TorneoComponent {
     private final String jugador2;
     private final String ronda;
     private String ganador;
-    private String resultado;
     private boolean resultadoRegistrado = false;
 
     /**
@@ -31,18 +30,23 @@ public class Partido extends TorneoComponent {
     }
 
     /**
-     * Registra el resultado del partido y determina al ganador.
-     * El resultado debe empezar con "1" para indicar que gana el jugador1, cualquier otro valor indica que gana el jugador2.
+     * Registra el ganador del partido.
+     * El nombre del ganador debe coincidir con uno de los jugadores del partido.
      *
-     * @param resultado resultado a registrar (ej: "1-0" o "0-1")
+     * @param nombreGanador el nombre del jugador que ganó el partido
      * @throws IllegalStateException si el resultado ya ha sido registrado previamente
+     * @throws IllegalArgumentException si el nombre del ganador no corresponde a ninguno de los jugadores del partido
      */
-    public void registrarResultado(String resultado) {
+    public void registrarResultado(String nombreGanador) {
         if (resultadoRegistrado) {
             throw new IllegalStateException("No se puede modificar un resultado ya registrado");
         }
-        this.resultado = resultado;
-        this.ganador = resultado.startsWith("1") ? jugador1 : jugador2;
+
+        if (!nombreGanador.equals(jugador1) && !nombreGanador.equals(jugador2)) {
+            throw new IllegalArgumentException("El ganador seleccionado (" + nombreGanador + ") no es un jugador válido para este partido.");
+        }
+
+        this.ganador = nombreGanador;
         this.resultadoRegistrado = true;
     }
 

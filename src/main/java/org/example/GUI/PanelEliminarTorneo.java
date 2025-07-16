@@ -15,6 +15,7 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
     public PanelEliminarTorneo() {
         super(new BorderLayout());
         setBackground(new Color(200, 50, 50));
+        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         Font font = new Font("SansSerif", Font.BOLD, 14);
         Font font1 = new Font("Arial", Font.BOLD, 12);
@@ -29,7 +30,7 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
         eliminarBtn.setForeground(Color.WHITE);
         torneosComboBox = new JComboBox<>();
         torneosComboBox.setFont(font);
-        torneosComboBox.setRenderer(new GuiUtils.TorneoComboBoxRenderer());
+        torneosComboBox.setRenderer(new GuiUtils.ComboBoxRenderer<>(Torneo::getNombre));
 
         // Panel superior
         JPanel topPanel = GuiUtils.crearPanelDeEncabezado(irAtrasBtn,
@@ -65,11 +66,11 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
 
         if (!listenersActivos) {
             irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
-            eliminarBtn.addActionListener(e -> eliminarTorneo());
+            eliminarBtn.addActionListener(e -> clickEliminarTorneo());
             listenersActivos = true;
         }
 
-        cargarTorneosEnComboBox();
+        cargarTorneosEnComboxBox();
 
         this.revalidate();
         this.repaint();
@@ -87,28 +88,12 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
         }
     }
 
-    private void cargarTorneosEnComboBox() {
-        Torneo seleccionAnterior = (Torneo) torneosComboBox.getSelectedItem();
-        torneosComboBox.removeAllItems();
+    private void cargarTorneosEnComboxBox() {
         List<Torneo> torneos = gestorTorneos.getTorneosCreados();
-
-        if (torneos.isEmpty()) {
-            torneosComboBox.setEnabled(false);
-        } else {
-            for (Torneo torneo : torneos) {
-                torneosComboBox.addItem(torneo);
-            }
-            torneosComboBox.setEnabled(true);
-
-            if (seleccionAnterior != null && torneos.contains(seleccionAnterior)) {
-                torneosComboBox.setSelectedItem(seleccionAnterior);
-            } else if (torneosComboBox.getItemCount() > 0) {
-                torneosComboBox.setSelectedIndex(0);
-            }
-        }
+        GuiUtils.cargarTorneosEnComboBox(torneosComboBox, torneos);
     }
 
-    private void eliminarTorneo() {
+    private void clickEliminarTorneo() {
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
         if (torneoSeleccionado == null) {
             GuiUtils.showMessageOnce(this, "Por favor seleccione un torneo", "Error", JOptionPane.ERROR_MESSAGE);
@@ -125,7 +110,7 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
 
         if (confirmacion == JOptionPane.YES_OPTION) {
             gestorTorneos.eliminarTorneo(torneoSeleccionado.getNombre());
-            cargarTorneosEnComboBox();
+            cargarTorneosEnComboxBox();
         }
     }
 }

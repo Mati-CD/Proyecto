@@ -21,6 +21,7 @@ public class PanelOrganizador extends JPanel implements PanelConfigurable {
     public PanelOrganizador() {
         super(new BorderLayout());
         setBackground(new Color(200, 255, 200));
+        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         Font font1 = new Font("Arial", Font.BOLD, 12);
 

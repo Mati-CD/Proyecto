@@ -25,6 +25,7 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable, Torne
     public PanelCrearTorneo() {
         super(new BorderLayout());
         setBackground(new Color(255, 255, 200));
+        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         Font font = new Font("SansSerif", Font.BOLD, 12);
         Font font1 = new Font("Arial", Font.BOLD, 12);
