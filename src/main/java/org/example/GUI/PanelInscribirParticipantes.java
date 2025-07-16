@@ -2,8 +2,13 @@ package org.example.GUI;
 
 import org.example.CodigoLogico.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import javax.swing.border.TitledBorder;
+import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
+import java.io.IOException;
 import java.util.List;
 
 public class PanelInscribirParticipantes extends JPanel implements PanelConfigurable, TorneoObserver {
@@ -21,6 +26,7 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
     private PanelFormularioEquipo panelFormularioEquipo;
     private JPanel panelFormularioInscripcion;
     private JPanel panelVacio;
+    private BufferedImage backgroundImage;
 
     private final Dimension size1 = new Dimension(200, 50);
     private final Dimension size2 = new Dimension(120, 30);
@@ -33,28 +39,69 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
      */
     public PanelInscribirParticipantes() {
         super(new BorderLayout());
-        setBackground(new Color(6, 153, 153));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        try {
+            backgroundImage = ImageIO.read(getClass().getResource("/images/image1.png"));
+            if (backgroundImage == null) {
+                System.err.println("La imagen no se encontró en la ruta: /images/image1.png");
+                setBackground(new Color(195, 0, 0));
+            }
+            else {
+                float[] scales = {1.5f, 1.0f, 0.4f, 1.0f};
+                float[] offsets = {0f, 0f, 0f, 0f};
+                RescaleOp op = new RescaleOp(scales, offsets, null);
+                backgroundImage = op.filter(backgroundImage, null);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error al cargar la imagen de fondo: " + e.getMessage());
+            setBackground(new Color(195, 0, 0));
+        }
 
         // Inicializar Componentes
         inscribirBtn = new PanelButton("Inscribir Participante", componentFont1);
         inscribirBtn.setButtonPreferredSize(size1);
+        inscribirBtn.setButtonColor(new Color(156, 0, 0),
+                Color.WHITE,
+                new Color(248, 0, 0),
+                2
+        );
+
         removerBtn = new PanelButton("Eliminar participante", componentFont1);
         removerBtn.setButtonPreferredSize(size1);
+        removerBtn.setButtonColor(new Color(200, 0, 0),
+                Color.WHITE,
+                new Color(255, 100, 100),
+                2
+        );
+
         irAtrasBtn = new PanelButton("Volver atrás", componentFont2);
         irAtrasBtn.setButtonPreferredSize(size2);
+        irAtrasBtn.setButtonColor(new Color(50, 50, 50),
+                Color.WHITE,
+                Color.GRAY,
+                1
+        );
 
         torneosComboBox = new JComboBox<>();
         torneosComboBox.setFont(componentFont1);
         torneosComboBox.setRenderer(new GuiUtils.ComboBoxRenderer<>(Torneo::getNombre));
+        torneosComboBox.setForeground(Color.BLACK);
+        torneosComboBox.setBackground(Color.WHITE);
 
         participantesModel = new DefaultListModel<>();
         participantesList = new JList<>(participantesModel);
         participantesList.setFont(componentFont1);
         participantesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        participantesList.setForeground(Color.BLACK);
+        participantesList.setBackground(Color.WHITE);
+        participantesList.setOpaque(true);
 
         panelFormularioIndividual = new PanelFormularioIndividual();
         panelFormularioEquipo = new PanelFormularioEquipo();
+        panelFormularioIndividual.setOpaque(false);
+        panelFormularioEquipo.setOpaque(false);
 
         panelVacio = new JPanel();
         panelVacio.setOpaque(false);
@@ -64,25 +111,32 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         panelFormularioInscripcion.add(panelFormularioEquipo, "EQUIPO");
         panelFormularioInscripcion.add(panelVacio, "VACIO");
 
-        // Panel superior
         JPanel topPanel = GuiUtils.crearPanelDeEncabezado(irAtrasBtn,
-                "Inscribir Participantes",
+                "",
                 titleFont,
                 null
         );
+        topPanel.setOpaque(false);
         add(topPanel, BorderLayout.NORTH);
 
-        // Panel Central
         JPanel centerPanel = new JPanel(new BorderLayout(50, 0));
         centerPanel.setOpaque(false);
         centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
-        // Panel Central Izquierdo
         JPanel centerLeftPanel = new JPanel(new BorderLayout());
         centerLeftPanel.setOpaque(false);
+        TitledBorder leftPanelBorder = BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.WHITE, 1),
+                "Formulario de Inscripción",
+                TitledBorder.CENTER, TitledBorder.TOP,
+                componentFont1, Color.WHITE
+        );
+        centerLeftPanel.setBorder(BorderFactory.createCompoundBorder(
+                leftPanelBorder,
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        ));
         centerLeftPanel.add(panelFormularioInscripcion, BorderLayout.CENTER);
 
-        // Panel Izquierdo Inferior
         JPanel leftButtomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         leftButtomPanel.setOpaque(false);
         leftButtomPanel.add(inscribirBtn);
@@ -90,39 +144,53 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
 
         centerPanel.add(centerLeftPanel, BorderLayout.WEST);
 
-        // Panel Central Derecho
         JPanel centerRightPanel = new JPanel(new BorderLayout());
         centerRightPanel.setOpaque(false);
-        centerRightPanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 0, 0));
+        TitledBorder rightPanelBorder = BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.WHITE, 1),
+                "Participantes Inscritos",
+                TitledBorder.CENTER, TitledBorder.TOP,
+                componentFont1, Color.WHITE
+        );
+        centerRightPanel.setBorder(BorderFactory.createCompoundBorder(
+                rightPanelBorder,
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        ));
 
         JPanel comboPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         comboPanel.setOpaque(false);
         JLabel labelSeleccionarTorneo = new JLabel("Seleccione torneo:");
         labelSeleccionarTorneo.setFont(componentFont1);
+        GuiUtils.setLabelTextColor(labelSeleccionarTorneo, Color.WHITE);
         comboPanel.add(labelSeleccionarTorneo);
         comboPanel.add(torneosComboBox);
         centerRightPanel.add(comboPanel, BorderLayout.NORTH);
 
         // Lista de participantes
+        JPanel participantesTitlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+        participantesTitlePanel.setOpaque(false);
+
         JLabel labelParticipantesInscritos = new JLabel("Participantes inscritos");
         labelParticipantesInscritos.setFont(componentFont1);
-        labelParticipantesInscritos.setAlignmentX(Component.CENTER_ALIGNMENT);
+        GuiUtils.setLabelTextColor(labelParticipantesInscritos, Color.WHITE);
+        participantesTitlePanel.add(labelParticipantesInscritos);
 
-        contadorParticipantesLabel = new JLabel("0 de 0");
-        contadorParticipantesLabel.setFont(componentFont2);
-        contadorParticipantesLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contadorParticipantesLabel = new JLabel("(0 de 0)");
+        contadorParticipantesLabel.setFont(componentFont1);
+        GuiUtils.setLabelTextColor(contadorParticipantesLabel, Color.WHITE);
+        participantesTitlePanel.add(contadorParticipantesLabel);
 
         JScrollPane scrollPane = new JScrollPane(participantesList);
         scrollPane.setPreferredSize(new Dimension(300, 500));
         scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
 
         JPanel participantesListPanel = new JPanel();
         participantesListPanel.setLayout(new BoxLayout(participantesListPanel, BoxLayout.Y_AXIS));
         participantesListPanel.setOpaque(false);
 
-        participantesListPanel.add(labelParticipantesInscritos);
-        participantesListPanel.add(Box.createVerticalStrut(5));
-        participantesListPanel.add(contadorParticipantesLabel);
+        participantesListPanel.add(participantesTitlePanel);
         participantesListPanel.add(Box.createVerticalStrut(10));
         participantesListPanel.add(scrollPane);
 
@@ -143,6 +211,25 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         add(centerPanel, BorderLayout.CENTER);
     }
 
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (backgroundImage != null) {
+            Graphics2D g2d = (Graphics2D) g;
+
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
+    }
+
+    /**
+     * Inicializa el panel configurando el gestor de torneos, registrando listeners y actualizando la UI.
+     *
+     * @param actionAssigner    Asignador de acciones que se encarga de delegar eventos de botones.
+     * @param gestorTorneos     Instancia de la lógica del sistema que gestiona los torneos.
+     */
     @Override
     public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         this.gestorTorneos = gestorTorneos;

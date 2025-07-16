@@ -3,6 +3,7 @@ package org.example.GUI;
 import org.example.CodigoLogico.Torneo;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.util.List;
 import java.util.function.Function;
@@ -26,6 +27,12 @@ public class GuiUtils {
         SwingUtilities.invokeLater(() -> {
             JOptionPane.showMessageDialog(parentComponent, message, title, messageType);
         });
+    }
+
+    public static void setLabelTextColor(JLabel label, Color color) {
+        if (label != null) {
+            label.setForeground(color);
+        }
     }
 
     public static JPanel crearPanelDeEncabezado(PanelButton leftButton,
@@ -91,35 +98,7 @@ public class GuiUtils {
             return this;
         }
     }
-    /*
-    public static class TorneoComboBoxRenderer extends JLabel implements ListCellRenderer<Torneo> {
 
-        public TorneoComboBoxRenderer() {
-            setOpaque(true);
-        }
-
-        @Override
-        public Component getListCellRendererComponent(JList<? extends Torneo> list, Torneo value, int index, boolean isSelected, boolean cellHasFocus) {
-            if (value != null) {
-                setText(value.getNombre());
-            }
-            else {
-                setText("");
-            }
-
-            if (isSelected) {
-                setBackground(list.getSelectionBackground());
-                setForeground(list.getSelectionForeground());
-            }
-            else {
-                setBackground(list.getBackground());
-                setForeground(list.getForeground());
-            }
-
-            return this;
-        }
-    }
-    */
     public static void cargarTorneosEnComboBox(JComboBox<Torneo> torneosComboBox, List<Torneo> listaDeTorneos) {
         Torneo seleccionAnterior = (Torneo) torneosComboBox.getSelectedItem();
         DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();

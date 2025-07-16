@@ -2,9 +2,13 @@ package org.example.GUI;
 
 import org.example.CodigoLogico.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
+import java.io.IOException;
 
 /**
  * Panel de interfaz gráfica encargado de la creación de un nuevo torneo.
@@ -17,10 +21,11 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable, Torne
     private PanelButton crearTorneoBtn;
     private PanelFormularioTorneo panelFormularioTorneo;
     private boolean listenersActivos = false;
+    private BufferedImage backgroundImage;
 
     private final Dimension size1 = new Dimension(120, 30);
     private final Dimension size2 = new Dimension(200, 50);
-    private final Font componentFont1 = new Font("SansSerif", Font.BOLD, 12);
+    private final Font componentFont1 = new Font("Arial", Font.BOLD, 12);
     private final Font componentFont2 = new Font("SansSerif", Font.BOLD, 18);
     private final Font titleFont = new Font("SansSerif", Font.BOLD, 24);
 
@@ -30,45 +35,85 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable, Torne
      */
     public PanelCrearTorneo() {
         super(new BorderLayout());
-        setBackground(new Color(70, 31, 243));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        try {
+            backgroundImage = ImageIO.read(getClass().getResource("/images/image1.png"));
+            if (backgroundImage == null) {
+                System.err.println("La imagen no se encontró en la ruta: /images/image1.png");
+                setBackground(new Color(195, 0, 0));
+            }
+            else {
+                float darkFactor = 0.5f;
+                float[] scales = {darkFactor, darkFactor, darkFactor, 1.0f};
+                float[] offsets = {0f, 0f, 0f, 0f};
+
+                RescaleOp op = new RescaleOp(scales, offsets, null);
+                backgroundImage = op.filter(backgroundImage, null);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error al cargar la imagen de fondo: " + e.getMessage());
+            setBackground(new Color(195, 0, 0));
+        }
 
         // Inicializar Componenetes
         irAtrasBtn = new PanelButton("Volver atrás", componentFont1);
         irAtrasBtn.setButtonPreferredSize(size1);
+        irAtrasBtn.setButtonColor(new Color(50, 50, 50), Color.WHITE, Color.GRAY, 1);
+
         panelFormularioTorneo = new PanelFormularioTorneo();
         crearTorneoBtn = new PanelButton("Crear Torneo", componentFont2);
         crearTorneoBtn.setButtonPreferredSize(size2);
+        crearTorneoBtn.setButtonColor(new Color(200, 0, 0),
+                Color.WHITE,
+                new Color(255, 100, 100),
+                2
+        );
 
         // Panel superior
         JPanel topPanel = GuiUtils.crearPanelDeEncabezado(irAtrasBtn,
-                "Crear nuevo torneo",
+                "",
                 titleFont,
                 null
+
         );
+        topPanel.setOpaque(false);
         add(topPanel, BorderLayout.NORTH);
 
         // Panel central con el formulario
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         centerPanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0));
         centerPanel.setOpaque(false);
-        centerPanel.add(panelFormularioTorneo);
 
+        centerPanel.add(panelFormularioTorneo);
         add(centerPanel, BorderLayout.CENTER);
 
         // Panel inferior con botón de crear
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setOpaque(false);
         bottomPanel.add(crearTorneoBtn);
-
         add(bottomPanel, BorderLayout.SOUTH);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (backgroundImage != null) {
+            Graphics2D g2d = (Graphics2D) g;
+
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
     }
 
     /**
      * Inicializa el panel y registra listeners para los botones.
      *
-     * @param actionAssigner   Encargado de asignar acciones a los botones.
-     * @param gestorTorneos    Instancia lógica que administra los torneos.
+     * @param actionAssigner Encargado de asignar acciones a los botones.
+     * @param gestorTorneos Instancia lógica que administra los torneos.
      */
     @Override
     public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
@@ -79,8 +124,8 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable, Torne
             irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_ORGANIZADOR.getID()));
             crearTorneoBtn.addActionListener(e -> clickCrearBtn(e, actionAssigner));
             listenersActivos = true;
-        }
 
+        }
         this.revalidate();
         this.repaint();
     }
@@ -103,8 +148,8 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable, Torne
      * Lógica que se ejecuta cuando se hace clic en el botón "Crear Torneo".
      * Valida los datos del formulario y crea el torneo si son válidos.
      *
-     * @param e                Evento de acción.
-     * @param actionAssigner   Asignador de acciones para volver a la pantalla anterior si se crea con éxito.
+     * @param e Evento de acción.
+     * @param actionAssigner Asignador de acciones para volver a la pantalla anterior si se crea con éxito.
      */
     private void clickCrearBtn(ActionEvent e, ActionAssigner actionAssigner) {
         String nombre = panelFormularioTorneo.getNombre().trim();
@@ -121,7 +166,6 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable, Torne
             GuiUtils.showMessageOnce(this, "El número de miembros por equipo debe ser mayor a 0.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
         Torneo torneo = new Torneo(nombre, disciplina, tipoDeInscripcion, numParticipantes, numMiembrosEquipo);
         gestorTorneos.addTorneo(torneo);
 

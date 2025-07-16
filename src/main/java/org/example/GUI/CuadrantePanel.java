@@ -1,56 +1,76 @@
 package org.example.GUI;
 
-import org.example.CodigoLogico.Participante;
+import org.example.CodigoLogico.*;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CuadrantePanel extends JPanel {
+    private String title;
     private List<MatchDisplayPanel> matchPanels;
-    private JLabel titleLabel;
+    private JPanel matchesContainerPanel;
+
+    private final Font titleFont = new Font("SansSerif", Font.BOLD, 18);
 
     public CuadrantePanel(String title) {
-        super();
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.title = title;
         setOpaque(false);
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        setLayout(new BorderLayout());
 
-        titleLabel = new JLabel(title, SwingConstants.CENTER);
-        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
-        titleLabel.setForeground(Color.WHITE);
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        add(titleLabel);
-        add(Box.createVerticalStrut(10));
+        TitledBorder titledBorder = BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.WHITE, 1),
+                this.title,
+                TitledBorder.CENTER,
+                TitledBorder.TOP,
+                titleFont,
+                Color.WHITE
+        );
+
+        setBorder(BorderFactory.createCompoundBorder(
+                titledBorder,
+                BorderFactory.createEmptyBorder(20, 20, 20, 10)
+        ));
+
+        matchesContainerPanel = new JPanel();
+        matchesContainerPanel.setOpaque(false);
+        matchesContainerPanel.setLayout(new BoxLayout(matchesContainerPanel, BoxLayout.Y_AXIS));
+        matchesContainerPanel.add(Box.createVerticalGlue());
+
+        JScrollPane scrollPane = new JScrollPane(matchesContainerPanel);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(null);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        add(scrollPane, BorderLayout.CENTER);
 
         matchPanels = new ArrayList<>();
     }
 
-    public void setMatches(List<Participante> participantesPorCuadrante) {
-        removeAll();
+    public void setMatches(List<Participante> participants) {
+        matchesContainerPanel.removeAll();
         matchPanels.clear();
 
-        add(titleLabel);
-        add(Box.createVerticalStrut(10));
-
-        if (participantesPorCuadrante != null && participantesPorCuadrante.size() % 2 == 0) {
-            for (int i = 0; i < participantesPorCuadrante.size(); i += 2) {
-                Participante p1 = participantesPorCuadrante.get(i);
-                Participante p2 = participantesPorCuadrante.get(i + 1);
+        if (participants != null && participants.size() >= 2) {
+            for (int i = 0; i < participants.size(); i += 2) {
+                Participante p1 = participants.get(i);
+                Participante p2 = participants.get(i + 1);
                 MatchDisplayPanel matchPanel = new MatchDisplayPanel(p1, p2);
+
+                matchPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
                 matchPanels.add(matchPanel);
-                add(matchPanel);
-                if (i + 2 < participantesPorCuadrante.size()) {
-                    add(Box.createVerticalStrut(10));
+                matchesContainerPanel.add(matchPanel);
+                if (i + 2 < participants.size()) {
+                    matchesContainerPanel.add(Box.createVerticalStrut(5));
                 }
             }
-        } else {
-            JLabel noMatchesLabel = new JLabel("No hay partidos en este cuadrante.", SwingConstants.CENTER);
-            noMatchesLabel.setForeground(Color.GRAY);
-            noMatchesLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            add(noMatchesLabel);
         }
+        matchesContainerPanel.add(Box.createVerticalGlue());
         revalidate();
         repaint();
     }

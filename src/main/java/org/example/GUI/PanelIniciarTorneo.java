@@ -1,8 +1,13 @@
 package org.example.GUI;
 
 import org.example.CodigoLogico.*;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -20,34 +25,80 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
     private boolean listenersActivos = false;
     private Torneo actualObservedTorneo = null;
 
+    private BufferedImage backgroundImage;
+
+    private final Dimension size1 = new Dimension(200, 50);
+    private final Dimension size2 = new Dimension(120, 30);
+    private final Font componentFont1 = new Font("SansSerif", Font.BOLD, 14);
+    private final Font componentFont2 = new Font("Arial", Font.BOLD, 12);
+    private final Font titleFont = new Font("Arial", Font.BOLD, 24);
+
     /**
      * Constructor que configura el panel gráfico.
      * Se establece el layout, los botones y el título.
      */
     public PanelIniciarTorneo() {
         super(new BorderLayout());
-        setBackground(new Color(88, 150, 234));
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        Font font = new Font("SansSerif", Font.BOLD, 14);
-        Font font1 = new Font("SansSerif", Font.BOLD, 12);
-        Font titleFont = new Font("Arial", Font.BOLD, 24);
+        try {
+            backgroundImage = ImageIO.read(getClass().getResource("/images/image1.png"));
+            if (backgroundImage == null) {
+                System.err.println("La imagen no se encontró en la ruta: /images/image1.png");
+                setBackground(new Color(195, 0, 0));
+            }
+            else {
+                float darkFactor = 0.4f;
+                float[] scales = {darkFactor, darkFactor, darkFactor, 1.0f};
+                float[] offsets = {0f, 0f, 0f, 0f};
+
+                RescaleOp op = new RescaleOp(scales, offsets, null);
+                backgroundImage = op.filter(backgroundImage, null);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error al cargar la imagen de fondo: " + e.getMessage());
+            setBackground(new Color(195, 0, 0));
+        }
 
         // Inicializar Componentes
-        irAtrasBtn = new PanelButton("Volver atrás", font1);
+        irAtrasBtn = new PanelButton("Volver atrás", componentFont2);
         irAtrasBtn.setButtonPreferredSize(new Dimension(120, 30));
-        crearBracketBtn = new PanelButton("Crear Bracket", font);
-        crearBracketBtn.setButtonPreferredSize(new Dimension(250, 50));
-        iniciarTorneoBtn = new PanelButton("Iniciar Torneo", font);
-        iniciarTorneoBtn.setButtonPreferredSize(new Dimension(200, 50));
+        irAtrasBtn.setButtonPreferredSize(size2);
+        irAtrasBtn.setButtonColor(new Color(50, 50, 50),
+                Color.WHITE,
+                Color.GRAY,
+                1
+        );
+
+        crearBracketBtn = new PanelButton("Generar Bracket", componentFont1);
+        crearBracketBtn.setButtonPreferredSize(size1);
+        crearBracketBtn.setButtonColor(new Color(128, 0, 128),
+                Color.WHITE,
+                new Color(160, 82, 190),
+                2
+        );
+
+        iniciarTorneoBtn = new PanelButton("Iniciar Torneo", componentFont1);
+        iniciarTorneoBtn.setButtonPreferredSize(size1);
+        iniciarTorneoBtn.setButtonColor(new Color(128, 0, 128),
+                Color.WHITE,
+                new Color(160, 82, 190),
+                2
+        );
+
         bracketDisplayPanel = new MatchesDisplayPanel();
+        bracketDisplayPanel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+
         torneosComboBox = new JComboBox<>();
-        torneosComboBox.setFont(font);
+        torneosComboBox.setFont(componentFont1);
+        torneosComboBox.setForeground(Color.BLACK);
+        torneosComboBox.setBackground(Color.WHITE);
         torneosComboBox.setRenderer(new GuiUtils.ComboBoxRenderer<>(Torneo::getNombre));
 
         // Panel supeior
         JPanel topPanel = GuiUtils.crearPanelDeEncabezado(irAtrasBtn,
-                "Iniciar Torneo",
+                "",
                 titleFont,
                 null
         );
@@ -56,15 +107,21 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.setOpaque(false);
 
-        JPanel comboPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel comboPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         comboPanel.setOpaque(false);
-        JLabel labelSeleccionarTorneo = new JLabel("Seleccione Torneo:");
-        labelSeleccionarTorneo.setFont(font);
+        JLabel labelSeleccionarTorneo = new JLabel("Seleccione torneo:");
+        labelSeleccionarTorneo.setFont(componentFont1);
+        GuiUtils.setLabelTextColor(labelSeleccionarTorneo, Color.WHITE);
         comboPanel.add(labelSeleccionarTorneo);
         comboPanel.add(torneosComboBox);
-
         centerPanel.add(comboPanel, BorderLayout.NORTH);
-        centerPanel.add(bracketDisplayPanel, BorderLayout.CENTER);
+
+        JPanel bracketWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        bracketWrapper.setOpaque(false);
+        bracketWrapper.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0));
+        bracketWrapper.add(bracketDisplayPanel);
+        centerPanel.add(bracketWrapper, BorderLayout.CENTER);
+
         add(centerPanel, BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -73,6 +130,19 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
         bottomPanel.add(iniciarTorneoBtn);
 
         add(bottomPanel, BorderLayout.SOUTH);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (backgroundImage != null) {
+            Graphics2D g2d = (Graphics2D) g;
+
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
     }
 
     /**
@@ -163,7 +233,7 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
 
         if (sortearParticipantes != null) {
             sorteoBracketActual = sortearParticipantes;
-            bracketDisplayPanel.setParticipantes(sorteoBracketActual);
+            bracketDisplayPanel.mostrarBracketSorteado(sorteoBracketActual);
         }
     }
 

@@ -8,9 +8,10 @@ import java.awt.*;
 public class MatchDisplayPanel extends JPanel {
     private Participante p1;
     private Participante p2;
+
     private final Color BOX_BORDER_COLOR = Color.WHITE;
     private final Color TEXT_COLOR = Color.WHITE;
-    private final Font FONT = new Font("SansSerif", Font.PLAIN, 14);
+    private final Font FONT = new Font("SansSerif", Font.PLAIN, 20);
     private final int BOX_WIDTH = 250;
     private final int BOX_HEIGHT = 28;
     private final int PADDING_Y = 5;

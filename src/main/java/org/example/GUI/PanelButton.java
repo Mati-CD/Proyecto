@@ -1,6 +1,7 @@
 package org.example.GUI;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 
 /**
@@ -15,6 +16,9 @@ public class PanelButton extends JButton {
     public PanelButton(String label, Font font) {
         super(label);
         this.setFont(font);
+        this.setOpaque(true);
+        this.setContentAreaFilled(true);
+        this.setBorderPainted(true);
     }
 
     /**
@@ -22,5 +26,22 @@ public class PanelButton extends JButton {
      */
     public void setButtonPreferredSize(Dimension preferredSize) {
         setPreferredSize(preferredSize);
+    }
+
+    /**
+     * @param backgroundColor El color de fondo del botón.
+     * @param foregroundColor El color del texto del botón.
+     * @param borderColor     El color del borde del botón (null para sin borde).
+     * @param borderWidth     El grosor del borde (borderColor no debe ser null).
+     */
+    public void setButtonColor(Color backgroundColor, Color foregroundColor, Color borderColor, int borderWidth) {
+        this.setBackground(backgroundColor);
+        this.setForeground(foregroundColor);
+        if (borderColor != null) {
+            Border lineBorder = BorderFactory.createLineBorder(borderColor, borderWidth);
+            this.setBorder(BorderFactory.createCompoundBorder(lineBorder, BorderFactory.createEmptyBorder(5, 15, 5, 15)));
+        } else {
+            this.setBorder(null);
+        }
     }
 }
