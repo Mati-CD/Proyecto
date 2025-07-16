@@ -4,6 +4,8 @@ import org.example.CodigoLogico.Torneo;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
+import java.util.function.Function;
 
 /**
  * Clase usada para mostrar mensajes en la interfaz gráfica.
@@ -58,6 +60,38 @@ public class GuiUtils {
         return topPanel;
     }
 
+    public static class ComboBoxRenderer<T> extends JLabel implements ListCellRenderer<T> {
+        private final Function<T, String> textExtractor;
+
+        /**
+         * Constructor para el renderer genérico.
+         * @param textExtractor Una función que toma un objeto T y devuelve la String a mostrar.
+         */
+        public ComboBoxRenderer(Function<T, String> textExtractor) {
+            setOpaque(true);
+            this.textExtractor = textExtractor;
+        }
+
+        @Override
+        public Component getListCellRendererComponent(JList<? extends T> list, T value, int index, boolean isSelected, boolean cellHasFocus) {
+            if (value != null) {
+                setText(textExtractor.apply(value));
+            } else {
+                setText("");
+            }
+
+            if (isSelected) {
+                setBackground(list.getSelectionBackground());
+                setForeground(list.getSelectionForeground());
+            } else {
+                setBackground(list.getBackground());
+                setForeground(list.getForeground());
+            }
+
+            return this;
+        }
+    }
+    /*
     public static class TorneoComboBoxRenderer extends JLabel implements ListCellRenderer<Torneo> {
 
         public TorneoComboBoxRenderer() {
@@ -66,7 +100,6 @@ public class GuiUtils {
 
         @Override
         public Component getListCellRendererComponent(JList<? extends Torneo> list, Torneo value, int index, boolean isSelected, boolean cellHasFocus) {
-            // Solo mostrar el nombre del torneo
             if (value != null) {
                 setText(value.getNombre());
             }
@@ -84,6 +117,29 @@ public class GuiUtils {
             }
 
             return this;
+        }
+    }
+    */
+    public static void cargarTorneosEnComboBox(JComboBox<Torneo> torneosComboBox, List<Torneo> listaDeTorneos) {
+        Torneo seleccionAnterior = (Torneo) torneosComboBox.getSelectedItem();
+        DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
+
+        if (listaDeTorneos.isEmpty()) {
+            torneosComboBox.setEnabled(false);
+            torneosComboBox.setModel(model);
+        }
+        else {
+            for (Torneo torneo : listaDeTorneos) {
+                model.addElement(torneo);
+            }
+            torneosComboBox.setModel(model);
+            torneosComboBox.setEnabled(true);
+
+            if (seleccionAnterior != null && listaDeTorneos.contains(seleccionAnterior)) {
+                torneosComboBox.setSelectedItem(seleccionAnterior);
+            } else if (torneosComboBox.getItemCount() > 0) {
+                torneosComboBox.setSelectedIndex(0);
+            }
         }
     }
 }
