@@ -64,7 +64,6 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         panelFormularioInscripcion.add(panelFormularioEquipo, "EQUIPO");
         panelFormularioInscripcion.add(panelVacio, "VACIO");
 
-
         // Panel superior
         JPanel topPanel = GuiUtils.crearPanelDeEncabezado(irAtrasBtn,
                 "Inscribir Participantes",
@@ -144,12 +143,6 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         add(centerPanel, BorderLayout.CENTER);
     }
 
-    /**
-     * Inicializa el panel configurando el gestor de torneos, registrando listeners y actualizando la UI.
-     *
-     * @param actionAssigner    Asignador de acciones que se encarga de delegar eventos de botones.
-     * @param gestorTorneos     Instancia de la lógica del sistema que gestiona los torneos.
-     */
     @Override
     public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         this.gestorTorneos = gestorTorneos;
@@ -176,11 +169,6 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         this.repaint();
     }
 
-    /**
-     * Recibe notificaciones del gestor de torneos y muestra mensajes según el contenido recibido.
-     *
-     * @param mensaje Mensaje emitido por el gestor de torneos.
-     */
     @Override
     public void actualizar(String mensaje) {
         if (mensaje.contains("ya está inscrito en el torneo")) {
@@ -222,12 +210,6 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         }
     }
 
-    /**
-     * Maneja el evento de inscripción de participante.
-     * Valida los campos ingresados y, si son correctos, intenta inscribir al participante en el torneo seleccionado.
-     *
-     * @throws IllegalArgumentException si los campos requeridos están vacíos.
-     */
     private void clickInscribirParticipanteBtn() {
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
         if (torneoSeleccionado == null || gestorTorneos.getTorneosCreados().isEmpty()) {
@@ -254,8 +236,12 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
                 GuiUtils.showMessageOnce(this, "El número de integrantes (" + integrantes.size() + ") excede el máximo permitido para este torneo (" + torneoSeleccionado.getNumMiembrosEquipo() + ").", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            if (correo.isEmpty() || !correo.endsWith("@gmail.com")) { // Agregamos una validación simple de formato
+            if (correo.isEmpty() || !correo.endsWith("@gmail.com")) {
                 GuiUtils.showMessageOnce(this, "Por favor ingrese un correo válido para el equipo.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (gestorTorneos.nombreEquipoExiste(torneoSeleccionado.getNombre(), nombreEquipo)) {
+                GuiUtils.showMessageOnce(this, "Ya existe un equipo con ese nombre en el torneo.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -281,6 +267,11 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
                 GuiUtils.showMessageOnce(this, "Por favor ingrese un correo válido (debe terminar en @gmail.com).", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            if (gestorTorneos.nombreIndividualExiste(torneoSeleccionado.getNombre(), nombre)) {
+                GuiUtils.showMessageOnce(this, "Ya existe un participante con ese nombre en el torneo.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             participante = new ParticipanteIndividual(nombre, edad, pais);
             participante.setCorreo(correo);
         }
@@ -297,10 +288,6 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         }
     }
 
-    /**
-     * Maneja el evento de eliminación del participante seleccionado de la lista.
-     * Solicita confirmación antes de proceder a eliminarlo del torneo.
-     */
     private void clickEliminarParticipanteBtn() {
         int selectedIndex = participantesList.getSelectedIndex();
         if (selectedIndex == -1) {
@@ -340,18 +327,11 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         }
     }
 
-    /**
-     * Carga los torneos existentes en el comboBox.
-     * Intenta mantener la selección anterior si todavía existe.
-     */
     private void cargarTorneosEnComboBox() {
         List<Torneo> torneos = gestorTorneos.getTorneosCreados();
         GuiUtils.cargarTorneosEnComboBox(torneosComboBox, torneos);
     }
 
-    /**
-     * Carga la lista de participantes correspondientes al torneo actualmente seleccionado.
-     */
     private void cargarParticipantesTorneoSeleccionado() {
         participantesModel.clear();
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
@@ -386,6 +366,12 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         if (panelFormularioEquipo.getIntegrantesModel().contains(nombre)) {
             GuiUtils.showMessageOnce(this,
                     "Este integrante ya está en la lista del equipo.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (gestorTorneos.nombreIndividualExiste(torneoSeleccionado.getNombre(), nombre)) {
+            GuiUtils.showMessageOnce(this,
+                    "Este nombre ya está en uso por otro participante o integrante de equipo.",
                     "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }

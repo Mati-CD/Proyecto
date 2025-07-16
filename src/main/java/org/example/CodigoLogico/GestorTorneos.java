@@ -37,6 +37,38 @@ public class GestorTorneos extends ObserverController {
         return false;
     }
 
+    /**
+     * Verifica si el nombre del participante individual ya existe en el torneo.
+     */
+    public boolean nombreIndividualExiste(String nombreTorneo, String nombreParticipante) {
+        Torneo torneo = buscarTorneoPorNombre(nombreTorneo);
+        if (torneo == null) return false;
+
+        for (Participante p : torneo.getParticipantes()) {
+            if (p instanceof ParticipanteIndividual && p.getNombre().equalsIgnoreCase(nombreParticipante)) {
+                return true;
+            }
+            if (p instanceof ParticipanteEquipo) {
+                ParticipanteEquipo equipo = (ParticipanteEquipo) p;
+                if (equipo.getMiembros().stream().anyMatch(m -> m.equalsIgnoreCase(nombreParticipante))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Verifica si el nombre del equipo ya existe en el torneo.
+     */
+    public boolean nombreEquipoExiste(String nombreTorneo, String nombreEquipo) {
+        Torneo torneo = buscarTorneoPorNombre(nombreTorneo);
+        if (torneo == null) return false;
+
+        return torneo.getParticipantes().stream()
+                .anyMatch(p -> p.getNombre().equalsIgnoreCase(nombreEquipo));
+    }
+
     public boolean getCreadoConExito() {
         return creadoConExito;
     }
@@ -124,14 +156,14 @@ public class GestorTorneos extends ObserverController {
         boolean removidoExitosamentePorTorneo = torneo.removeParticipante(participante);
 
         if (removidoExitosamentePorTorneo) {
-            notificarObservers("Participante '" + participante.getNombreForTorneo() + "' eliminado exitosamente del torneo '" + nombreTorneo + "'."); // Usar getNombreForTorneo()
+            notificarObservers("Participante '" + participante.getNombreForTorneo() + "' eliminado exitosamente del torneo '" + nombreTorneo + "'.");
         }
         else {
             if (!torneo.getFases().isEmpty()) {
                 notificarObservers("No se puede eliminar participantes de un torneo que ya ha iniciado.");
             }
             else {
-                notificarObservers("El participante '" + participante.getNombreForTorneo() + "' no se encontró en el torneo '" + nombreTorneo + "'."); // Usar getNombreForTorneo()
+                notificarObservers("El participante '" + participante.getNombreForTorneo() + "' no se encontró en el torneo '" + nombreTorneo + "'.");
             }
         }
     }
