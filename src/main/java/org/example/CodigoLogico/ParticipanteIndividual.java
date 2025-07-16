@@ -5,8 +5,8 @@ package org.example.CodigoLogico;
  * Extiende la clase Participante e incluye información adicional como edad y país.
  */
 public class ParticipanteIndividual extends Participante {
-    private final int edad;
-    private final String pais;
+    private int edad;
+    private String pais;
 
     /**
      * Crea un nuevo participante individual con todos sus datos.
@@ -20,18 +20,10 @@ public class ParticipanteIndividual extends Participante {
         this.pais = pais;
     }
 
-    /**
-     * Obtiene la edad del participante.
-     * @return Edad del participante
-     */
     public int getEdad() {
         return edad;
     }
 
-    /**
-     * Obtiene el país del participante.
-     * @return País de origen del participante
-     */
     public String getPais() {
         return pais;
     }

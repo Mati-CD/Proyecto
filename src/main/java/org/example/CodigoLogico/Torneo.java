@@ -16,6 +16,7 @@ public class Torneo extends ObserverController {
     private String disciplina;
     private String tipoDeInscripcion;
     private int numParticipantes;
+    private int numMiembrosEquipo;
 
     /**
      * Constructor para crear un nuevo torneo.
@@ -25,12 +26,13 @@ public class Torneo extends ObserverController {
      * @param tipoDeInscripcion tipo de inscripción (ej: "Individual", "Grupal")
      */
 
-    public Torneo(String nombre, String disciplina, String tipoDeInscripcion, int numParticipantes) {
+    public Torneo(String nombre, String disciplina, String tipoDeInscripcion, int numParticipantes, int numMiembrosEquipo) {
         this.nombre = nombre;
         this.disciplina = disciplina;
         this.tipoDeInscripcion = tipoDeInscripcion;
         this.numParticipantes = numParticipantes;
-        participantes = new ArrayList<>();
+        this.numMiembrosEquipo = numMiembrosEquipo;
+        this.participantes = new ArrayList<>();
     }
 
     public String getNombre() {
@@ -47,6 +49,10 @@ public class Torneo extends ObserverController {
 
     public int getNumParticipantes() {
         return numParticipantes;
+    }
+
+    public int getNumMiembrosEquipo() {
+        return numMiembrosEquipo;
     }
 
     public List<Participante> getParticipantes() {
@@ -90,13 +96,25 @@ public class Torneo extends ObserverController {
      *
      * @param participante participante a agregar
      */
-    void addParticipante(Participante participante) {
-        if (!participantes.contains(participante)) {
-            participantes.add(participante);
+    public boolean addParticipante(Participante participante) {
+        if (!fases.isEmpty()) {
+            return false;
         }
+
+        if (participantes.contains(participante)) {
+            return false;
+        }
+        if (participantes.size() >= numParticipantes) {
+            return false;
+        }
+        participantes.add(participante);
+        return true;
     }
 
     public boolean removeParticipante(Participante participante) {
+        if (!fases.isEmpty()) {
+            return false;
+        }
         return participantes.remove(participante);
     }
 

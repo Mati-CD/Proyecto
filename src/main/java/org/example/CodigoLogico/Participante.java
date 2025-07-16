@@ -25,20 +25,10 @@ public abstract class Participante {
         this.correo = correo;
     }
 
-    /**
-     * Obtiene el nombre del participante.
-     *
-     * @return el nombre del participante
-     */
     public String getNombre() {
         return nombre;
     }
 
-    /**
-     * Obtiene el correo electrónico del participante.
-     *
-     * @return el correo del participante
-     */
     public String getCorreo() {
         return correo;
     }

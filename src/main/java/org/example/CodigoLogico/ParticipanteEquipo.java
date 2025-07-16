@@ -1,6 +1,7 @@
 package org.example.CodigoLogico;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -8,86 +9,43 @@ import java.util.List;
  * Cada equipo tiene un nombre, un número máximo de miembros y una lista de integrantes.
  */
 public class ParticipanteEquipo extends Participante {
-
-
     private List<String> miembros;
-    private int cantidadMiembros;
 
-    /**
-     * Crea un nuevo equipo con nombre y cantidad máxima de integrantes.
-     *
-     * @param nombreEquipo nombre del equipo
-     * @param cantidadMiembros cantidad máxima de miembros permitidos
-     */
-    public ParticipanteEquipo(String nombreEquipo, int cantidadMiembros) {
+    public ParticipanteEquipo(String nombreEquipo,  List<String> miembrosIniciales) {
         super(nombreEquipo);
-        this.cantidadMiembros = 11;
-        this.miembros = new ArrayList<>(11);
+        this.miembros = new ArrayList<>(miembrosIniciales);
     }
 
-    public void setCorreoEquipo(String correo) {
-        setCorreo(correo);
-    }
-
-    /**
-     * Agrega un miembro al equipo si no ha alcanzado el límite y no está repetido.
-     *
-     * @param nombre nombre del nuevo integrante
-     */
     public void addMiembro(String nombre) {
-        if (miembros.size() >= 11) { // Cambiar el límite aquí
-            throw new IllegalStateException("El equipo ya tiene el máximo de 11 integrantes");
-        }
         if (!miembros.contains(nombre)) {
             miembros.add(nombre);
         }
     }
 
-    /**
-     * Devuelve la cantidad máxima de miembros del equipo.
-     *
-     * @return cantidad máxima de integrantes
-     */
-    public int getCantidadMiembros() {
-        return cantidadMiembros;
+    public void removeMiembro(String nombre) {
+        miembros.remove(nombre);
     }
 
-    /**
-     * Retorna una copia de la lista de miembros actuales del equipo.
-     *
-     * @return lista de nombres de integrantes
-     */
-    public List<String> getEquipo() {
-        return new ArrayList<>(miembros);
+    public int getCantidadMiembrosActual() {
+        return miembros.size();
     }
 
-    /**
-     * Devuelve el nombre que se mostrará en el torneo para este equipo.
-     *
-     * @return nombre del equipo
-     */
+    public List<String> getMiembros() {
+        return Collections.unmodifiableList(miembros);
+    }
+
     @Override
     public String getNombreForTorneo() {
         return getNombre();
     }
 
-    /**
-     * Devuelve un resumen con la información del equipo y sus miembros.
-     *
-     * @return descripción textual del equipo
-     */
     @Override
     public String getDatos() {
-        return getNombre() + " (Equipo - " + miembros.size() + "/" + cantidadMiembros +
-                " miembros: " + String.join(", ", miembros) +
-                " - Correo: " + getCorreo() + ")";
+        String correoDisplay = (getCorreo() != null && !getCorreo().isEmpty()) ? " - Correo: " + getCorreo() : "";
+        return getNombre() + " (Equipo - " + miembros.size() + " miembros: " +
+                String.join(", ", miembros) + correoDisplay + ")";
     }
 
-    /**
-     * Devuelve una representación simple del equipo para propósitos generales.
-     *
-     * @return texto con el nombre del equipo seguido de "(Equipo)"
-     */
     @Override
     public String toString() {
         return getNombre() + " (Equipo)";
