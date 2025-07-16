@@ -79,14 +79,6 @@ public enum ActionGUI {
         }
     },
 
-    /** Usado para mostrar el panel de próximos encuentros. */
-    IR_A_PROXIMOS_ENCUENTROS("PROXIMOS_ENCUENTROS") {
-        @Override
-        public void ejecutar(Navegador navegador) {
-            navegador.mostrarPanelProximosEncuentros();
-        }
-    },
-
     /** Usado para mostrar el panel de estadísticas generales. */
     IR_A_ESTADISTICAS_GENERALES("ESTADISTICAS_GENERALES") {
         @Override

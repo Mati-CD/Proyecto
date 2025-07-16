@@ -12,7 +12,6 @@ import java.awt.*;
  */
 public class UsuarioButtons extends JPanel {
     private PanelButton verEstadoActualTorneoBtn;
-    private PanelButton verProxEncuentrosBtn;
     private PanelButton verEstadisticasBtn;
     private PanelButton verParticipantesBtn;
 
@@ -30,12 +29,10 @@ public class UsuarioButtons extends JPanel {
 
         // Crear Botones
         verEstadoActualTorneoBtn = new PanelButton("Ver estado actual del Torneo", font);
-        verProxEncuentrosBtn = new PanelButton("Ver próximos encuentros", font);
         verEstadisticasBtn = new PanelButton("Ver estadisticas del Torneo", font);
         verParticipantesBtn = new PanelButton("Ver datos de participantes", font);
 
         add(verEstadoActualTorneoBtn);
-        add(verProxEncuentrosBtn);
         add(verEstadisticasBtn);
         add(verParticipantesBtn);
     }
@@ -45,13 +42,6 @@ public class UsuarioButtons extends JPanel {
      */
     public PanelButton getVerEstadoActualTorneoBtn() {
         return verEstadoActualTorneoBtn;
-    }
-
-    /**
-     * @return Botón para ver los próximos encuentros.
-     */
-    public PanelButton getVerProxEncuentrosBtn() {
-        return verProxEncuentrosBtn;
     }
 
     /**

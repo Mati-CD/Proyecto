@@ -66,11 +66,6 @@ public class Navegador {
         mostrarPanel(PanelType.ESTADO_ACTUAL, e -> mostrarPanelUsuario());
     }
 
-    /** Muestra el panel de próximos encuentros. */
-    public void mostrarPanelProximosEncuentros() {
-        mostrarPanel(PanelType.PROXIMOS_ENCUENTROS, e -> mostrarPanelUsuario());
-    }
-
     /** Muestra el panel de estadísticas generales. */
     public void mostrarPanelEstadisticasGenerales() {
         mostrarPanel(PanelType.ESTADISTICAS_GENERALES, e -> mostrarPanelUsuario());

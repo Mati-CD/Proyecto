@@ -6,17 +6,19 @@ import java.awt.*;
 import java.util.List;
 
 /**
- * Panel que muestra el estado actual de un torneo, incluyendo sus fases y partidos.
+ * Panel que muestra el estado actual de un torneo, incluyendo sus fases, partidos y próximos encuentros.
  */
 public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable, TorneoObserver {
     private GestorTorneos gestorTorneos;
     private PanelButton irAtrasBtn;
     private JComboBox<Torneo> torneosComboBox;
     private JTextArea estadoTorneoArea;
+    private JList<String> encuentrosList;
+    private DefaultListModel<String> encuentrosModel;
     private boolean listenersAdded = false;
 
     /**
-     * Crea el panel con el diseño gráfico correspondiente al estado actual del torneo.
+     * Crea el panel con el diseño gráfico correspondiente al estado actual del torneo y próximos encuentros.
      */
     public PanelEstadoActualTorneo() {
         super(new BorderLayout());
@@ -26,6 +28,7 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
         Font font = new Font("SansSerif", Font.BOLD, 16);
         Font titleFont = new Font("Arial", Font.BOLD, 24);
 
+        // Panel superior con botón de volver y título
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
 
@@ -40,6 +43,7 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
         topPanel.add(titleLabel, BorderLayout.CENTER);
         add(topPanel, BorderLayout.NORTH);
 
+        // Panel central con selector de torneo
         JPanel centerPanel = new JPanel(new BorderLayout(10, 10));
         centerPanel.setOpaque(false);
         centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
@@ -52,23 +56,37 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
         torneoPanel.add(torneosComboBox);
         centerPanel.add(torneoPanel, BorderLayout.NORTH);
 
+        // Panel dividido para estado y próximos encuentros
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        splitPane.setResizeWeight(0.6); // 60% para el estado, 40% para próximos encuentros
+        splitPane.setDividerLocation(400);
+        splitPane.setOpaque(false);
+
+        // Área de texto para el estado del torneo
         estadoTorneoArea = new JTextArea();
         estadoTorneoArea.setEditable(false);
         estadoTorneoArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
         estadoTorneoArea.setLineWrap(true);
         estadoTorneoArea.setWrapStyleWord(true);
         estadoTorneoArea.setBackground(new Color(240, 240, 240));
-        centerPanel.add(new JScrollPane(estadoTorneoArea), BorderLayout.CENTER);
+        JScrollPane estadoScroll = new JScrollPane(estadoTorneoArea);
+        estadoScroll.setBorder(BorderFactory.createTitledBorder("Estado del Torneo"));
+
+        // Lista para próximos encuentros
+        encuentrosModel = new DefaultListModel<>();
+        encuentrosList = new JList<>(encuentrosModel);
+        encuentrosList.setFont(font);
+        encuentrosList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane encuentrosScroll = new JScrollPane(encuentrosList);
+        encuentrosScroll.setBorder(BorderFactory.createTitledBorder("Próximos Encuentros"));
+
+        splitPane.setTopComponent(estadoScroll);
+        splitPane.setBottomComponent(encuentrosScroll);
+        centerPanel.add(splitPane, BorderLayout.CENTER);
 
         add(centerPanel, BorderLayout.CENTER);
     }
 
-    /**
-     * Inicializa el panel con el gestor de torneos y asigna las acciones necesarias.
-     *
-     * @param actionAssigner objeto que asigna las acciones de interfaz gráfica
-     * @param gestorTorneos objeto que contiene la lógica del torneo
-     */
     @Override
     public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         this.gestorTorneos = gestorTorneos;
@@ -82,12 +100,16 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
                 torneo.registrarObserver(this);
             }
             torneosComboBox.setModel(model);
-            torneosComboBox.addActionListener(e -> actualizarEstadoTorneo());
+            torneosComboBox.addActionListener(e -> {
+                actualizarEstadoTorneo();
+                actualizarProximosEncuentros();
+            });
 
             listenersAdded = true;
         }
 
         actualizarEstadoTorneo();
+        actualizarProximosEncuentros();
         this.revalidate();
         this.repaint();
     }
@@ -132,14 +154,42 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
     }
 
     /**
-     * Actualiza el contenido del panel cuando se recibe un mensaje del observable.
-     *
-     * @param mensaje mensaje enviado por el observable
+     * Actualiza la lista de próximos encuentros según el torneo seleccionado.
      */
+    private void actualizarProximosEncuentros() {
+        Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
+        encuentrosModel.clear();
+
+        if (torneo != null && !torneo.getFases().isEmpty()) {
+            FaseTorneo faseActual = torneo.getFaseActual();
+
+            if (faseActual != null) {
+                for (TorneoComponent componente : faseActual.getComponentes()) {
+                    Partido partido = (Partido) componente;
+                    if (!partido.tieneResultado()) {
+                        encuentrosModel.addElement(partido.getJugador1() + " vs " + partido.getJugador2());
+                    }
+                }
+            }
+
+            if (encuentrosModel.isEmpty()) {
+                encuentrosModel.addElement("No hay próximos encuentros pendientes");
+                if (torneo.tieneCampeon()) {
+                    encuentrosModel.addElement("El torneo ha finalizado");
+                } else {
+                    encuentrosModel.addElement("Esperando siguiente fase...");
+                }
+            }
+        } else {
+            encuentrosModel.addElement("Seleccione un torneo iniciado");
+        }
+    }
+
     @Override
     public void actualizar(String mensaje) {
         SwingUtilities.invokeLater(() -> {
             actualizarEstadoTorneo();
+            actualizarProximosEncuentros();
             if (mensaje.contains("ERROR") || mensaje.contains("Campeón")) {
                 JOptionPane.showMessageDialog(this, mensaje);
             }

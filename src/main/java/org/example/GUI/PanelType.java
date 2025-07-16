@@ -59,12 +59,7 @@ public enum PanelType {
             return new PanelRegistrarResultados();
         }
     },
-    PROXIMOS_ENCUENTROS("PROXIMOS_ENCUENTROS") {
-        @Override
-        public PanelProximosEncuentros crearPanel() {
-            return new PanelProximosEncuentros();
-        }
-    },
+
     ESTADISTICAS_GENERALES("ESTADISTICAS_GENERALES") {
         @Override
         public PanelEstadisticasGenerales crearPanel() {
