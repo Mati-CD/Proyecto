@@ -45,6 +45,7 @@ public class PanelInicio extends JPanel implements PanelConfigurable {
                 new Color(100, 149, 237),
                 20
         );
+        organizadorBtn.setButtonPreferredSize(new Dimension(400, 200));
 
         usuarioBtn = new PanelButton("Usuario", font);
         usuarioBtn.setButtonColor(
@@ -53,6 +54,8 @@ public class PanelInicio extends JPanel implements PanelConfigurable {
                 new Color(100, 149, 237),
                 20
         );
+        usuarioBtn.setButtonPreferredSize(new Dimension(180, 60));
+
 
         JPanel centerPanel = new JPanel(new GridBagLayout());
         centerPanel.setOpaque(false);
