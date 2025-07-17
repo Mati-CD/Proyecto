@@ -17,15 +17,34 @@ public class PanelInicio extends JPanel implements PanelConfigurable {
      * Constructor que inicializa y organiza los botones del panel.
      */
     public PanelInicio() {
-        super(new FlowLayout(FlowLayout.CENTER, 10, 100));
-        setBackground(Color.LIGHT_GRAY);
+        setLayout(new BorderLayout());
+        setOpaque(false);
 
         Font font = new Font("SansSerif", Font.BOLD, 18);
-        organizadorBtn = new PanelButton("Organizador", font);
-        usuarioBtn = new PanelButton("Usuario", font);
 
-        add(organizadorBtn, BorderLayout.WEST);
-        add(usuarioBtn, BorderLayout.EAST);
+        organizadorBtn = new PanelButton("Organizador", font);
+        organizadorBtn.setButtonColor(
+                new Color(70, 130, 180),
+                Color.WHITE,
+                new Color(100, 149, 237),
+                20
+        );
+
+        usuarioBtn = new PanelButton("Usuario", font);
+        usuarioBtn.setButtonColor(
+                new Color(70, 130, 180),
+                Color.WHITE,
+                new Color(100, 149, 237),
+                20
+        );
+
+        JPanel centerPanel = new JPanel(new GridLayout(2, 1, 20, 20));
+        centerPanel.setOpaque(false);
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(100, 200, 100, 200));
+        centerPanel.add(organizadorBtn);
+        centerPanel.add(usuarioBtn);
+
+        add(centerPanel, BorderLayout.CENTER);
     }
 
     /**
