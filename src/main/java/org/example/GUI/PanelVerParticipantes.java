@@ -71,7 +71,10 @@ public class PanelVerParticipantes extends JPanel implements PanelConfigurable, 
 
         JPanel torneoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         torneoPanel.setOpaque(false);
-        torneoPanel.add(new JLabel("Seleccione torneo:"));
+        JLabel torneoLabel = new JLabel("Seleccione torneo:");
+        torneoLabel.setForeground(Color.WHITE);
+        torneoPanel.add(torneoLabel);
+
         torneosComboBox = new JComboBox<>();
         torneosModel = new DefaultComboBoxModel<>();
         torneosComboBox.setModel(torneosModel);

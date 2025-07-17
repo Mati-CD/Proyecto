@@ -88,8 +88,9 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
         JPanel torneoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         torneoPanel.setOpaque(false);
         JLabel torneoLabel = new JLabel("Seleccione torneo:");
-        torneoLabel.setForeground(Color.BLACK);
+        torneoLabel.setForeground(Color.WHITE);
         torneoPanel.add(torneoLabel);
+
 
         torneosComboBox = new JComboBox<>();
         torneosModel = new DefaultComboBoxModel<>();
