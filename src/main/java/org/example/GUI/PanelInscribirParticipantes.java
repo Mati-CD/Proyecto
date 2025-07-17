@@ -350,10 +350,11 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
                 GuiUtils.showMessageOnce(this, "Por favor ingrese una edad válida (mayor a 0).", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            if (!correo.endsWith("@gmail.com")) {
-                GuiUtils.showMessageOnce(this, "Por favor ingrese un correo válido (debe terminar en @gmail.com).", "Error", JOptionPane.ERROR_MESSAGE);
+            if (correo.isEmpty() || !correo.endsWith("@gmail.com")) {
+                GuiUtils.showMessageOnce(this, "Por favor ingrese un correo válido (no vacío y debe terminar en @gmail.com).", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+
             if (gestorTorneos.nombreIndividualExiste(torneoSeleccionado.getNombre(), nombre)) {
                 GuiUtils.showMessageOnce(this, "Ya existe un participante con ese nombre en el torneo.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
