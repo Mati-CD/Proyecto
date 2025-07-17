@@ -1,9 +1,13 @@
 package org.example.GUI;
 
 import org.example.CodigoLogico.*;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,14 +19,50 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
     private JComboBox<Torneo> torneosComboBox;
     private JTextArea estadisticasArea;
     private boolean listenersAdded = false;
+    private BufferedImage backgroundImage;
+    private BufferedImage grayImage;
+    private DefaultComboBoxModel<Torneo> torneosModel;
 
     /**
      * Construye el panel de estadísticas generales con su interfaz gráfica.
      */
     public PanelEstadisticasGenerales() {
         super(new BorderLayout());
-        setBackground(new Color(104, 120, 1));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // Carga la imagen de fondo y genera versión en gris aclarado
+        try {
+            backgroundImage = ImageIO.read(getClass().getResource("/images/image1.png"));
+            if (backgroundImage == null) {
+                System.err.println("No se encontró la imagen en /images/image1.png");
+                setBackground(new Color(230, 230, 230));
+            } else {
+                // Crear imagen gris aclarada solo una vez para rendimiento
+                grayImage = new BufferedImage(
+                        backgroundImage.getWidth(),
+                        backgroundImage.getHeight(),
+                        BufferedImage.TYPE_INT_ARGB
+                );
+                for (int y = 0; y < backgroundImage.getHeight(); y++) {
+                    for (int x = 0; x < backgroundImage.getWidth(); x++) {
+                        int rgb = backgroundImage.getRGB(x, y);
+                        int a = (rgb >> 24) & 0xff;
+                        int r = (rgb >> 16) & 0xff;
+                        int g = (rgb >> 8) & 0xff;
+                        int b = rgb & 0xff;
+
+                        int gray = (r + g + b) / 3;
+                        int lightGray = Math.min(gray + 40, 255);
+
+                        int grayRgb = (a << 24) | (lightGray << 16) | (lightGray << 8) | lightGray;
+                        grayImage.setRGB(x, y, grayRgb);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            setBackground(new Color(230, 230, 230));
+        }
 
         Font font = new Font("SansSerif", Font.BOLD, 16);
         Font titleFont = new Font("Arial", Font.BOLD, 24);
@@ -30,14 +70,14 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
 
-        // Botón "Volver atrás" con efecto hover suave y sin borde
+        // Botón "Volver atrás" con fondo gris claro y texto negro, hover gris
         Font botonFont = new Font("Arial", Font.BOLD, 12);
         irAtrasBtn = new PanelButton("Volver atrás", botonFont);
         irAtrasBtn.setButtonColor(
-                new Color(220, 220, 220),  // fondo base gris claro
-                Color.BLACK,               // texto negro
-                new Color(200, 200, 200),  // hover gris un poco más oscuro
-                0                         // sin borde
+                new Color(220, 220, 220),
+                Color.BLACK,
+                new Color(200, 200, 200),
+                0
         );
 
         JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -45,9 +85,10 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
         topLeftPanel.add(irAtrasBtn);
         topPanel.add(topLeftPanel, BorderLayout.WEST);
 
-        JLabel titleLabel = new JLabel("Estadísticas Generales", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("", SwingConstants.CENTER);
         titleLabel.setFont(titleFont);
         topPanel.add(titleLabel, BorderLayout.CENTER);
+
         add(topPanel, BorderLayout.NORTH);
 
         JPanel centerPanel = new JPanel(new BorderLayout(10, 10));
@@ -58,6 +99,8 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
         torneoPanel.setOpaque(false);
         torneoPanel.add(new JLabel("Seleccione torneo:"));
         torneosComboBox = new JComboBox<>();
+        torneosModel = new DefaultComboBoxModel<>();
+        torneosComboBox.setModel(torneosModel);
         torneosComboBox.setFont(font);
         torneoPanel.add(torneosComboBox);
         centerPanel.add(torneoPanel, BorderLayout.NORTH);
@@ -73,37 +116,61 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
         add(centerPanel, BorderLayout.CENTER);
     }
 
-    /**
-     * Inicializa el panel cargando los torneos y asignando acciones a los botones.
-     *
-     * @param actionAssigner objeto que permite obtener acciones asociadas a eventos
-     * @param gestorTorneos gestor que contiene la lógica de los torneos
-     */
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (grayImage != null) {
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.drawImage(grayImage, 0, 0, getWidth(), getHeight(), this);
+        } else {
+            g.setColor(new Color(230, 230, 230));
+            g.fillRect(0, 0, getWidth(), getHeight());
+        }
+    }
+
     @Override
     public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         this.gestorTorneos = gestorTorneos;
 
         if (!listenersAdded) {
             irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_USUARIO.getID()));
-
-            DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
-            for (Torneo torneo : gestorTorneos.getTorneosCreados()) {
-                model.addElement(torneo);
-                torneo.registrarObserver(this);
-            }
-            torneosComboBox.setModel(model);
             torneosComboBox.addActionListener(e -> actualizarEstadisticas());
-
             listenersAdded = true;
         }
 
+        actualizarListaTorneos();
         actualizarEstadisticas();
         this.revalidate();
         this.repaint();
     }
 
     /**
-     * Actualiza el área de texto con estadísticas del torneo seleccionado.
+     * Actualiza la lista de torneos disponibles en el ComboBox.
+     * Mantiene la selección actual si el torneo sigue disponible.
+     */
+    private void actualizarListaTorneos() {
+        Torneo seleccionado = (Torneo) torneosComboBox.getSelectedItem();
+        torneosModel.removeAllElements();
+
+        List<Torneo> torneos = gestorTorneos.getTorneosCreados();
+        for (Torneo torneo : torneos) {
+            torneosModel.addElement(torneo);
+            torneo.registrarObserver(this);
+        }
+
+        // Restaurar la selección anterior si todavía existe
+        if (seleccionado != null && torneos.contains(seleccionado)) {
+            torneosComboBox.setSelectedItem(seleccionado);
+        } else if (torneosModel.getSize() > 0) {
+            torneosComboBox.setSelectedIndex(0);
+        }
+    }
+
+    /**
+     * Actualiza el área de estadísticas con la información del torneo seleccionado.
      */
     private void actualizarEstadisticas() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
@@ -132,13 +199,17 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
 
             for (FaseTorneo fase : torneo.getFases()) {
                 for (TorneoComponent componente : fase.getComponentes()) {
-                    Partido partido = (Partido) componente;
-                    if (partido.tieneResultado()) {
-                        partidosJugados++;
-                        String ganador = partido.getGanador();
-                        victoriasPorParticipante.put(ganador, victoriasPorParticipante.getOrDefault(ganador, 0) + 1);
-                    } else {
-                        partidosPendientes++;
+                    if (componente instanceof Partido) {
+                        Partido partido = (Partido) componente;
+                        if (partido.tieneResultado()) {
+                            partidosJugados++;
+                            String ganador = partido.getGanador();
+                            if (ganador != null) {
+                                victoriasPorParticipante.put(ganador, victoriasPorParticipante.getOrDefault(ganador, 0) + 1);
+                            }
+                        } else {
+                            partidosPendientes++;
+                        }
                     }
                 }
             }
@@ -168,16 +239,12 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
         estadisticasArea.setText(sb.toString());
     }
 
-    /**
-     * Actualiza el panel con el mensaje recibido del observable.
-     *
-     * @param mensaje mensaje emitido desde el torneo observado
-     */
     @Override
     public void actualizar(String mensaje) {
         SwingUtilities.invokeLater(() -> {
+            actualizarListaTorneos();
             actualizarEstadisticas();
-            if (mensaje.contains("ERROR") || mensaje.contains("Campeón")) {
+            if (mensaje != null && (mensaje.contains("ERROR") || mensaje.contains("Campeón"))) {
                 JOptionPane.showMessageDialog(this, mensaje);
             }
         });
