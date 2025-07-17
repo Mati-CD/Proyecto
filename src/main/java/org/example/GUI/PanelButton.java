@@ -11,6 +11,13 @@ public class PanelButton extends JButton {
     private Color pressedBackgroundColor;
     private Color defaultBackgroundColor;
 
+    /**
+     * Constructor para crear un PanelButton.
+     * Configura el botón con el texto, la fuente y los manejadores de eventos de ratón para los cambios de color.
+     *
+     * @param label El texto que se mostrará en el botón.
+     * @param font La fuente a usar para el texto del botón.
+     */
     public PanelButton(String label, Font font) {
         super(label);
         setFont(font);
@@ -53,10 +60,24 @@ public class PanelButton extends JButton {
         });
     }
 
+    /**
+     * Establece el tamaño preferido para el botón.
+     *
+     * @param preferredSize Las dimensiones preferidas del botón.
+     */
     public void setButtonPreferredSize(Dimension preferredSize) {
         setPreferredSize(preferredSize);
     }
 
+    /**
+     * Configura los colores de fondo para los estados normal, de hover y el color de texto.
+     * También permite definir un borde opcional. El color de presionado se calcula automáticamente.
+     *
+     * @param backgroundColor Color de fondo por defecto.
+     * @param foregroundColor Color del texto.
+     * @param hoverColor Color de fondo cuando el cursor está sobre el botón.
+     * @param borderWidth El ancho del borde. Si es > 0, se dibujará un borde.
+     */
     public void setButtonColor(Color backgroundColor, Color foregroundColor,
                                Color hoverColor, int borderWidth) {
         this.defaultBackgroundColor = backgroundColor;

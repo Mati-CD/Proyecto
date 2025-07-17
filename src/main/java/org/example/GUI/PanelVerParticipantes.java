@@ -18,6 +18,7 @@ public class PanelVerParticipantes extends JPanel implements PanelConfigurable, 
     private JComboBox<Torneo> torneosComboBox;
     private JTextArea participantesArea;
     private boolean listenersAdded = false;
+    private Torneo actualObservedTorneo = null;
     private BufferedImage backgroundImage;
     private DefaultComboBoxModel<Torneo> torneosModel;
 
@@ -133,14 +134,26 @@ public class PanelVerParticipantes extends JPanel implements PanelConfigurable, 
 
         if (!listenersAdded) {
             irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_USUARIO.getID()));
-            torneosComboBox.addActionListener(e -> actualizarParticipantes());
+            torneosComboBox.addActionListener(e -> {
+                actualizarObserverDelTorneo();
+                actualizarParticipantes();
+            });
             listenersAdded = true;
         }
 
         actualizarListaTorneos();
+        actualizarObserverDelTorneo();
         actualizarParticipantes();
         this.revalidate();
         this.repaint();
+    }
+
+    @Override
+    public void actualizar(String mensaje) {
+        SwingUtilities.invokeLater(() -> {
+            actualizarListaTorneos();
+            actualizarParticipantes();
+        });
     }
 
     /**
@@ -154,14 +167,27 @@ public class PanelVerParticipantes extends JPanel implements PanelConfigurable, 
         List<Torneo> torneos = gestorTorneos.getTorneosCreados();
         for (Torneo torneo : torneos) {
             torneosModel.addElement(torneo);
-            torneo.registrarObserver(this);
         }
 
-        // Restaurar la selección anterior si todavía existe
         if (seleccionado != null && torneos.contains(seleccionado)) {
             torneosComboBox.setSelectedItem(seleccionado);
         } else if (torneosModel.getSize() > 0) {
             torneosComboBox.setSelectedIndex(0);
+        }
+    }
+
+    private void actualizarObserverDelTorneo() {
+        Torneo nuevoTorneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
+
+        if (actualObservedTorneo != null && actualObservedTorneo != nuevoTorneoSeleccionado) {
+            actualObservedTorneo.removerObserver(this);
+        }
+
+        if (nuevoTorneoSeleccionado != null && actualObservedTorneo != nuevoTorneoSeleccionado) {
+            nuevoTorneoSeleccionado.registrarObserver(this);
+            actualObservedTorneo = nuevoTorneoSeleccionado;
+        } else if (nuevoTorneoSeleccionado == null && actualObservedTorneo != null) {
+            actualObservedTorneo = null;
         }
     }
 
@@ -189,13 +215,5 @@ public class PanelVerParticipantes extends JPanel implements PanelConfigurable, 
         }
 
         participantesArea.setText(sb.toString());
-    }
-
-    @Override
-    public void actualizar(String mensaje) {
-        SwingUtilities.invokeLater(() -> {
-            actualizarListaTorneos();
-            actualizarParticipantes();
-        });
     }
 }

@@ -23,7 +23,6 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
         super(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // Cargar imagen de fondo y crear versión gris aclarada
         try {
             backgroundImage = ImageIO.read(getClass().getResource("/images/image1.png"));
             if (backgroundImage == null) {

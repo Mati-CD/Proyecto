@@ -17,28 +17,44 @@ public class UsuarioButtons extends JPanel {
 
     public UsuarioButtons() {
         setOpaque(false);
-        setLayout(new GridLayout(4, 1, 0, 100));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(40, 150, 60, 0));
 
-        verEstadoActualTorneoBtn = crearBotonEstilizado("Ver estado actual del Torneo");
-        verEstadisticasBtn = crearBotonEstilizado("Ver estadísticas del Torneo");
-        verParticipantesBtn = crearBotonEstilizado("Ver datos de participantes");
+        Font font1 = new Font("SansSerif", Font.BOLD, 18);
+        Dimension size1 = new Dimension(350, 200);
 
-        add(verEstadoActualTorneoBtn);
-        add(verEstadisticasBtn);
-        add(verParticipantesBtn);
-    }
-
-    private PanelButton crearBotonEstilizado(String texto) {
-        PanelButton boton = new PanelButton(texto, new Font("SansSerif", Font.BOLD, 18));
-        boton.setButtonPreferredSize(new Dimension(250, 50));
-        boton.setButtonColor(
-                new Color(70, 130, 180),  // Azul acero
+        verEstadoActualTorneoBtn = new PanelButton("Ver estado actual de Torneo", font1);
+        verEstadoActualTorneoBtn.setButtonPreferredSize(size1);
+        verEstadoActualTorneoBtn.setButtonColor(
+                new Color(70, 130, 180),
                 Color.WHITE,
-                new Color(100, 149, 237), // Azul claro
+                new Color(100, 149, 237),
                 2
         );
-        return boton;
+
+        verEstadisticasBtn = new PanelButton("Ver estadísticas de Torneo", font1);
+        verEstadisticasBtn.setButtonPreferredSize(size1);
+        verEstadisticasBtn.setButtonColor(
+                new Color(70, 130, 180),
+                Color.WHITE,
+                new Color(100, 149, 237),
+                2
+        );
+
+        verParticipantesBtn = new PanelButton("Ver datos de participantes", font1);
+        verParticipantesBtn.setButtonPreferredSize(size1);
+        verParticipantesBtn.setButtonColor(
+                new Color(70, 130, 180),
+                Color.WHITE,
+                new Color(100, 149, 237),
+                2
+        );
+
+        add(verEstadoActualTorneoBtn);
+        add(Box.createVerticalStrut(30));
+        add(verEstadisticasBtn);
+        add(Box.createVerticalStrut(30));
+        add(verParticipantesBtn);
     }
 
     public PanelButton getVerEstadoActualTorneoBtn() {

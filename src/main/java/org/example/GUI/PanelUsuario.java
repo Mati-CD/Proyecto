@@ -60,9 +60,6 @@ public class PanelUsuario extends JPanel implements PanelConfigurable {
         add(centerLeftPanel, BorderLayout.CENTER);
     }
 
-    /**
-     * Dibuja el fondo con la imagen si está disponible.
-     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

@@ -4,9 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Panel que contiene el formulario para inscribir participantes en un torneo.
- * Incluye campos para nombre, edad, país y correo electrónico.
- * El campo de correo automáticamente añade "@gmail.com" al texto ingresado.
+ * Panel que contiene un formulario para la inscripción de participantes individuales en un torneo.
+ * Permite ingresar el nombre, edad, país y correo electrónico del participante.
  */
 public class PanelFormularioIndividual extends JPanel {
     private JTextField fieldNombre;
@@ -30,7 +29,6 @@ public class PanelFormularioIndividual extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 5, 10, 5);
 
-        // Configuración del campo Nombre
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.EAST;
@@ -48,7 +46,6 @@ public class PanelFormularioIndividual extends JPanel {
         fieldNombre.setPreferredSize(preferredFieldSize);
         add(fieldNombre, gbc);
 
-        // Configuración del campo Edad
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.EAST;
@@ -64,7 +61,6 @@ public class PanelFormularioIndividual extends JPanel {
         fieldEdad.setPreferredSize(preferredFieldSize);
         add(fieldEdad, gbc);
 
-        // Configuración del campo País (como JTextField)
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.EAST;
@@ -80,7 +76,6 @@ public class PanelFormularioIndividual extends JPanel {
         fieldPais.setPreferredSize(preferredFieldSize);
         add(fieldPais, gbc);
 
-        // Sección de Datos de Contacto
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
@@ -93,7 +88,6 @@ public class PanelFormularioIndividual extends JPanel {
         gbc.gridwidth = 1;
         gbc.insets = new Insets(10, 5, 10, 5);
 
-        // Configuración del campo Correo
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.anchor = GridBagConstraints.EAST;
@@ -118,10 +112,18 @@ public class PanelFormularioIndividual extends JPanel {
         add(correoPanel, gbc);
     }
 
+    /**
+     * Obtiene el nombre ingresado en el campo "Nombre".
+     * @return El nombre del participante.
+     */
     public String getNombre() {
         return fieldNombre.getText().trim();
     }
 
+    /**
+     * Obtiene la edad ingresada en el campo "Edad". Si no es un número válido, retorna 0.
+     * @return La edad del participante.
+     */
     public int getEdad() {
         try {
             return Integer.parseInt(fieldEdad.getText().trim());
@@ -130,10 +132,18 @@ public class PanelFormularioIndividual extends JPanel {
         }
     }
 
+    /**
+     * Obtiene el país ingresado en el campo "País".
+     * @return El país del participante.
+     */
     public String getPais() {
         return fieldPais.getText().trim();
     }
 
+    /**
+     * Obtiene el correo electrónico ingresado, añadiendo "@gmail.com" si el campo no está vacío.
+     * @return El correo electrónico del participante.
+     */
     public String getCorreo() {
         String usuario = fieldCorreoUsuario.getText().trim();
         if (usuario.isEmpty()) return "";

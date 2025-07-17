@@ -9,7 +9,8 @@ import java.awt.event.ActionListener;
 
 /**
  * Panel de formulario para la creación de un torneo.
- * Incluye campos para el nombre, disciplina, tipo de inscripción y número de participantes.
+ * Permite ingresar el nombre, disciplina, tipo de inscripción (individual o por equipo)
+ * y el número de participantes. Si es por equipo, también permite especificar miembros por equipo.
  */
 public class PanelFormularioTorneo extends JPanel {
     private JTextField fieldNombre;
@@ -25,7 +26,8 @@ public class PanelFormularioTorneo extends JPanel {
     private final Color labelColor = Color.WHITE;
 
     /**
-     * Constructor que inicializa y dispone gráficamente los campos del formulario.
+     * Constructor que inicializa y organiza los campos del formulario para crear un torneo.
+     * Configura el diseño, los bordes y los manejadores de eventos.
      */
     public PanelFormularioTorneo() {
         setOpaque(false);
@@ -58,7 +60,7 @@ public class PanelFormularioTorneo extends JPanel {
 
         JLabel labelDisciplina = new JLabel("Disciplina:");
         labelDisciplina.setFont(componentFont);
-        GuiUtils.setLabelTextColor(labelDisciplina, labelColor); // <--- USAR EL MÉTODO DE UTILIDAD
+        GuiUtils.setLabelTextColor(labelDisciplina, labelColor);
         fieldDisciplina = new JTextField();
         fieldDisciplina.setFont(componentFont);
         fieldDisciplina.setPreferredSize(fieldYComboSize);
@@ -70,20 +72,20 @@ public class PanelFormularioTorneo extends JPanel {
 
         JLabel labelNumParticipantes = new JLabel("Número de Participantes:");
         labelNumParticipantes.setFont(componentFont);
-        GuiUtils.setLabelTextColor(labelNumParticipantes, labelColor); // <--- USAR EL MÉTODO DE UTILIDAD
+        GuiUtils.setLabelTextColor(labelNumParticipantes, labelColor);
         Integer[] numParticipantesOpciones = {2, 4, 8, 16, 32};
         comboNumParticipantes = new JComboBox<>(numParticipantesOpciones);
         comboNumParticipantes.setFont(componentFont);
         comboNumParticipantes.setPreferredSize(fieldYComboSize);
         comboNumParticipantes.setMaximumSize(fieldYComboSize);
         comboNumParticipantes.setSelectedIndex(0);
-        comboNumParticipantes.setForeground(Color.BLACK); // Texto seleccionado en el combo
-        comboNumParticipantes.setBackground(Color.WHITE); // Fondo del combo
+        comboNumParticipantes.setForeground(Color.BLACK);
+        comboNumParticipantes.setBackground(Color.WHITE);
 
 
         JLabel labelTipoInscripcion = new JLabel("Tipo de Inscripción:");
         labelTipoInscripcion.setFont(componentFont);
-        GuiUtils.setLabelTextColor(labelTipoInscripcion, labelColor); // <--- USAR EL MÉTODO DE UTILIDAD
+        GuiUtils.setLabelTextColor(labelTipoInscripcion, labelColor);
         String[] tiposDeInscripcion = {"Individual", "Equipo"};
         comboTipoInscripcion = new JComboBox<>(tiposDeInscripcion);
         comboTipoInscripcion.setFont(componentFont);
@@ -96,7 +98,7 @@ public class PanelFormularioTorneo extends JPanel {
 
         labelNumMiembrosEquipo = new JLabel("Miembros por Equipo:");
         labelNumMiembrosEquipo.setFont(componentFont);
-        GuiUtils.setLabelTextColor(labelNumMiembrosEquipo, labelColor); // <--- USAR EL MÉTODO DE UTILIDAD
+        GuiUtils.setLabelTextColor(labelNumMiembrosEquipo, labelColor);
         fieldNumMiembrosEquipo = new JTextField();
         fieldNumMiembrosEquipo.setFont(componentFont);
         fieldNumMiembrosEquipo.setPreferredSize(fieldYComboSize);
@@ -107,7 +109,6 @@ public class PanelFormularioTorneo extends JPanel {
         labelNumMiembrosEquipo.setVisible(false);
         fieldNumMiembrosEquipo.setVisible(false);
 
-        // ... (resto de los wrappers y el ActionListener) ...
         JPanel labelNombreWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         labelNombreWrapper.setOpaque(false);
         labelNombreWrapper.add(labelNombre);
@@ -167,8 +168,8 @@ public class PanelFormularioTorneo extends JPanel {
     }
 
     /**
-     * Actualiza la visibilidad del campo de miembros por equipo, esto
-     * controlado por el tipo de inscripción seleccionado.
+     * Actualiza la visibilidad del campo "Miembros por Equipo" y su etiqueta
+     * según el tipo de inscripción seleccionado (visible solo si es "Equipo").
      */
     private void actualizarVisibilidadMiembrosEquipo() {
         String tipoInscripcion = (String) comboTipoInscripcion.getSelectedItem();
@@ -180,22 +181,43 @@ public class PanelFormularioTorneo extends JPanel {
         repaint();
     }
 
+    /**
+     * Obtiene el nombre del torneo ingresado.
+     * @return El nombre del torneo.
+     */
     public String getNombre() {
         return fieldNombre.getText();
     }
 
+    /**
+     * Obtiene la disciplina del torneo ingresada.
+     * @return La disciplina del torneo.
+     */
     public String getDisciplina() {
         return fieldDisciplina.getText();
     }
 
+    /**
+     * Obtiene el tipo de inscripción seleccionado (Individual o Equipo).
+     * @return El tipo de inscripción.
+     */
     public String getTipoInscripcion() {
         return (String) comboTipoInscripcion.getSelectedItem();
     }
 
+    /**
+     * Obtiene el número de participantes seleccionado.
+     * @return El número de participantes.
+     */
     public int getNumParticipantes() {
         return (Integer) comboNumParticipantes.getSelectedItem();
     }
 
+    /**
+     * Obtiene el número de miembros por equipo. Retorna 0 si el tipo de inscripción es "Individual"
+     * o si el valor ingresado no es un número válido.
+     * @return El número de miembros por equipo.
+     */
     public int getNumMiembrosEquipo() {
         if ("Individual".equals(getTipoInscripcion())) {
             return 0;
@@ -207,6 +229,7 @@ public class PanelFormularioTorneo extends JPanel {
             return 0;
         }
     }
+
     /**
      * Limpia todos los campos del formulario, restableciendo sus valores por defecto.
      */

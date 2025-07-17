@@ -45,11 +45,6 @@ public class MatchDisplayPanel extends JPanel {
         repaint();
     }
 
-    /**
-     * Dibuja el contenido del panel con los nombres de los participantes.
-     *
-     * @param g Objeto Graphics usado para pintar el componente
-     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

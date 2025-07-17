@@ -11,6 +11,12 @@ import java.awt.image.RescaleOp;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Panel de interfaz gráfica para la inscripción de participantes en torneos.
+ * Permite seleccionar un torneo, y luego inscribir participantes (individuales o equipos)
+ * o eliminar participantes ya inscritos.
+ * El formulario de inscripción se adapta al tipo de inscripción del torneo seleccionado.
+ */
 public class PanelInscribirParticipantes extends JPanel implements PanelConfigurable, TorneoObserver {
     private GestorTorneos gestorTorneos;
     private PanelButton removerBtn;
@@ -35,7 +41,7 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
     private final Font titleFont = new Font("Arial", Font.BOLD, 24);
 
     /**
-     * Constructor que inicializa los componentes gráficos del panel de inscripción.
+     * Constructor que inicializa los componentes gráficos del panel de inscripción,
      */
     public PanelInscribirParticipantes() {
         super(new BorderLayout());
@@ -256,6 +262,7 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         this.repaint();
     }
 
+    @Override
     public void actualizar(String mensaje) {
         if (mensaje.startsWith("ERROR_PARTICIPANTE_DUPLICADO:") ||
                 mensaje.startsWith("ERROR_TORNEO_LLENO:") ||
@@ -271,6 +278,10 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         }
     }
 
+    /**
+     * Cambia el formulario visible (individual o equipo) según el tipo de inscripción del torneo seleccionado.
+     * Muestra un panel vacío si no hay un torneo válido seleccionado.
+     */
     private void actualizarFormularioSegunTorneo() {
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
         CardLayout cardLayout = (CardLayout) (panelFormularioInscripcion.getLayout());
@@ -295,6 +306,10 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         }
     }
 
+    /**
+     * Gestiona la lógica al hacer clic en el botón "Inscribir Participante".
+     * Valida los datos del formulario (individual o equipo) y llama al gestor para inscribir.
+     */
     private void clickInscribirParticipanteBtn() {
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
         if (torneoSeleccionado == null || gestorTorneos.getTorneosCreados().isEmpty()) {
@@ -374,6 +389,10 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         }
     }
 
+    /**
+     * Gestiona la lógica al hacer clic en el botón "Eliminar participante".
+     * Elimina el participante seleccionado de la lista y del torneo.
+     */
     private void clickEliminarParticipanteBtn() {
         int selectedIndex = participantesList.getSelectedIndex();
         if (selectedIndex == -1) {
@@ -417,11 +436,17 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         }
     }
 
+    /**
+     * Carga la lista de torneos disponibles en el ComboBox.
+     */
     private void cargarTorneosEnComboBox() {
         List<Torneo> torneos = gestorTorneos.getTorneosCreados();
         GuiUtils.cargarTorneosEnComboBox(torneosComboBox, torneos);
     }
 
+    /**
+     * Carga los participantes del torneo actualmente seleccionado en la lista de participantes.
+     */
     private void cargarParticipantesTorneoSeleccionado() {
         participantesModel.clear();
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
@@ -435,6 +460,10 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         actualizarContadorParticipantes();
     }
 
+    /**
+     * Añade un nuevo integrante a la lista del equipo en el formulario,
+     * realizando validaciones de nombre, límite y duplicados.
+     */
     private void agregarIntegranteEquipo() {
         String nombre = panelFormularioEquipo.getNuevoIntegrante();
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
@@ -471,6 +500,9 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         panelFormularioEquipo.updateIntegrantesCountLabel();
     }
 
+    /**
+     * Elimina el integrante seleccionado de la lista del equipo en el formulario.
+     */
     private void eliminarIntegranteEquipo() {
         int selectedIndex = panelFormularioEquipo.getSelectedIndexIntegrantesList();
         if (selectedIndex == -1) {
@@ -483,6 +515,9 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         panelFormularioEquipo.updateIntegrantesCountLabel();
     }
 
+    /**
+     * Actualiza la etiqueta que muestra el conteo actual y máximo de participantes en el torneo seleccionado.
+     */
     private void actualizarContadorParticipantes() {
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
         if (torneoSeleccionado != null) {
