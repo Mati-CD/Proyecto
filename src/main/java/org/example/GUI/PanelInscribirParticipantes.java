@@ -351,7 +351,7 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
                 return;
             }
             if (correo.isEmpty() || !correo.endsWith("@gmail.com")) {
-                GuiUtils.showMessageOnce(this, "Por favor ingrese un correo válido (no vacío y debe terminar en @gmail.com).", "Error", JOptionPane.ERROR_MESSAGE);
+                GuiUtils.showMessageOnce(this, "Por favor ingrese un correo válido", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 

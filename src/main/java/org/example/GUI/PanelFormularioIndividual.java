@@ -135,8 +135,11 @@ public class PanelFormularioIndividual extends JPanel {
     }
 
     public String getCorreo() {
-        return fieldCorreoUsuario.getText().trim() + "@gmail.com";
+        String usuario = fieldCorreoUsuario.getText().trim();
+        if (usuario.isEmpty()) return "";
+        return usuario + "@gmail.com";
     }
+
 
     /**
      * Limpia todos los campos del formulario.
