@@ -378,7 +378,8 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
     private void clickEliminarParticipanteBtn() {
         int selectedIndex = participantesList.getSelectedIndex();
         if (selectedIndex == -1) {
-            GuiUtils.showMessageOnce(this, "Por favor, seleccione un participante de la lista para eliminar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            GuiUtils.showMessageOnce(this, "Por favor, seleccione un participante de la lista para eliminar.",
+                    "Advertencia", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -386,14 +387,16 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
 
         if (torneoSeleccionado == null) {
-            GuiUtils.showMessageOnce(this, "No hay un torneo seleccionado para eliminar el participante.", "Error", JOptionPane.ERROR_MESSAGE);
+            GuiUtils.showMessageOnce(this, "No hay un torneo seleccionado para eliminar el participante.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
+        // Buscar el participante por su nombre de torneo (que incluye país para individuales)
         Participante buscarParticipante = null;
         List<Participante> participantesEnTorneo = gestorTorneos.getParticipantesDeTorneo(torneoSeleccionado.getNombre());
         for (Participante p : participantesEnTorneo) {
-            if (p.getNombre().equals(participanteSeleccionado)) {
+            if (p.getNombreForTorneo().equals(participanteSeleccionado)) {
                 buscarParticipante = p;
                 break;
             }
@@ -401,16 +404,17 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
 
         if (buscarParticipante != null) {
             int confirmar = JOptionPane.showConfirmDialog(this,
-                    "¿Está seguro de que desea eliminar a '" + participanteSeleccionado + "' del torneo '" + torneoSeleccionado.getNombre() + "'?",
+                    "¿Está seguro de que desea eliminar a '" + participanteSeleccionado +
+                            "' del torneo '" + torneoSeleccionado.getNombre() + "'?",
                     "Confirmar Eliminación",
                     JOptionPane.YES_NO_OPTION);
             if (confirmar == JOptionPane.YES_OPTION) {
                 gestorTorneos.removeParticipanteDeTorneo(torneoSeleccionado.getNombre(), buscarParticipante);
                 cargarParticipantesTorneoSeleccionado();
             }
-        }
-        else {
-            GuiUtils.showMessageOnce(this, "ERROR: No se pudo encontrar el participante seleccionado en la lista del torneo.", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            GuiUtils.showMessageOnce(this, "ERROR: No se pudo encontrar el participante seleccionado en la lista del torneo.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
