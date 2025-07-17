@@ -26,7 +26,7 @@ public class PanelVerParticipantes extends JPanel implements PanelConfigurable, 
      */
     public PanelVerParticipantes() {
         super(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         try {
             backgroundImage = ImageIO.read(getClass().getResource("/images/image1.png"));
@@ -112,7 +112,7 @@ public class PanelVerParticipantes extends JPanel implements PanelConfigurable, 
                     int b = rgb & 0xff;
 
                     int gray = (r + g1 + b) / 3;
-                    int lightGray = Math.min(gray + 40, 255); // aclarado
+                    int lightGray = Math.min(gray + 40, 255);
 
                     int grayRgb = (a << 24) | (lightGray << 16) | (lightGray << 8) | lightGray;
                     grayImage.setRGB(x, y, grayRgb);

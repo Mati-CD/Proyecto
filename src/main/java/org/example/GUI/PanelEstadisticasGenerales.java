@@ -28,16 +28,14 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
      */
     public PanelEstadisticasGenerales() {
         super(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // Carga la imagen de fondo y genera versión en gris aclarado
         try {
             backgroundImage = ImageIO.read(getClass().getResource("/images/image1.png"));
             if (backgroundImage == null) {
                 System.err.println("No se encontró la imagen en /images/image1.png");
                 setBackground(new Color(230, 230, 230));
             } else {
-                // Crear imagen gris aclarada solo una vez para rendimiento
                 grayImage = new BufferedImage(
                         backgroundImage.getWidth(),
                         backgroundImage.getHeight(),
@@ -70,7 +68,6 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
 
-        // Botón "Volver atrás" con fondo gris claro y texto negro, hover gris
         Font botonFont = new Font("Arial", Font.BOLD, 12);
         irAtrasBtn = new PanelButton("Volver atrás", botonFont);
         irAtrasBtn.setButtonColor(
@@ -104,6 +101,7 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
         torneosComboBox = new JComboBox<>();
         torneosModel = new DefaultComboBoxModel<>();
         torneosComboBox.setModel(torneosModel);
+        torneosComboBox.setRenderer(new GuiUtils.ComboBoxRenderer<>(Torneo::getNombre));
         torneosComboBox.setFont(font);
         torneoPanel.add(torneosComboBox);
         centerPanel.add(torneoPanel, BorderLayout.NORTH);
@@ -134,6 +132,12 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
         }
     }
 
+    /**
+     * Inicializa el panel cargando los torneos y asignando acciones a los botones.
+     *
+     * @param actionAssigner objeto que permite obtener acciones asociadas a eventos
+     * @param gestorTorneos gestor que contiene la lógica de los torneos
+     */
     @Override
     public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         this.gestorTorneos = gestorTorneos;

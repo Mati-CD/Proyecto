@@ -120,12 +120,12 @@ public class Torneo extends ObserverController {
 
     public List<Participante> sorteoParticipantesRandom(List<Participante> participantesActuales) {
         if (!fases.isEmpty()) {
-            notificarObservers("No se puede generar un nuevo bracket porque el torneo '" + nombre + "' ya ha comenzado");
+            notificarObservers("ERROR_BRACKET_GENERACION:No se puede generar un nuevo bracket porque el torneo '" + nombre + "' ya ha comenzado");
             return null;
         }
 
         if (participantesActuales.size() != numParticipantes) {
-            notificarObservers("Para generar un bracket del torneo '" + nombre + "' se requieren " + numParticipantes + " participantes." +
+            notificarObservers("ERROR_BRACKET_PARTICIPANTES:Para generar un bracket del torneo '" + nombre + "' se requieren " + numParticipantes + " participantes." +
                     "\nActualmente hay " + participantesActuales.size() + ".");
             return null;
         }
@@ -140,11 +140,11 @@ public class Torneo extends ObserverController {
      */
     public void iniciarTorneo(List<Participante> participantesSorteados) {
         if (!fases.isEmpty()) {
-            notificarObservers("El torneo '" + nombre + "' ya ha sido iniciado.");
+            notificarObservers("ADVERTENCIA_TORNEO_INICIADO:El torneo '" + nombre + "' ya ha sido iniciado.");
             return;
         }
         if (participantesSorteados.size() != numParticipantes) {
-            notificarObservers("La lista de participantes para iniciar el torneo tiene una cantidad incorrecta. Se esperaban " + numParticipantes + " y se recibieron " + participantesSorteados.size() + ".");
+            notificarObservers("ADVERTENCIA_PARTICIPANTES_INCORRECTOS:La lista de participantes para iniciar el torneo tiene una cantidad incorrecta. Se esperaban " + numParticipantes + " y se recibieron " + participantesSorteados.size() + ".");
             return;
         }
 
@@ -153,7 +153,7 @@ public class Torneo extends ObserverController {
         this.participantes.addAll(participantesSorteados);
 
         crearFaseInicial();
-        notificarObservers("Torneo '" + nombre + "' iniciado con " + this.participantes.size() + " participantes.");
+        notificarObservers("EXITO_TORNEO_INICIADO:Torneo '" + nombre + "' iniciado con " + this.participantes.size() + " participantes.");
         notificarObservers(getFaseActual().getNombre() + " programada");
         notificarObservers("EVENTO_SALTO_DE_LINEA:");
     }

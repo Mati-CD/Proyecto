@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Panel que permite eliminar torneos existentes desde una lista desplegable.
+ * PanelEliminarTorneo permite al usuario seleccionar y eliminar un torneo desde una lista desplegable.
  */
 public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, TorneoObserver {
     private GestorTorneos gestorTorneos;
@@ -21,9 +21,14 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
     private boolean listenersActivos = false;
 
     private BufferedImage backgroundImage;
+    private final Dimension size2 = new Dimension(120, 30);
     private final Font componentFont1 = new Font("SansSerif", Font.BOLD, 14);
+    private final Font componentFont2 = new Font("Arial", Font.BOLD, 12);
 
-
+    /**
+     * Constructor que inicializa el panel, sus componentes visuales,
+     * carga la imagen de fondo y configura la interfaz.
+     */
     public PanelEliminarTorneo() {
         super(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
@@ -48,16 +53,17 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
             setBackground(new Color(195, 0, 0));
         }
 
-        Font fontBoton = new Font("SansSerif", Font.BOLD, 14);
         Font fontTitulo = new Font("Arial", Font.BOLD, 24);
 
-        // Botón Volver atrás con estilo personalizado
-        irAtrasBtn = new PanelButton("Volver atrás", fontBoton);
-        irAtrasBtn.setButtonPreferredSize(new Dimension(150, 40));
-        aplicarEstiloVolverAtras(irAtrasBtn);
+        irAtrasBtn = new PanelButton("Volver atrás", componentFont2);
+        irAtrasBtn.setButtonPreferredSize(size2);
+        irAtrasBtn.setButtonColor(new Color(50, 50, 50),
+                Color.WHITE,
+                Color.GRAY,
+                1
+        );
 
-        // Botón Eliminar con estilo original (rojo)
-        eliminarBtn = new PanelButton("Eliminar Torneo", fontBoton);
+        eliminarBtn = new PanelButton("Eliminar Torneo", componentFont1);
         eliminarBtn.setButtonPreferredSize(new Dimension(200, 50));
         eliminarBtn.setButtonColor(
                 new Color(231, 76, 60), // rojo
@@ -96,7 +102,6 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
         comboPanel.add(torneosComboBox);
         centerPanel.add(comboPanel, BorderLayout.NORTH);
 
-        // Línea: botón eliminar
         JPanel botonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         botonPanel.setOpaque(false);
         botonPanel.setBackground(Color.WHITE);
@@ -107,18 +112,6 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
         centerPanel.add(botonPanel);
 
         add(centerPanel, BorderLayout.CENTER);
-    }
-
-    /**
-     * Aplica estilo personalizado solo al botón "Volver atrás"
-     */
-    private void aplicarEstiloVolverAtras(PanelButton boton) {
-        boton.setButtonColor(
-                new Color(220, 220, 220),
-                Color.BLACK,
-                new Color(200, 200, 200),
-                0
-        );
     }
 
     @Override
@@ -153,20 +146,30 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
 
     @Override
     public void actualizar(String mensaje) {
-        if (mensaje.contains("No se puede eliminar un torneo")) {
-            GuiUtils.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (mensaje.contains("No se encontró el torneo")) {
-            GuiUtils.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (mensaje.contains("eliminado exitosamente")) {
-            GuiUtils.showMessageOnce(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
-        }
+        SwingUtilities.invokeLater(() -> {
+            if (mensaje.startsWith("ERROR_TORNEO_NO_ELIMINABLE:")) {
+                GuiUtils.showMessageOnce(this, GuiUtils.formatearMensajeTorneo(mensaje), "Error", JOptionPane.ERROR_MESSAGE);
+            } else if (mensaje.startsWith("ERROR_TORNEO_NO_ENCONTRADO:")) {
+                GuiUtils.showMessageOnce(this, GuiUtils.formatearMensajeTorneo(mensaje), "Error", JOptionPane.ERROR_MESSAGE);
+            } else if (mensaje.startsWith("EXITO_TORNEO_ELIMINADO:")) {
+                GuiUtils.showMessageOnce(this, GuiUtils.formatearMensajeTorneo(mensaje), "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
     }
 
+    /**
+     * Carga en el combo box los torneos actualmente creados disponibles
+     * a través del gestor de torneos.
+     */
     private void cargarTorneosEnComboxBox() {
         List<Torneo> torneos = gestorTorneos.getTorneosCreados();
         GuiUtils.cargarTorneosEnComboBox(torneosComboBox, torneos);
     }
 
+    /**
+     * Muestra una confirmación antes de proceder con la eliminación.
+     * Si el usuario acepta, elimina el torneo seleccionado y actualiza la lista.
+     */
     private void clickEliminarTorneo() {
         Torneo torneoSeleccionado = (Torneo) torneosComboBox.getSelectedItem();
         if (torneoSeleccionado == null) {

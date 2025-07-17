@@ -137,11 +137,13 @@ public class PanelCrearTorneo extends JPanel implements PanelConfigurable, Torne
      */
     @Override
     public void actualizar(String mensaje) {
-        if (mensaje.contains("Ya existe un torneo con el nombre")) {
-            GuiUtils.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (mensaje.contains("Torneo creado exitosamente:")) {
-            GuiUtils.showMessageOnce(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
-        }
+        SwingUtilities.invokeLater(() -> {
+            if (mensaje.startsWith("ERROR_TORNEO_EXISTE:")) {
+                GuiUtils.showMessageOnce(this, GuiUtils.formatearMensajeTorneo(mensaje), "Error", JOptionPane.ERROR_MESSAGE);
+            } else if (mensaje.startsWith("EXITO_TORNEO_CREADO:")) {
+                GuiUtils.showMessageOnce(this, GuiUtils.formatearMensajeTorneo(mensaje), "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
     }
 
     /**

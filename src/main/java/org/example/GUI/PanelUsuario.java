@@ -28,7 +28,7 @@ public class PanelUsuario extends JPanel implements PanelConfigurable {
             backgroundImage = ImageIO.read(getClass().getResource("/images/image1.png"));
             if (backgroundImage == null) {
                 System.err.println("No se encontró la imagen en /images/image1.png");
-                setBackground(new Color(230, 230, 230)); // fondo gris claro de respaldo
+                setBackground(new Color(230, 230, 230));
             }
         } catch (IOException e) {
             e.printStackTrace();

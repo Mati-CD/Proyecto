@@ -176,16 +176,16 @@ public class PanelIniciarTorneo extends JPanel implements PanelConfigurable, Tor
      */
     @Override
     public void actualizar(String mensaje) {
-        if (mensaje.contains("No se puede generar un nuevo bracket")) {
-            GuiUtils.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (mensaje.contains("Para generar un bracket del torneo '") && mensaje.contains("se requieren ") && mensaje.contains("participantes.") && mensaje.contains("Actualmente hay")) {
-            GuiUtils.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (mensaje.contains("ya ha sido iniciado")) {
-            GuiUtils.showMessageOnce(this, mensaje, "Advertencia", JOptionPane.WARNING_MESSAGE);
-        } else if (mensaje.contains("una cantidad incorrecta. Se esperaban")) {
-            GuiUtils.showMessageOnce(this, mensaje, "Advertencia", JOptionPane.WARNING_MESSAGE);
-        } else if (mensaje.contains("iniciado con")){
-            GuiUtils.showMessageOnce(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        if (mensaje.startsWith("ERROR_BRACKET_GENERACION:")) {
+            GuiUtils.showMessageOnce(this, GuiUtils.formatearMensajeTorneo(mensaje), "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (mensaje.startsWith("ERROR_BRACKET_PARTICIPANTES:")) {
+            GuiUtils.showMessageOnce(this, GuiUtils.formatearMensajeTorneo(mensaje), "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (mensaje.startsWith("ADVERTENCIA_TORNEO_INICIADO:")) {
+            GuiUtils.showMessageOnce(this, GuiUtils.formatearMensajeTorneo(mensaje), "Advertencia", JOptionPane.WARNING_MESSAGE);
+        } else if (mensaje.startsWith("ADVERTENCIA_PARTICIPANTES_INCORRECTOS:")) {
+            GuiUtils.showMessageOnce(this, GuiUtils.formatearMensajeTorneo(mensaje), "Advertencia", JOptionPane.WARNING_MESSAGE);
+        } else if (mensaje.startsWith("EXITO_TORNEO_INICIADO:")) {
+            GuiUtils.showMessageOnce(this, GuiUtils.formatearMensajeTorneo(mensaje), "Éxito", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 

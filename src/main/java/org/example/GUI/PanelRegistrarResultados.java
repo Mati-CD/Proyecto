@@ -239,10 +239,18 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
     @Override
     public void actualizar(String mensaje) {
         SwingUtilities.invokeLater(() -> {
-            if (notificacionVisibleParaOrganizador(mensaje)) {
-                String mensajeFormateado = formatearNotificacionTorneo(mensaje);
-                infoTorneoArea.append(mensajeFormateado + "\n");
-                infoTorneoArea.setCaretPosition(infoTorneoArea.getDocument().getLength());
+            if (mensaje.startsWith("ERROR_BRACKET_GENERACION:") || mensaje.startsWith("ERROR_BRACKET_PARTICIPANTES:")) {
+                GuiUtils.showMessageOnce(this, GuiUtils.formatearMensajeTorneo(mensaje), "Error", JOptionPane.ERROR_MESSAGE);
+            } else if (mensaje.startsWith("ADVERTENCIA_TORNEO_INICIADO:") || mensaje.startsWith("ADVERTENCIA_PARTICIPANTES_INCORRECTOS:")) {
+                GuiUtils.showMessageOnce(this, GuiUtils.formatearMensajeTorneo(mensaje), "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (mensaje.startsWith("EXITO_TORNEO_INICIADO:")) {
+                GuiUtils.showMessageOnce(this, GuiUtils.formatearMensajeTorneo(mensaje), "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            }
+            else {
+                if (notificacionVisibleParaOrganizador(mensaje)) {
+                    infoTorneoArea.append(GuiUtils.formatearMensajeTorneo(mensaje) + "\n");
+                    infoTorneoArea.setCaretPosition(infoTorneoArea.getDocument().getLength());
+                }
             }
         });
     }
@@ -272,8 +280,7 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
             StringBuilder tempLog = new StringBuilder();
             for (String mensaje : actualObservedTorneo.getHistorialNotificaciones()) {
                 if (notificacionVisibleParaOrganizador(mensaje)) {
-                    String mensajeFormateado = formatearNotificacionTorneo(mensaje);
-                    tempLog.append(mensajeFormateado).append("\n");
+                    tempLog.append(GuiUtils.formatearMensajeTorneo(mensaje)).append("\n");
                 }
             }
             infoTorneoArea.setText(tempLog.toString());
@@ -281,19 +288,6 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         } else {
             infoTorneoArea.setText("Seleccione un torneo para ver sus últimas actualizaciones.");
         }
-    }
-
-    private String formatearNotificacionTorneo(String mensaje) {
-        String mensajeFormateado = mensaje;
-
-        if (mensaje.startsWith("EVENTO_PARTIDO_FINALIZADO:")) {
-            return mensaje.substring("EVENTO_PARTIDO_FINALIZADO:".length());
-        } else if (mensaje.startsWith("EVENTO_GANADOR_SELECCIONADO:")) {
-            return mensaje.substring("EVENTO_GANADOR_SELECCIONADO:".length());
-        } else if (mensaje.startsWith("EVENTO_SALTO_DE_LINEA:")) {
-            return "";
-        }
-        return mensajeFormateado;
     }
 
     private boolean notificacionVisibleParaOrganizador(String mensaje) {

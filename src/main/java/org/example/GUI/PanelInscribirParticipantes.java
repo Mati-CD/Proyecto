@@ -256,20 +256,18 @@ public class PanelInscribirParticipantes extends JPanel implements PanelConfigur
         this.repaint();
     }
 
-    @Override
     public void actualizar(String mensaje) {
-        if (mensaje.contains("ya está inscrito en el torneo")) {
-            GuiUtils.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (mensaje.contains("máximo de inscritos para este torneo")) {
-            GuiUtils.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (mensaje.contains("Participante inscrito exitosamente:")) {
-            GuiUtils.showMessageOnce(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
-        } else if (mensaje.contains("No se puede eliminar participantes de un torneo que ya ha iniciado.")) {
-            GuiUtils.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (mensaje.contains("no se encontró en el torneo")) {
-            GuiUtils.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (mensaje.contains("eliminado exitosamente del torneo")) {
-            GuiUtils.showMessageOnce(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        if (mensaje.startsWith("ERROR_PARTICIPANTE_DUPLICADO:") ||
+                mensaje.startsWith("ERROR_TORNEO_LLENO:") ||
+                mensaje.startsWith("ERROR_TORNEO_INICIADO:") ||
+                mensaje.startsWith("ERROR_PARTICIPANTE_NO_ENCONTRADO:") ||
+                mensaje.startsWith("ERROR_TORNEO_NO_ENCONTRADO:") ||
+                mensaje.startsWith("ERROR_PARTICIPANTE_NULO:") ||
+                mensaje.startsWith("ERROR_INSCRIPCION_FALLIDA:")) {
+            GuiUtils.showMessageOnce(this, GuiUtils.formatearMensajeTorneo(mensaje), "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (mensaje.startsWith("EXITO_PARTICIPANTE_INSCRITO:") ||
+                mensaje.startsWith("EXITO_PARTICIPANTE_ELIMINADO:")) {
+            GuiUtils.showMessageOnce(this, GuiUtils.formatearMensajeTorneo(mensaje), "Éxito", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 

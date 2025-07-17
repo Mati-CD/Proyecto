@@ -1,6 +1,7 @@
 package org.example.GUI;
 
 import org.example.CodigoLogico.*;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +21,7 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
 
     public PanelEstadoActualTorneo() {
         super(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         // Cargar imagen de fondo y crear versión gris aclarada
         try {
@@ -154,7 +155,6 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
             torneo.registrarObserver(this);
         }
 
-        // Restaurar la selección anterior si todavía existe
         if (seleccionado != null && torneos.contains(seleccionado)) {
             torneosComboBox.setSelectedItem(seleccionado);
         } else if (torneosModel.getSize() > 0) {

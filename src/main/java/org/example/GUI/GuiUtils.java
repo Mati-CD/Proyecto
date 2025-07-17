@@ -121,4 +121,16 @@ public class GuiUtils {
             }
         }
     }
+
+    /**
+     * Extrae el contenido de un mensaje en formato TAG:mensaje.
+     * Si no contiene ":", retorna el mensaje tal cual.
+     *
+     * @param mensaje El mensaje completo con tag opcional.
+     * @return El contenido del mensaje sin el tag.
+     */
+    public static String formatearMensajeTorneo(String mensaje) {
+        if (mensaje == null || !mensaje.contains(":")) return mensaje;
+        return mensaje.substring(mensaje.indexOf(':') + 1);
+    }
 }
