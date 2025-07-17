@@ -22,6 +22,12 @@ public class PanelUsuario extends JPanel implements PanelConfigurable {
 
         Font font1 = new Font("Arial", Font.BOLD, 12);
         irAInicioBtn = new PanelButton("Volver al Inicio", font1);
+        irAInicioBtn.setButtonColor(
+                new Color(220, 220, 220),  // color base gris claro
+                Color.BLACK,               // texto negro
+                new Color(200, 200, 200),  // hover un poco más oscuro
+                0                         // sin borde
+        );
 
         // Panel para posicionar el botón de volver
         JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));

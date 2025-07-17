@@ -3,36 +3,34 @@ package org.example.GUI;
 import org.example.CodigoLogico.*;
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
-/**
- * Panel que muestra el estado actual de un torneo, incluyendo sus fases, partidos y próximos encuentros.
- */
 public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable, TorneoObserver {
     private GestorTorneos gestorTorneos;
     private PanelButton irAtrasBtn;
     private JComboBox<Torneo> torneosComboBox;
-    private JTextArea estadoTorneoArea;
-    private JList<String> encuentrosList;
-    private DefaultListModel<String> encuentrosModel;
+    private JTextArea estadoArea;
     private boolean listenersAdded = false;
 
-    /**
-     * Crea el panel con el diseño gráfico correspondiente al estado actual del torneo y próximos encuentros.
-     */
     public PanelEstadoActualTorneo() {
         super(new BorderLayout());
-        setBackground(new Color(0, 32, 142));
+        setBackground(new Color(200, 180, 220));
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         Font font = new Font("SansSerif", Font.BOLD, 16);
         Font titleFont = new Font("Arial", Font.BOLD, 24);
 
-        // Panel superior con botón de volver y título
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
 
-        irAtrasBtn = new PanelButton("Volver atrás", font);
+        Font botonFont = new Font("Arial", Font.BOLD, 12);
+        irAtrasBtn = new PanelButton("Volver atrás", botonFont);
+        irAtrasBtn.setButtonColor(
+                new Color(220, 220, 220),
+                Color.BLACK,
+                new Color(200, 200, 200),
+                0
+        );
+
         JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topLeftPanel.setOpaque(false);
         topLeftPanel.add(irAtrasBtn);
@@ -41,48 +39,31 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
         JLabel titleLabel = new JLabel("Estado Actual del Torneo", SwingConstants.CENTER);
         titleLabel.setFont(titleFont);
         topPanel.add(titleLabel, BorderLayout.CENTER);
+
         add(topPanel, BorderLayout.NORTH);
 
-        // Panel central con selector de torneo
         JPanel centerPanel = new JPanel(new BorderLayout(10, 10));
         centerPanel.setOpaque(false);
         centerPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
         JPanel torneoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         torneoPanel.setOpaque(false);
-        torneoPanel.add(new JLabel("Seleccione torneo:"));
+        JLabel torneoLabel = new JLabel("Seleccione torneo:");
+        torneoLabel.setForeground(Color.WHITE);
+        torneoPanel.add(torneoLabel);
+
         torneosComboBox = new JComboBox<>();
         torneosComboBox.setFont(font);
         torneoPanel.add(torneosComboBox);
         centerPanel.add(torneoPanel, BorderLayout.NORTH);
 
-        // Panel dividido para estado y próximos encuentros
-        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        splitPane.setResizeWeight(0.6); // 60% para el estado, 40% para próximos encuentros
-        splitPane.setDividerLocation(400);
-        splitPane.setOpaque(false);
-
-        // Área de texto para el estado del torneo
-        estadoTorneoArea = new JTextArea();
-        estadoTorneoArea.setEditable(false);
-        estadoTorneoArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
-        estadoTorneoArea.setLineWrap(true);
-        estadoTorneoArea.setWrapStyleWord(true);
-        estadoTorneoArea.setBackground(new Color(240, 240, 240));
-        JScrollPane estadoScroll = new JScrollPane(estadoTorneoArea);
-        estadoScroll.setBorder(BorderFactory.createTitledBorder("Estado del Torneo"));
-
-        // Lista para próximos encuentros
-        encuentrosModel = new DefaultListModel<>();
-        encuentrosList = new JList<>(encuentrosModel);
-        encuentrosList.setFont(font);
-        encuentrosList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane encuentrosScroll = new JScrollPane(encuentrosList);
-        encuentrosScroll.setBorder(BorderFactory.createTitledBorder("Próximos Encuentros"));
-
-        splitPane.setTopComponent(estadoScroll);
-        splitPane.setBottomComponent(encuentrosScroll);
-        centerPanel.add(splitPane, BorderLayout.CENTER);
+        estadoArea = new JTextArea();
+        estadoArea.setEditable(false);
+        estadoArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        estadoArea.setLineWrap(true);
+        estadoArea.setWrapStyleWord(true);
+        estadoArea.setBackground(new Color(240, 240, 240));
+        centerPanel.add(new JScrollPane(estadoArea), BorderLayout.CENTER);
 
         add(centerPanel, BorderLayout.CENTER);
     }
@@ -90,109 +71,89 @@ public class PanelEstadoActualTorneo extends JPanel implements PanelConfigurable
     @Override
     public void inicializar(ActionAssigner actionAssigner, GestorTorneos gestorTorneos) {
         this.gestorTorneos = gestorTorneos;
+        gestorTorneos.registrarObserver(this); // Registrar este panel como observer del gestor
 
         if (!listenersAdded) {
             irAtrasBtn.addActionListener(actionAssigner.getAction(ActionGUI.IR_A_USUARIO.getID()));
-
-            DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
-            for (Torneo torneo : gestorTorneos.getTorneosCreados()) {
-                model.addElement(torneo);
-                torneo.registrarObserver(this);
-            }
-            torneosComboBox.setModel(model);
-            torneosComboBox.addActionListener(e -> {
-                actualizarEstadoTorneo();
-                actualizarProximosEncuentros();
-            });
-
+            actualizarListaTorneos();
+            torneosComboBox.addActionListener(e -> mostrarEstadoTorneo());
             listenersAdded = true;
         }
 
-        actualizarEstadoTorneo();
-        actualizarProximosEncuentros();
-        this.revalidate();
-        this.repaint();
+        mostrarEstadoTorneo();
     }
 
-    /**
-     * Actualiza el estado mostrado del torneo seleccionado, incluyendo su fase y resultados.
-     */
-    private void actualizarEstadoTorneo() {
+    private void actualizarListaTorneos() {
+        SwingUtilities.invokeLater(() -> {
+            Torneo seleccionado = (Torneo) torneosComboBox.getSelectedItem();
+            DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
+
+            for (Torneo torneo : gestorTorneos.getTorneosCreados()) {
+                model.addElement(torneo);
+                torneo.registrarObserver(this); // Registrar como observer de cada torneo
+            }
+
+            torneosComboBox.setModel(model);
+
+            // Restaurar selección si el torneo sigue existiendo
+            if (seleccionado != null) {
+                for (int i = 0; i < model.getSize(); i++) {
+                    if (model.getElementAt(i).getNombre().equals(seleccionado.getNombre())) {
+                        torneosComboBox.setSelectedIndex(i);
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    private void mostrarEstadoTorneo() {
         Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
+        StringBuilder sb = new StringBuilder();
+
         if (torneo != null) {
-            StringBuilder sb = new StringBuilder();
-
-            sb.append("=== ").append(torneo.getNombre()).append(" ===\n");
+            sb.append("=== ESTADO DEL TORNEO ===\n\n");
+            sb.append("Nombre: ").append(torneo.getNombre()).append("\n");
             sb.append("Disciplina: ").append(torneo.getDisciplina()).append("\n");
-            sb.append("Tipo de inscripción: ").append(torneo.getTipoDeInscripcion()).append("\n");
-            sb.append("Total participantes: ").append(torneo.getParticipantes().size()).append("\n");
+            sb.append("Participantes: ").append(torneo.getParticipantes().size())
+                    .append("/").append(torneo.getNumParticipantes()).append("\n");
 
-            if (torneo.tieneCampeon()) {
-                sb.append("\n¡¡¡ CAMPEÓN: ").append(torneo.getCampeon()).append(" !!!\n");
-            } else if (!torneo.getFases().isEmpty()) {
-                sb.append("\nEstado actual: En progreso\n");
-            } else {
-                sb.append("\nEstado actual: Sin iniciar\n");
-            }
-
-            for (FaseTorneo fase : torneo.getFases()) {
-                sb.append("\n=== ").append(fase.getNombre().toUpperCase()).append(" ===\n");
-                for (TorneoComponent componente : fase.getComponentes()) {
-                    Partido partido = (Partido) componente;
-                    sb.append(partido.getJugador1()).append(" vs ").append(partido.getJugador2());
-                    if (partido.getGanador() != null) {
-                        sb.append(" -> Ganador: ").append(partido.getGanador());
-                    }
-                    sb.append("\n");
-                }
-            }
-
-            estadoTorneoArea.setText(sb.toString());
-        } else {
-            estadoTorneoArea.setText("No hay torneos disponibles");
-        }
-    }
-
-    /**
-     * Actualiza la lista de próximos encuentros según el torneo seleccionado.
-     */
-    private void actualizarProximosEncuentros() {
-        Torneo torneo = (Torneo) torneosComboBox.getSelectedItem();
-        encuentrosModel.clear();
-
-        if (torneo != null && !torneo.getFases().isEmpty()) {
-            FaseTorneo faseActual = torneo.getFaseActual();
-
-            if (faseActual != null) {
-                for (TorneoComponent componente : faseActual.getComponentes()) {
-                    Partido partido = (Partido) componente;
-                    if (!partido.tieneResultado()) {
-                        encuentrosModel.addElement(partido.getJugador1() + " vs " + partido.getJugador2());
+            if (!torneo.getFases().isEmpty()) {
+                sb.append("\n=== FASES ===\n");
+                for (FaseTorneo fase : torneo.getFases()) {
+                    sb.append("\n").append(fase.getNombre()).append(":\n");
+                    for (TorneoComponent componente : fase.getComponentes()) {
+                        Partido partido = (Partido) componente;
+                        sb.append("- ").append(partido.getJugador1())
+                                .append(" vs ").append(partido.getJugador2())
+                                .append(": ").append(partido.getGanador() != null ?
+                                        "Ganador: " + partido.getGanador() : "En juego")
+                                .append("\n");
                     }
                 }
-            }
 
-            if (encuentrosModel.isEmpty()) {
-                encuentrosModel.addElement("No hay próximos encuentros pendientes");
                 if (torneo.tieneCampeon()) {
-                    encuentrosModel.addElement("El torneo ha finalizado");
-                } else {
-                    encuentrosModel.addElement("Esperando siguiente fase...");
+                    sb.append("\n¡CAMPEÓN: ").append(torneo.getCampeon()).append("!\n");
                 }
+            } else {
+                sb.append("\nEl torneo no ha comenzado.\n");
             }
         } else {
-            encuentrosModel.addElement("Seleccione un torneo iniciado");
+            sb.append("No hay torneos disponibles.\n");
         }
+
+        estadoArea.setText(sb.toString());
+        estadoArea.setCaretPosition(0); // Mover scroll al inicio
     }
 
     @Override
     public void actualizar(String mensaje) {
-        SwingUtilities.invokeLater(() -> {
-            actualizarEstadoTorneo();
-            actualizarProximosEncuentros();
-            if (mensaje.contains("ERROR") || mensaje.contains("Campeón")) {
-                JOptionPane.showMessageDialog(this, mensaje);
-            }
-        });
+        // Reaccionar a cambios relevantes
+        if (mensaje.contains("Torneo creado") || mensaje.contains("Torneo eliminado") ||
+                mensaje.contains("iniciado") || mensaje.contains("finalizado") ||
+                mensaje.contains("Campeón declarado")) {
+            actualizarListaTorneos();
+        }
+        mostrarEstadoTorneo();
     }
 }

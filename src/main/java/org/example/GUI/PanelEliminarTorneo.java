@@ -1,10 +1,14 @@
 package org.example.GUI;
 
 import org.example.CodigoLogico.*;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Panel que permite eliminar torneos existentes desde una lista desplegable.
+ */
 public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, TorneoObserver {
     private GestorTorneos gestorTorneos;
     private PanelButton irAtrasBtn;
@@ -14,49 +18,77 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
 
     public PanelEliminarTorneo() {
         super(new BorderLayout());
-        setBackground(new Color(200, 50, 50));
-        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        setBackground(Color.WHITE); // Fondo unificado
+        setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
 
-        Font font = new Font("SansSerif", Font.BOLD, 14);
-        Font font1 = new Font("Arial", Font.BOLD, 12);
-        Font titleFont = new Font("Arial", Font.BOLD, 24);
+        Font fontBoton = new Font("SansSerif", Font.BOLD, 14);
+        Font fontTitulo = new Font("Arial", Font.BOLD, 24);
 
-        // Inicializar Componentes
-        irAtrasBtn = new PanelButton("Volver atrás", font1);
-        irAtrasBtn.setButtonPreferredSize(new Dimension(120, 30));
-        eliminarBtn = new PanelButton("Eliminar Torneo", font);
+        // Botón Volver atrás con estilo personalizado
+        irAtrasBtn = new PanelButton("Volver atrás", fontBoton);
+        irAtrasBtn.setButtonPreferredSize(new Dimension(150, 40));
+        aplicarEstiloVolverAtras(irAtrasBtn);
+
+        // Botón Eliminar con estilo original (rojo)
+        eliminarBtn = new PanelButton("Eliminar Torneo", fontBoton);
         eliminarBtn.setButtonPreferredSize(new Dimension(200, 50));
-        eliminarBtn.setBackground(Color.RED);
-        eliminarBtn.setForeground(Color.WHITE);
-        torneosComboBox = new JComboBox<>();
-        torneosComboBox.setFont(font);
-        torneosComboBox.setRenderer(new GuiUtils.ComboBoxRenderer<>(Torneo::getNombre));
+        eliminarBtn.setButtonColor(
+                new Color(231, 76, 60), // rojo
+                Color.WHITE,
+                new Color(192, 57, 43), 2
+        );
 
-        // Panel superior
-        JPanel topPanel = GuiUtils.crearPanelDeEncabezado(irAtrasBtn,
-                "Eliminar Torneo",
-                titleFont,
+        // ComboBox
+        torneosComboBox = new JComboBox<>();
+        torneosComboBox.setFont(fontBoton);
+        torneosComboBox.setRenderer(new GuiUtils.ComboBoxRenderer<>(Torneo::getNombre));
+        torneosComboBox.setPreferredSize(new Dimension(300, 35));
+
+        // Título y encabezado
+        JPanel topPanel = GuiUtils.crearPanelDeEncabezado(
+                irAtrasBtn,
+                "",
+                fontTitulo,
                 null
         );
         add(topPanel, BorderLayout.NORTH);
 
         // Panel central
-        JPanel centerPanel = new JPanel(new GridLayout(2, 1, 10, 10));
-        centerPanel.setOpaque(false);
-        centerPanel.setBorder(BorderFactory.createEmptyBorder(50, 50, 50, 50));
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.setBackground(Color.WHITE);
+        centerPanel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        JPanel comboPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        comboPanel.setOpaque(false);
-        comboPanel.add(new JLabel("Seleccione torneo a eliminar:"));
+        // Línea: combo y label
+        JPanel comboPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        comboPanel.setBackground(Color.WHITE);
+        JLabel label = new JLabel("Seleccione torneo a eliminar:");
+        label.setFont(fontBoton);
+        comboPanel.add(label);
         comboPanel.add(torneosComboBox);
-        centerPanel.add(comboPanel);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        buttonPanel.setOpaque(false);
-        buttonPanel.add(eliminarBtn);
-        centerPanel.add(buttonPanel);
+        // Línea: botón eliminar
+        JPanel botonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        botonPanel.setBackground(Color.WHITE);
+        botonPanel.add(eliminarBtn);
+
+        centerPanel.add(comboPanel);
+        centerPanel.add(Box.createVerticalStrut(20));
+        centerPanel.add(botonPanel);
 
         add(centerPanel, BorderLayout.CENTER);
+    }
+
+    /**
+     * Aplica estilo personalizado solo al botón "Volver atrás"
+     */
+    private void aplicarEstiloVolverAtras(PanelButton boton) {
+        boton.setButtonColor(
+                new Color(220, 220, 220),  // Fondo gris claro
+                Color.BLACK,               // Texto negro
+                new Color(200, 200, 200),  // Fondo hover gris más oscuro
+                0                         // Sin borde
+        );
     }
 
     @Override
@@ -72,8 +104,8 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
 
         cargarTorneosEnComboxBox();
 
-        this.revalidate();
-        this.repaint();
+        revalidate();
+        repaint();
     }
 
     @Override
@@ -82,8 +114,7 @@ public class PanelEliminarTorneo extends JPanel implements PanelConfigurable, To
             GuiUtils.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
         } else if (mensaje.contains("No se encontró el torneo")) {
             GuiUtils.showMessageOnce(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-        }
-        else if (mensaje.contains("eliminado exitosamente")) {
+        } else if (mensaje.contains("eliminado exitosamente")) {
             GuiUtils.showMessageOnce(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
         }
     }

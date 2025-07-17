@@ -6,8 +6,8 @@ import java.awt.*;
 /**
  * Panel que contiene los botones principales para el usuario normal.
  *
- * Permite acceder a distintas secciones, sea para ver el estado actual del torneo, proximos encuentros,
- * estadisticas o los participantes.
+ * Permite acceder a distintas secciones, sea para ver el estado actual del torneo, próximos encuentros,
+ * estadísticas o los participantes.
  *
  */
 public class UsuarioButtons extends JPanel {
@@ -15,45 +15,40 @@ public class UsuarioButtons extends JPanel {
     private PanelButton verEstadisticasBtn;
     private PanelButton verParticipantesBtn;
 
-    /**
-     * Constructor que crea y organiza los botones en el panel.
-     * Usa una fuente grande y un espaciado amplio entre los botones.
-     */
     public UsuarioButtons() {
         setOpaque(false);
-
-        Font font = new Font("SansSerif", Font.BOLD, 18);
-
         setLayout(new GridLayout(4, 1, 0, 100));
         setBorder(BorderFactory.createEmptyBorder(40, 150, 60, 0));
 
-        // Crear Botones
-        verEstadoActualTorneoBtn = new PanelButton("Ver estado actual del Torneo", font);
-        verEstadisticasBtn = new PanelButton("Ver estadisticas del Torneo", font);
-        verParticipantesBtn = new PanelButton("Ver datos de participantes", font);
+        verEstadoActualTorneoBtn = crearBotonEstilizado("Ver estado actual del Torneo");
+        verEstadisticasBtn = crearBotonEstilizado("Ver estadísticas del Torneo");
+        verParticipantesBtn = crearBotonEstilizado("Ver datos de participantes");
 
         add(verEstadoActualTorneoBtn);
         add(verEstadisticasBtn);
         add(verParticipantesBtn);
     }
 
-    /**
-     * @return Botón para ir a la vista de estado actual del torneo.
-     */
+    private PanelButton crearBotonEstilizado(String texto) {
+        PanelButton boton = new PanelButton(texto, new Font("SansSerif", Font.BOLD, 18));
+        boton.setButtonPreferredSize(new Dimension(250, 50));
+        boton.setButtonColor(
+                new Color(70, 130, 180),  // Azul acero
+                Color.WHITE,
+                new Color(100, 149, 237), // Azul claro
+                2
+        );
+        return boton;
+    }
+
     public PanelButton getVerEstadoActualTorneoBtn() {
         return verEstadoActualTorneoBtn;
     }
 
-    /**
-     * @return Botón para ver estadísticas del torneo.
-     */
     public PanelButton getVerEstadisticasBtn() {
         return verEstadisticasBtn;
     }
 
-    /**
-     * @return Botón para ver los datos de los participantes.
-     */
     public PanelButton getVerParticipantesBtn() {
         return verParticipantesBtn;
     }

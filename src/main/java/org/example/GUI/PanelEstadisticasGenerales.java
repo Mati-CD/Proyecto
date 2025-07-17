@@ -4,7 +4,6 @@ import org.example.CodigoLogico.*;
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,7 +30,16 @@ public class PanelEstadisticasGenerales extends JPanel implements PanelConfigura
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
 
-        irAtrasBtn = new PanelButton("Volver atrás", font);
+        // Botón "Volver atrás" con efecto hover suave y sin borde
+        Font botonFont = new Font("Arial", Font.BOLD, 12);
+        irAtrasBtn = new PanelButton("Volver atrás", botonFont);
+        irAtrasBtn.setButtonColor(
+                new Color(220, 220, 220),  // fondo base gris claro
+                Color.BLACK,               // texto negro
+                new Color(200, 200, 200),  // hover gris un poco más oscuro
+                0                         // sin borde
+        );
+
         JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topLeftPanel.setOpaque(false);
         topLeftPanel.add(irAtrasBtn);

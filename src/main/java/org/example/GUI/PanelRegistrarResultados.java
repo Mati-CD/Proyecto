@@ -35,11 +35,14 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         Font buttonFont = new Font("Arial", Font.BOLD, 12);
         Font titleFont = new Font("Arial", Font.BOLD, 24);
 
-        // Inicializar Componentes
+        // Botones con estilo uniforme
         irAtrasBtn = new PanelButton("Volver atrás", buttonFont);
         irAtrasBtn.setButtonPreferredSize(new Dimension(120, 30));
+        aplicarEstiloBoton(irAtrasBtn);
+
         registrarGanadorBtn = new PanelButton("Registrar Resultado", buttonFont);
         registrarGanadorBtn.setButtonPreferredSize(new Dimension(200, 50));
+        aplicarEstiloBoton(registrarGanadorBtn);
 
         torneosComboBox = new JComboBox<>();
         torneosComboBox.setFont(labelFont);
@@ -71,7 +74,7 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         // Panel Superior
         JPanel topPanel = GuiUtils.crearPanelDeEncabezado(
                 irAtrasBtn,
-                "Registrar Resultados",
+                "",
                 titleFont,
                 null
         );
@@ -163,6 +166,18 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         centerPanel.add(doublePanel, BorderLayout.CENTER);
 
         add(centerPanel, BorderLayout.CENTER);
+    }
+
+    /**
+     * Aplica el estilo de botón sin borde, con texto negro y efecto hover gris claro.
+     */
+    private void aplicarEstiloBoton(PanelButton boton) {
+        boton.setButtonColor(
+                new Color(220, 220, 220),  // Color base fondo gris claro
+                Color.BLACK,               // Color texto negro
+                new Color(200, 200, 200),  // Color fondo hover gris más oscuro
+                0                         // Sin borde
+        );
     }
 
     /**
