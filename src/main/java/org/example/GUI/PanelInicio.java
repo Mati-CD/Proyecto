@@ -54,11 +54,14 @@ public class PanelInicio extends JPanel implements PanelConfigurable {
                 20
         );
 
-        JPanel centerPanel = new JPanel(new GridLayout(2, 1, 20, 20));
+        JPanel centerPanel = new JPanel(new GridBagLayout());
         centerPanel.setOpaque(false);
-        centerPanel.setBorder(BorderFactory.createEmptyBorder(100, 200, 100, 200));
-        centerPanel.add(organizadorBtn);
-        centerPanel.add(usuarioBtn);
+
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 100, 0));
+        buttonPanel.setOpaque(false);
+        buttonPanel.add(organizadorBtn);
+        buttonPanel.add(usuarioBtn);
+        centerPanel.add(buttonPanel);
 
         add(centerPanel, BorderLayout.CENTER);
     }

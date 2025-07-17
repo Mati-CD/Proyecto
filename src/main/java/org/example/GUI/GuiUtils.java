@@ -9,19 +9,18 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * Clase usada para mostrar mensajes en la interfaz gráfica.
- * Nos permite trabajar con métodos reutilizables que encapsulan la lógica de diálogos con el usuario.
+ * Clase de utilidades comunes para la interfaz gráfica.
  */
 public class GuiUtils {
 
     /**
-     * Muestra un mensaje emergente (JOptionPane) de forma asíncrona en el hilo de eventos de Swing.
-     * Este metodo garantiza que el mensaje se muestre correctamente desde cualquier hilo.
+     * Muestra un mensaje emergente (JOptionPane) de forma asíncrona a los de eventos.
+     * Este metodo garantiza que el mensaje se muestre correctamente.
      *
-     * @param parentComponent el componente padre del diálogo;
-     * @param message el mensaje que se desea mostrar
-     * @param title el título del cuadro de diálogo
-     * @param messageType el tipo de mensaje
+     * @param parentComponent el componente padre del diálogo
+     * @param message         el mensaje que se desea mostrar
+     * @param title           el título del cuadro de diálogo
+     * @param messageType     el tipo de mensaje (e.g., JOptionPane.ERROR_MESSAGE)
      */
     public static void showMessageOnce(Component parentComponent, String message, String title, int messageType) {
         SwingUtilities.invokeLater(() -> {
@@ -29,12 +28,27 @@ public class GuiUtils {
         });
     }
 
+    /**
+     * Cambia el color del texto de un JLabel si el label no es nulo.
+     *
+     * @param label JLabel al que se le cambiará el color
+     * @param color nuevo color para el texto
+     */
     public static void setLabelTextColor(JLabel label, Color color) {
         if (label != null) {
             label.setForeground(color);
         }
     }
 
+    /**
+     * Crea un panel de encabezado con botones opcionales a la izquierda y derecha, y un título centrado.
+     *
+     * @param leftButton  botón opcional a la izquierda
+     * @param titleText   texto opcional del título central
+     * @param titleFont   fuente opcional del título
+     * @param rightButton botón opcional a la derecha
+     * @return el panel de encabezado
+     */
     public static JPanel crearPanelDeEncabezado(PanelButton leftButton,
             String titleText,
             Font titleFont,
@@ -43,7 +57,6 @@ public class GuiUtils {
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setOpaque(false);
 
-        // Panel para el botón izquierdo
         JPanel topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topLeftPanel.setOpaque(false);
         if (leftButton != null) {
@@ -51,12 +64,10 @@ public class GuiUtils {
         }
         topPanel.add(topLeftPanel, BorderLayout.WEST);
 
-        // Etiqueta para título central
         JLabel titleLabel = new JLabel(titleText, SwingConstants.CENTER);
         titleLabel.setFont(titleFont);
         topPanel.add(titleLabel, BorderLayout.CENTER);
 
-        // Panel para el botón derecho
         JPanel topRightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         topRightPanel.setOpaque(false);
         if (rightButton != null) {
@@ -67,12 +78,18 @@ public class GuiUtils {
         return topPanel;
     }
 
+    /**
+     * Renderizador personalizado para JComboBox que permite mostrar una representación del textode los objetos.
+     *
+     * @param <T> tipo de los elementos en la lista
+     */
     public static class ComboBoxRenderer<T> extends JLabel implements ListCellRenderer<T> {
         private final Function<T, String> textExtractor;
 
         /**
-         * Constructor para el renderer genérico.
-         * @param textExtractor Una función que toma un objeto T y devuelve la String a mostrar.
+         * Constructor que recibe una función para extraer texto de cada objeto.
+         *
+         * @param textExtractor función que define cómo mostrar cada objeto
          */
         public ComboBoxRenderer(Function<T, String> textExtractor) {
             setOpaque(true);
@@ -99,6 +116,12 @@ public class GuiUtils {
         }
     }
 
+    /**
+     * Carga una lista de torneos en un JComboBox y mantiene la selección anterior si es posible.
+     *
+     * @param torneosComboBox el combo box donde se cargarán los torneos
+     * @param listaDeTorneos lista de torneos disponibles
+     */
     public static void cargarTorneosEnComboBox(JComboBox<Torneo> torneosComboBox, List<Torneo> listaDeTorneos) {
         Torneo seleccionAnterior = (Torneo) torneosComboBox.getSelectedItem();
         DefaultComboBoxModel<Torneo> model = new DefaultComboBoxModel<>();
