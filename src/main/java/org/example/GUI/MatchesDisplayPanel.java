@@ -7,7 +7,12 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Panel que muestra los emparejamientos (brackets) de un torneo,
+ * incluyendo cuadrantes y la final.
+ */
 public class MatchesDisplayPanel extends JPanel {
+
     private CuadrantePanel cuadrante1Panel;
     private CuadrantePanel cuadrante2Panel;
     private JLabel finalMatchLabel;
@@ -22,26 +27,33 @@ public class MatchesDisplayPanel extends JPanel {
     private int numParticipantes = 0;
     private boolean bracketGenerated = false;
 
+    /**
+     * Crea el panel visual para mostrar los brackets del torneo.
+     */
     public MatchesDisplayPanel() {
         super(new BorderLayout());
         setOpaque(true);
         setBackground(Color.BLACK);
         setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
 
+        // Inicializa cuadrantes
         cuadrante1Panel = new CuadrantePanel("Cuadrante 1");
         cuadrante1Panel.setLayout(new FlowLayout(FlowLayout.CENTER));
         cuadrante2Panel = new CuadrantePanel("Cuadrante 2");
         cuadrante2Panel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
+        // Panel para la final
         finalMatchLabel = new JLabel("FINAL", SwingConstants.CENTER);
         finalMatchLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
         finalMatchLabel.setForeground(Color.WHITE);
         finalMatchPanel = new MatchDisplayPanel(null, null);
         finalMatchPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
+        // Card panel para alternar vistas
         cardPanel = new JPanel(new CardLayout());
         cardPanel.setOpaque(false);
 
+        // Mensaje: sin torneo seleccionado
         emptyMessagePanel = new JPanel(new GridBagLayout());
         emptyMessagePanel.setOpaque(false);
         JLabel msg0 = new JLabel("Seleccione un torneo para ver los emparejamientos.", SwingConstants.CENTER);
@@ -50,6 +62,7 @@ public class MatchesDisplayPanel extends JPanel {
         emptyMessagePanel.add(msg0);
         cardPanel.add(emptyMessagePanel, "EMPTY_MESSAGE");
 
+        // Mensaje: falta generar el bracket
         generateBracketMessagePanel = new JPanel(new GridBagLayout());
         generateBracketMessagePanel.setOpaque(false);
         JLabel msgGenerate = new JLabel("Haga clic en 'Generar Bracket Aleatorio' para ver los emparejamientos.", SwingConstants.CENTER);
@@ -58,6 +71,7 @@ public class MatchesDisplayPanel extends JPanel {
         generateBracketMessagePanel.add(msgGenerate);
         cardPanel.add(generateBracketMessagePanel, "GENERATE_BRACKET_MESSAGE");
 
+        // Panel para solo 2 participantes
         twoParticipantsPanel = new JPanel();
         twoParticipantsPanel.setOpaque(false);
         twoParticipantsPanel.setLayout(new BoxLayout(twoParticipantsPanel, BoxLayout.Y_AXIS));
@@ -70,6 +84,7 @@ public class MatchesDisplayPanel extends JPanel {
         twoParticipantsPanel.add(Box.createVerticalGlue());
         cardPanel.add(twoParticipantsPanel, "TWO_PARTICIPANTS");
 
+        // Panel para más de 2 participantes
         multipleParticipantsPanel = new JPanel();
         multipleParticipantsPanel.setOpaque(false);
         multipleParticipantsPanel.setLayout(new BoxLayout(multipleParticipantsPanel, BoxLayout.X_AXIS));
@@ -97,11 +112,21 @@ public class MatchesDisplayPanel extends JPanel {
         updateDisplay();
     }
 
+    /**
+     * Define el tamaño preferido del panel.
+     *
+     * @return Dimensiones del panel.
+     */
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(700, 500);
     }
 
+    /**
+     * Muestra el bracket sorteado según la cantidad de participantes.
+     *
+     * @param participantes Lista de participantes sorteados
+     */
     public void mostrarBracketSorteado(List<Participante> participantes) {
         this.bracketGenerated = true;
         this.numParticipantes = participantes != null ? participantes.size() : 0;
@@ -116,8 +141,7 @@ public class MatchesDisplayPanel extends JPanel {
             cuadrante1Panel.setMatches(new ArrayList<>());
             cuadrante2Panel.setMatches(new ArrayList<>());
             showCard("TWO_PARTICIPANTS");
-        }
-        else {
+        } else {
             int mitad = numParticipantes / 2;
             List<Participante> q1 = participantes.subList(0, mitad);
             List<Participante> q2 = participantes.subList(mitad, numParticipantes);
@@ -132,21 +156,39 @@ public class MatchesDisplayPanel extends JPanel {
         repaint();
     }
 
+    /**
+     * Establece el número total de participantes y actualiza la vista.
+     *
+     * @param numParticipantes número de participantes
+     */
     public void setNumParticipantes(int numParticipantes) {
         this.numParticipantes = numParticipantes;
         updateDisplay();
     }
 
+    /**
+     * Cambia el panel mostrado dentro del contenedor de tarjetas.
+     *
+     * @param cardName nombre de la tarjeta a mostrar
+     */
     private void showCard(String cardName) {
         CardLayout cl = (CardLayout) cardPanel.getLayout();
         cl.show(cardPanel, cardName);
     }
 
+    /**
+     * Establece si el bracket ya fue generado.
+     *
+     * @param generated true si ya fue generado
+     */
     public void setBracketGenerado(boolean generated) {
         this.bracketGenerated = generated;
         updateDisplay();
     }
 
+    /**
+     * Actualiza el panel mostrado según el estado actual del torneo.
+     */
     private void updateDisplay() {
         CardLayout cl = (CardLayout) cardPanel.getLayout();
 
@@ -156,8 +198,7 @@ public class MatchesDisplayPanel extends JPanel {
             cl.show(cardPanel, "GENERATE_BRACKET_MESSAGE");
         } else if (numParticipantes == 2) {
             cl.show(cardPanel, "TWO_PARTICIPANTS");
-        }
-        else {
+        } else {
             cl.show(cardPanel, "MULTIPLE_PARTICIPANTS");
         }
 
@@ -165,4 +206,3 @@ public class MatchesDisplayPanel extends JPanel {
         repaint();
     }
 }
-

@@ -8,13 +8,23 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Panel que representa un cuadrante de emparejamientos dentro del torneo.
+ * Muestra los enfrentamientos entre participantes en forma vertical.
+ */
 public class CuadrantePanel extends JPanel {
+
     private String title;
     private List<MatchDisplayPanel> matchPanels;
     private JPanel matchesContainerPanel;
 
     private final Font titleFont = new Font("SansSerif", Font.BOLD, 18);
 
+    /**
+     * Crea un nuevo panel de cuadrante con un título.
+     *
+     * @param title Título que se muestra en el borde del panel
+     */
     public CuadrantePanel(String title) {
         this.title = title;
         setOpaque(false);
@@ -52,6 +62,12 @@ public class CuadrantePanel extends JPanel {
         matchPanels = new ArrayList<>();
     }
 
+    /**
+     * Establece la lista de participantes para mostrar sus enfrentamientos.
+     * Se crean pares consecutivos de participantes.
+     *
+     * @param participants Lista de participantes (mínimo 2 para crear enfrentamientos)
+     */
     public void setMatches(List<Participante> participants) {
         matchesContainerPanel.removeAll();
         matchPanels.clear();
@@ -70,6 +86,7 @@ public class CuadrantePanel extends JPanel {
                 }
             }
         }
+
         matchesContainerPanel.add(Box.createVerticalGlue());
         revalidate();
         repaint();

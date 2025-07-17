@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Clase principal que representa un torneo, incluyendo participantes, fases y lógica de desarrollo.
- * Extiende {@link ObserverController} para enviar notificaciones a los observadores.
+ * Extiende ObserverController para enviar notificaciones a los observadores.
  */
 public class Torneo extends ObserverController {
     private final List<FaseTorneo> fases = new ArrayList<>();
