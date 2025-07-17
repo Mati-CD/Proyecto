@@ -2,8 +2,12 @@ package org.example.GUI;
 
 import org.example.CodigoLogico.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,13 +27,32 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
     private Torneo actualObservedTorneo = null;
     private boolean listenersAdded = false;
 
+    private BufferedImage backgroundImage;
+
     /**
      * Crea e inicializa todos los componentes visuales del panel.
      */
     public PanelRegistrarResultados() {
-        super(new BorderLayout(10, 10));
-        setBackground(new Color(26, 94, 24));
+        super(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        try {
+            backgroundImage = ImageIO.read(getClass().getResource("/images/image1.png"));
+            if (backgroundImage == null) {
+                System.err.println("La imagen no se encontró en la ruta: /images/image1.png");
+                setBackground(new Color(128, 0, 128));
+            }
+            else {
+                float[] scales = {1.0f, 0.5f, 1.2f, 1.0f};
+                float[] offsets = {0f, 0f, 30f, 0f};
+                RescaleOp op = new RescaleOp(scales, offsets, null);
+                backgroundImage = op.filter(backgroundImage, null);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error al cargar la imagen de fondo: " + e.getMessage());
+            setBackground(new Color(128, 0, 128));
+        }
 
         Font labelFont = new Font("SansSerif", Font.BOLD, 16);
         Font buttonFont = new Font("Arial", Font.BOLD, 12);
@@ -62,7 +85,7 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
         infoTorneoArea = new JTextArea(15, 35);
         infoTorneoArea.setEditable(false);
         infoTorneoArea.setFont(new Font("Monospaced", Font.PLAIN, 14));
-        infoTorneoArea.setBackground(new Color(46, 124, 44));
+        infoTorneoArea.setBackground(new Color(165, 0, 74));
         infoTorneoArea.setForeground(Color.WHITE);
         infoTorneoArea.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Información del torneo", 0, 0, labelFont, Color.WHITE));
 
@@ -178,6 +201,19 @@ public class PanelRegistrarResultados extends JPanel implements PanelConfigurabl
                 new Color(200, 200, 200),  // Color fondo hover gris más oscuro
                 0                         // Sin borde
         );
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (backgroundImage != null) {
+            Graphics2D g2d = (Graphics2D) g;
+
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
     }
 
     /**

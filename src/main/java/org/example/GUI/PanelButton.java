@@ -106,7 +106,6 @@ public class PanelButton extends JButton {
 
         g2.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
 
-        // Permitir que el texto se dibuje bien
         setContentAreaFilled(false);
         super.paintComponent(g);
     }

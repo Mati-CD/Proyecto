@@ -2,8 +2,11 @@ package org.example.GUI;
 
 import org.example.CodigoLogico.GestorTorneos;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 /**
  * Panel de inicio que permite al usuario elegir entre el rol de Organizador o Usuario.
@@ -12,13 +15,26 @@ import java.awt.*;
 public class PanelInicio extends JPanel implements PanelConfigurable {
     private PanelButton organizadorBtn;
     private PanelButton usuarioBtn;
+    private BufferedImage backgroundImage;
 
     /**
      * Constructor que inicializa y organiza los botones del panel.
      */
     public PanelInicio() {
         setLayout(new BorderLayout());
-        setOpaque(false);
+
+        try {
+            backgroundImage = ImageIO.read(getClass().getResource("/images/image3.png"));
+            if (backgroundImage == null) {
+                System.err.println("La imagen no se encontró en la ruta: /images/image3.png");
+                setBackground(new Color(195, 0, 0));
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error al cargar la imagen de fondo: " + e.getMessage());
+            setBackground(new Color(195, 0, 0));
+        }
 
         Font font = new Font("SansSerif", Font.BOLD, 18);
 
@@ -46,6 +62,20 @@ public class PanelInicio extends JPanel implements PanelConfigurable {
 
         add(centerPanel, BorderLayout.CENTER);
     }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (backgroundImage != null) {
+            Graphics2D g2d = (Graphics2D) g;
+
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
+    }
+
 
     /**
      * Inicializa el panel asignando las acciones correspondientes a los botones.
