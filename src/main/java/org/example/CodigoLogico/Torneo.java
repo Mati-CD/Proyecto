@@ -168,9 +168,10 @@ public class Torneo extends ObserverController {
         String nombreFase = obtenerNombreFase(numParticipantes);
         FaseTorneo fase = new FaseTorneo(nombreFase);
 
+        // Emparejar participantes consecutivos (1vs2, 3vs4, etc.)
         for (int i = 0; i < numParticipantes; i += 2) {
-            String player1 = this.participantes.get(i).getNombre();
-            String player2 = this.participantes.get(i + 1).getNombre();
+            String player1 = this.participantes.get(i).getNombreForTorneo();
+            String player2 = this.participantes.get(i + 1).getNombreForTorneo();
             Partido partido = new Partido(player1, player2, nombreFase);
             fase.agregar(partido);
         }
@@ -230,7 +231,11 @@ public class Torneo extends ObserverController {
         if (fases.isEmpty()) return false;
 
         for (TorneoComponent componente : getFaseActual().getComponentes()) {
-            if (((Partido) componente).getGanador() == null) {
+            if (!(componente instanceof Partido)) {
+                continue; // Solo verificamos partidos
+            }
+            Partido partido = (Partido) componente;
+            if (!partido.tieneResultado()) {
                 return false;
             }
         }

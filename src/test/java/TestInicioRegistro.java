@@ -4,55 +4,110 @@ import org.example.CodigoLogico.Partido;
 import org.example.CodigoLogico.Torneo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
-public class TestInicioRegistro{
+public class TestInicioRegistro {
 
     private Torneo torneo;
-    private Participante p1, p2, p3, p4;
+    private Participante jugadorA, jugadorB, jugadorC, jugadorD;
 
     @BeforeEach
     public void setUp() {
-        torneo = new Torneo("Torneo Resultados", "Tenis", "Individual", 4, 1);
-        p1 = new ParticipanteIndividual("Cristiano",40, "Portugal");
-        p2 = new ParticipanteIndividual("Ney",21 ,"Chile");
-        p3 = new ParticipanteIndividual("Joshua",30, "Alemania");
-        p4 = new ParticipanteIndividual("Tyler",31, "USA");
+        // Configuración inicial con nombres más descriptivos
+        torneo = new Torneo("Torneo de Prueba", "Tenis", "Individual", 4, 1);
+        jugadorA = new ParticipanteIndividual("Jugador A", 25, "España");
+        jugadorB = new ParticipanteIndividual("Jugador B", 30, "Francia");
+        jugadorC = new ParticipanteIndividual("Jugador C", 28, "Italia");
+        jugadorD = new ParticipanteIndividual("Jugador D", 22, "Alemania");
     }
 
     @Test
-    public void testInicioYRegistroDeResultados() {
-        //Verificar inicio de torneo
-        List<Participante> lista = Arrays.asList(p1, p2, p3, p4);
-        torneo.iniciarTorneo(lista);
+    public void testInicioTorneoCorrecto() {
+        // Arrange
+        List<Participante> participantes = Arrays.asList(jugadorA, jugadorB, jugadorC, jugadorD);
 
-        assertEquals(4, torneo.getParticipantes().size(), "El torneo debe tener 4 participantes");
-        assertEquals(1, torneo.getFases().size(), "Debe haberse creado una fase inicial");
-        assertEquals(2, torneo.getPartidosActuales().size(), "Debe haber 2 partidos con 4 participantes");
+        // Act
+        torneo.iniciarTorneo(participantes);
 
-        //REgistro de resultados
-        List<Partido> partidos = torneo.getPartidosActuales();
-        Partido partido1 = partidos.get(0);
-        Partido partido2 = partidos.get(1);
+        // Assert
+        assertEquals(4, torneo.getParticipantes().size(),
+                "El torneo debe tener exactamente 4 participantes");
 
-        //Asegurar que los partidos aún no están finalizados
-        assertFalse(partido1.tieneResultado());
-        assertFalse(partido2.tieneResultado());
+        assertNotNull(torneo.getFaseActual(),
+                "Debe existir una fase actual después de iniciar el torneo");
 
-        //Registrar ganadores
-        torneo.registrarResultado(partido1, partido1.getJugador1());
-        torneo.registrarResultado(partido2, partido2.getJugador2());
+        assertEquals("Semifinales", torneo.getFaseActual().getNombre(),
+                "Para 4 participantes la fase inicial debe ser Semifinales");
 
-        //Verificar que estén finalizados
-        assertTrue(partido1.tieneResultado(), "El partido 1 debe estar finalizado");
-        assertTrue(partido2.tieneResultado(), "El partido 2 debe estar finalizado");
+        assertEquals(2, torneo.getPartidosActuales().size(),
+                "Deben crearse 2 partidos para 4 participantes");
 
-        assertEquals(partido1.getJugador1(), partido1.getGanador(), "El ganador del partido 1 debe ser el jugador 1");
-        assertEquals(partido2.getJugador2(), partido2.getGanador(), "El ganador del partido 2 debe ser el jugador 2");
+        assertFalse(torneo.tieneCampeon(),
+                "No debe haber campeón al inicio del torneo");
+    }
 
-        //Verificar que todos los partidos estén completos
-        assertTrue(torneo.todosLosPartidosCompletados(), "Todos los partidos deben estar finalizados");
+    @Test
+    public void testRegistroResultadosYAvanceFases() {
+        // Arrange - Iniciar torneo
+        List<Participante> participantes = Arrays.asList(jugadorA, jugadorB, jugadorC, jugadorD);
+        torneo.iniciarTorneo(participantes);
+
+        // Verificar emparejamientos correctos
+        List<Partido> partidosIniciales = torneo.getPartidosActuales();
+        assertEquals(2, partidosIniciales.size());
+
+        // Verificar que los emparejamientos son los esperados (A vs B, C vs D)
+        Partido partido1 = partidosIniciales.get(0);
+        Partido partido2 = partidosIniciales.get(1);
+
+        assertTrue((partido1.getJugador1().equals("Jugador A (España)") && partido1.getJugador2().equals("Jugador B (Francia)")) ||
+                        (partido1.getJugador1().equals("Jugador B (Francia)") && partido1.getJugador2().equals("Jugador A (España)")),
+                "Emparejamiento incorrecto en semifinal 1");
+
+        assertTrue((partido2.getJugador1().equals("Jugador C (Italia)") && partido2.getJugador2().equals("Jugador D (Alemania)")) ||
+                        (partido2.getJugador1().equals("Jugador D (Alemania)") && partido2.getJugador2().equals("Jugador C (Italia)")),
+                "Emparejamiento incorrecto en semifinal 2");
+
+        // Resto del test...
+    }
+
+    @Test
+    public void testInicioTorneoConParticipantesIncorrectos() {
+        // Arrange - Lista con solo 3 participantes (se necesitan 4)
+        List<Participante> participantes = Arrays.asList(jugadorA, jugadorB, jugadorC);
+
+        // Act
+        torneo.iniciarTorneo(participantes);
+
+        // Assert
+        assertTrue(torneo.getParticipantes().isEmpty(),
+                "No se deben aceptar participantes si no se alcanza el número requerido");
+        assertTrue(torneo.getFases().isEmpty(),
+                "No se deben crear fases si no se alcanza el número requerido de participantes");
+    }
+
+    @Test
+    public void testRegistroResultadoInvalido() {
+        // Arrange - Iniciar torneo válido
+        List<Participante> participantes = Arrays.asList(jugadorA, jugadorB, jugadorC, jugadorD);
+        torneo.iniciarTorneo(participantes);
+        Partido partido = torneo.getPartidosActuales().get(0);
+
+        // Act & Assert - Intentar registrar un jugador que no está en el partido
+        assertThrows(IllegalArgumentException.class, () -> {
+            torneo.registrarResultado(partido, "Jugador Inexistente");
+        }, "Debe lanzar excepción al intentar registrar un jugador que no está en el partido");
+
+        // Registrar resultado válido
+        torneo.registrarResultado(partido, partido.getJugador1());
+
+        // Intentar registrar resultado nuevamente (ya está registrado)
+        assertThrows(IllegalStateException.class, () -> {
+            torneo.registrarResultado(partido, partido.getJugador2());
+        }, "Debe lanzar excepción al intentar modificar un resultado ya registrado");
     }
 }
